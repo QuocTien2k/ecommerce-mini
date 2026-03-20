@@ -1,3 +1,4 @@
+import { ApiResponse } from '@common/bases/api-response';
 import {
   ExceptionFilter,
   Catch,
@@ -6,7 +7,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiResponse } from '../bases/api-response';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
