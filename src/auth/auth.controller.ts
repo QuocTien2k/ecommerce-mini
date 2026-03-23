@@ -12,6 +12,7 @@ import { AuthUserResponseDto } from './dtos/auth-user-response.dto';
 import { LoginDto } from './dtos/login.dto';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
 
 @Controller('auth')
 export class AuthController {
@@ -35,14 +36,11 @@ export class AuthController {
       dto.password,
     );
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      //secure: false, // production -> true (HTTPS)
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'none',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      getRefreshTokenCookieOptions(this.configService),
+    );
 
     return {
       accessToken,
@@ -63,17 +61,31 @@ export class AuthController {
     const { accessToken, refreshToken: newRefreshToken } =
       await this.authService.refresh(refreshToken);
 
-    // set lại cookie (rotate)
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'none',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+      'refreshToken',
+      newRefreshToken,
+      getRefreshTokenCookieOptions(this.configService),
+    );
 
     return {
       accessToken,
     };
+  }
+
+  @Post('logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    //clear cookie
+    res.clearCookie(
+      'refreshToken',
+      getRefreshTokenCookieOptions(this.configService),
+    );
+
+    return { message: 'Đăng xuất thành công' };
   }
 }

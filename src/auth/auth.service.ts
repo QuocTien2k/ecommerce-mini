@@ -185,4 +185,25 @@ export class AuthService {
       refreshToken: newRefreshToken,
     };
   }
+
+  async logout(refreshToken: string) {
+    const hashedRefreshToken = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+
+    const tokenRecord = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: hashedRefreshToken },
+    });
+
+    if (!tokenRecord) {
+      return { message: 'Đăng xuất thành công!' };
+    }
+
+    await this.prisma.refreshToken.delete({
+      where: { tokenHash: hashedRefreshToken },
+    });
+
+    return { message: 'Đăng xuất thành công!' };
+  }
 }
