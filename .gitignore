@@ -5,6 +5,7 @@
 
 generated
 dist
+prisma/seed.ts
 
 # Logs
 logs
