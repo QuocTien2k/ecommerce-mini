@@ -23,6 +23,8 @@ model User {
   phone     String?  @unique
   fullname  String
   password  String
+  avatar    String?
+  address   String?
   role      Role     @default(USER)
 
   products  Product[]

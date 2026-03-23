@@ -13,6 +13,7 @@ async function main() {
       email: 'admin@gmail.com',
       fullname: 'System Admin',
       password: hashedPassword,
+      address:   'Tp.Hồ Chí Minh',
       role: Role.ADMIN,
     },
   });
