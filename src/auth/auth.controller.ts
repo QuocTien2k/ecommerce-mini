@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupUserDto } from './dtos/signup.dto';
@@ -13,6 +15,7 @@ import { LoginDto } from './dtos/login.dto';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -87,5 +90,13 @@ export class AuthController {
     );
 
     return { message: 'Đăng xuất thành công' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@Req() req: any) {
+    const userId = req.user.sub;
+
+    return this.authService.getMe(userId);
   }
 }
