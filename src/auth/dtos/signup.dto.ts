@@ -1,7 +1,6 @@
 import {
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MinLength,
   Matches,
@@ -11,11 +10,11 @@ export class SignupUserDto {
   @IsEmail()
   email: string;
 
-  @IsOptional()
+  @IsString()
   @Matches(/^(0|\+84)[0-9]{9}$/, {
     message: 'Số điện thoại không hợp lệ',
   })
-  phone?: string;
+  phone: string;
 
   @IsString()
   @IsNotEmpty()

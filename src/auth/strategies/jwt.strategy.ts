@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // payload chính là data bạn sign trong accessToken
+    // payload sign trong accessToken
     return payload;
   }
 }
