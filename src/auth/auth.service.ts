@@ -99,6 +99,17 @@ export class AuthService {
       .update(refreshToken)
       .digest('hex');
 
+    // revoke toàn bộ token cũ của user
+    await this.prisma.refreshToken.updateMany({
+      where: {
+        userId: user.id,
+        isRevoked: false,
+      },
+      data: {
+        isRevoked: true,
+      },
+    });
+
     await this.prisma.refreshToken.create({
       data: {
         tokenHash: hashedRefreshToken,
