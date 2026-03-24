@@ -24,6 +24,7 @@ model User {
   fullname  String
   password  String
   avatar    String?
+  avatarPublicId String?
   address   String?
   role      Role     @default(USER)
 
