@@ -38,4 +38,18 @@ export class CloudinaryService {
       });
     });
   }
+
+  async uploadMultipleImages(
+    files: Express.Multer.File[],
+    folder: string,
+  ): Promise<UploadApiResponse[]> {
+    const results: UploadApiResponse[] = [];
+
+    for (const file of files) {
+      const result = await this.uploadImage(file, folder);
+      results.push(result);
+    }
+
+    return results;
+  }
 }
