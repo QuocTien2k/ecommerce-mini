@@ -6,7 +6,7 @@ export class ApiResponse<T> {
   [ApiResponseKey.CODE]: number;
   [ApiResponseKey.MESSAGE]: string;
   [ApiResponseKey.DATA]?: T;
-  [ApiResponseKey.ERRORS]?: Record<string, any> | string[];
+  [ApiResponseKey.ERRORS]?: Record<string, string[]>;
   [ApiResponseKey.TIMESTAMP]: string;
 
   constructor(options: {
@@ -14,7 +14,7 @@ export class ApiResponse<T> {
     code?: number;
     message: string;
     data?: T;
-    errors?: Record<string, any> | string[];
+    errors?: Record<string, string[]>;
   }) {
     this.status = options.status;
     this.code = options.code ?? HttpStatus.OK;

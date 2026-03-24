@@ -23,10 +23,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
     } else if (typeof exceptionResponse === 'object') {
-      if (Array.isArray(exceptionResponse.message)) {
-        message = 'Validation failed';
-        errors = exceptionResponse.message;
-      } else {
+      if (typeof exceptionResponse === 'object') {
         message = exceptionResponse.message ?? 'Error';
         errors = exceptionResponse.errors;
       }

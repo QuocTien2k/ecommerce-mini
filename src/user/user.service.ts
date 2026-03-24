@@ -1,7 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { pickUpdatedFields } from '@common/utils/pick-update-fields';
+import * as bcrypt from 'bcrypt';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -33,7 +41,7 @@ export class UserService {
     const user = await this.findById(userId);
 
     if (!user) {
-      throw new Error('Người dùng không tồn tại!');
+      throw new NotFoundException('Người dùng không tồn tại!');
     }
 
     //check phone
@@ -43,7 +51,10 @@ export class UserService {
       });
 
       if (existingPhone && existingPhone.id !== userId) {
-        throw new Error('Số điện thoại đã được sử dụng');
+        throw new ConflictException({
+          message: 'Số điện thoại đã được sử dụng',
+          errors: { phone: 'duplicated' },
+        });
       }
     }
 
@@ -54,7 +65,10 @@ export class UserService {
       });
 
       if (existingEmail && existingEmail.id !== userId) {
-        throw new Error('Email đã được sử dụng');
+        throw new ConflictException({
+          message: 'Email đã được sử dụng',
+          errors: { email: 'duplicated' },
+        });
       }
     }
 
@@ -68,5 +82,43 @@ export class UserService {
     });
 
     return pickUpdatedFields(dto, updateUser);
+  }
+
+  //password
+  async updatePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại!');
+    }
+
+    //Check old password
+    const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Mật khẩu cũ không chính xác');
+    }
+
+    //Check new password != old password
+    const isSame = await bcrypt.compare(dto.newPassword, user.password);
+    if (isSame) {
+      throw new BadRequestException(
+        'Mật khẩu mới không được trùng mật khẩu cũ',
+      );
+    }
+
+    //Hash new password
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+    // 4. Update DB
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return {
+      message: 'Cập nhật mật khẩu thành công',
+    };
   }
 }

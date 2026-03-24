@@ -14,6 +14,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -31,5 +32,12 @@ export class UserController {
   @Patch('profile')
   async updateProfile(@Req() req, @Body() body: UpdateProfileDto) {
     return this.userService.updateProfile(req.user.sub, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  @Patch('password')
+  async updatePassword(@Req() req, @Body() body: ChangePasswordDto) {
+    return this.userService.updatePassword(req.user.sub, body);
   }
 }
