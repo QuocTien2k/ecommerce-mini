@@ -10,10 +10,14 @@ import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { pickUpdatedFields } from '@common/utils/pick-update-fields';
 import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   async findById(userId: string) {
     return this.prisma.user.findUnique({
@@ -119,6 +123,41 @@ export class UserService {
 
     return {
       message: 'Cập nhật mật khẩu thành công',
+    };
+  }
+
+  //upload avatar
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại!');
+    }
+
+    if (!file) {
+      throw new BadRequestException('Vui lòng chọn ảnh');
+    }
+
+    if (!file.mimetype.startsWith('image/')) {
+      throw new BadRequestException('File phải là hình ảnh');
+    }
+
+    const result: any = await this.cloudinaryService.uploadImage(
+      file,
+      'users/avatars',
+    );
+
+    const imageUrl = result.secure_url;
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        avatar: imageUrl,
+      },
+    });
+
+    return {
+      message: 'Cập nhật avatar thành công',
+      avatar: updatedUser.avatar,
     };
   }
 }

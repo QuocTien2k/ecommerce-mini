@@ -6,7 +6,9 @@ import {
   Post,
   Req,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -15,6 +17,7 @@ import { Role } from '@prisma/client';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -39,5 +42,13 @@ export class UserController {
   @Patch('password')
   async updatePassword(@Req() req, @Body() body: ChangePasswordDto) {
     return this.userService.updatePassword(req.user.sub, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  @Patch('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    return this.userService.uploadAvatar(req.user.sub, file);
   }
 }
