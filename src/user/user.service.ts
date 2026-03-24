@@ -141,17 +141,23 @@ export class UserService {
       throw new BadRequestException('File phải là hình ảnh');
     }
 
-    const result: any = await this.cloudinaryService.uploadImage(
+    if (user.avatarPublicId) {
+      await this.cloudinaryService.deleteImage(user.avatarPublicId);
+    }
+
+    const result = await this.cloudinaryService.uploadImage(
       file,
       'users/avatars',
     );
 
     const imageUrl = result.secure_url;
+    const publicId = result.public_id;
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: {
         avatar: imageUrl,
+        avatarPublicId: publicId,
       },
     });
 
