@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ConflictException,
+  GoneException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -263,6 +266,48 @@ export class AuthService {
     );
 
     return { message: 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const { token, newPassword } = dto;
+
+    const tokens = await this.prisma.passwordResetToken.findMany({
+      where: { isUsed: false },
+      include: { user: true },
+    });
+
+    let validTokenRecord: (typeof tokens)[number] | null = null;
+
+    for (const record of tokens) {
+      const isMatch = await bcrypt.compare(token, record.tokenHash);
+
+      if (isMatch) {
+        validTokenRecord = record;
+        break;
+      }
+    }
+
+    if (!validTokenRecord) {
+      throw new BadRequestException('Token không hợp lệ');
+    }
+
+    if (validTokenRecord.expiresAt < new Date()) {
+      throw new GoneException('Token đã hết hạn');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: validTokenRecord.userId },
+      data: { password: hashedPassword },
+    });
+
+    await this.prisma.passwordResetToken.update({
+      where: { id: validTokenRecord.id },
+      data: { isUsed: true },
+    });
+
+    return { message: 'Đặt lại mật khẩu thành công!' };
   }
 
   async getMe(userId: string) {

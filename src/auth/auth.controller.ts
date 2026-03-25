@@ -16,6 +16,7 @@ import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -95,6 +96,11 @@ export class AuthController {
   @Post('forgot-password')
   async forgotPassword(@Body('email') email: string) {
     return this.authService.forgotPassword(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   @UseGuards(JwtAuthGuard)
