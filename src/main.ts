@@ -60,13 +60,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.use(cookieParser());
 
-  const mailService = app.get(MailService);
-  await mailService.sendMail(
-    'hadesdqt1892000@gmail.com',
-    'Test Mail',
-    'Hello từ NestJS',
-  );
-
   const port = configService.get<number>('PORT') || 3000;
 
   await app.listen(port);

@@ -92,6 +92,11 @@ export class AuthController {
     return { message: 'Đăng xuất thành công' };
   }
 
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req: any) {

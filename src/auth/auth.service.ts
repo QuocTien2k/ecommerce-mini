@@ -8,12 +8,14 @@ import { SignupUserDto } from './dtos/signup.dto';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async signup(data: SignupUserDto) {
@@ -36,6 +38,12 @@ export class AuthService {
           address,
         },
       });
+
+      await this.mailService.sendMail(
+        user.email,
+        'Đăng ký thành công',
+        `Chào ${user.fullname}, bạn đã đăng ký tài khoản thành công.`,
+      );
 
       return {
         id: user.id,
@@ -218,6 +226,43 @@ export class AuthService {
     });
 
     return { message: 'Đăng xuất thành công!' };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // tránh lộ email tồn tại hay không
+      return { message: 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn' };
+    }
+
+    // tạo token random
+    const token = crypto.randomBytes(32).toString('hex');
+
+    // hash token trước khi lưu DB
+    const tokenHash = await bcrypt.hash(token, 10);
+
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 phút
+
+    await this.prisma.passwordResetToken.create({
+      data: {
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    await this.mailService.sendMail(
+      user.email,
+      'Đặt lại mật khẩu',
+      `Click vào link để đặt lại mật khẩu: ${resetLink}`,
+    );
+
+    return { message: 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn' };
   }
 
   async getMe(userId: string) {
