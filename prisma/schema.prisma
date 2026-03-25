@@ -30,10 +30,43 @@ model User {
 
   products  Product[]
   refreshTokens RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("users")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  tokenHash   String   @unique
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  isRevoked   Boolean  @default(false)
+  expiresAt   DateTime
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_token")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model Product {
@@ -56,20 +89,4 @@ model Product {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   @@map("products")
-}
-
-model RefreshToken {
-  id          String   @id @default(uuid())
-  tokenHash   String   @unique
-
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-
-  isRevoked   Boolean  @default(false)
-  expiresAt   DateTime
-
-  createdAt   DateTime @default(now())
-
-  @@index([userId])
-  @@map("refresh_token")
 }
