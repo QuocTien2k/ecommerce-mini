@@ -9,6 +9,7 @@ import {
 import { HttpExceptionFilter } from '@common/filters/http-exception.filter';
 import { ResponseInterceptor } from '@common/interceptors/response.interceptor';
 import cookieParser from 'cookie-parser';
+import { MailService } from './mail/mail.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -58,6 +59,13 @@ async function bootstrap() {
   // Response interceptor
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.use(cookieParser());
+
+  const mailService = app.get(MailService);
+  await mailService.sendMail(
+    'hadesdqt1892000@gmail.com',
+    'Test Mail',
+    'Hello từ NestJS',
+  );
 
   const port = configService.get<number>('PORT') || 3000;
 
