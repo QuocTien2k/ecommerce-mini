@@ -1,4 +1,10 @@
-import { IsEmail, IsOptional, IsString, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -16,4 +22,10 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsEmail()
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/\S/, { message: 'Địa chỉ không được rỗng' })
+  @MaxLength(255)
+  address?: string;
 }

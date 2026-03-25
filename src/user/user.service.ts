@@ -11,6 +11,7 @@ import { pickUpdatedFields } from '@common/utils/pick-update-fields';
 import * as bcrypt from 'bcrypt';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
+import { buildUpdateData } from '@common/utils/build-update-data';
 
 @Injectable()
 export class UserService {
@@ -76,13 +77,11 @@ export class UserService {
       }
     }
 
+    const data = buildUpdateData(dto);
+
     const updateUser = await this.prisma.user.update({
       where: { id: userId },
-      data: {
-        fullname: dto.fullname,
-        phone: dto.phone,
-        email: dto.email,
-      },
+      data,
     });
 
     return pickUpdatedFields(dto, updateUser);

@@ -4,6 +4,7 @@ import {
   IsString,
   MinLength,
   Matches,
+  MaxLength,
 } from 'class-validator';
 
 export class SignupUserDto {
@@ -27,4 +28,9 @@ export class SignupUserDto {
     message: 'Password phải có chữ hoa, chữ thường và số',
   })
   password: string;
+
+  @IsString()
+  @Matches(/\S/, { message: 'Địa chỉ không được rỗng' })
+  @MaxLength(255)
+  address: string;
 }

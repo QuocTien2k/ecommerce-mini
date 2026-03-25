@@ -17,11 +17,12 @@ export class AuthService {
   ) {}
 
   async signup(data: SignupUserDto) {
-    let { email, phone, fullname, password } = data;
+    let { email, phone, fullname, password, address } = data;
 
     email = email.toLowerCase().trim();
     fullname = fullname.trim();
     if (phone) phone = phone.trim();
+    if (address) address = address.trim();
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -32,6 +33,7 @@ export class AuthService {
           phone,
           fullname,
           password: hashedPassword,
+          address,
         },
       });
 
