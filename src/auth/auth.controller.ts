@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -26,6 +28,7 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @HttpCode(HttpStatus.CREATED)
   async signup(@Body() data: SignupUserDto): Promise<AuthUserResponseDto> {
     return this.authService.signup(data);
   }

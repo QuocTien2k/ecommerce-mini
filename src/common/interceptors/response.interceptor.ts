@@ -13,15 +13,20 @@ export class ResponseInterceptor<T> implements NestInterceptor<
   ApiResponse<T>
 > {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const ctx = context.switchToHttp();
+    const response = ctx.getResponse();
+
     return next.handle().pipe(
       map((data) => {
         // Nếu đã là ApiResponse thì giữ nguyên
         if (data instanceof ApiResponse) {
           return data;
         }
+        const statusCode = response.statusCode;
 
         return new ApiResponse({
           status: true,
+          code: statusCode,
           message: 'Request successful',
           data,
         });
