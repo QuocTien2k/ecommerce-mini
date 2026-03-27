@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseGuards,
@@ -32,5 +33,15 @@ export class CategoryController {
       message: 'Tạo danh mục thành công',
       data,
     };
+  }
+
+  @Get('tree')
+  getTree() {
+    return this.categoryService.getCategoryTreeWithLevel();
+  }
+
+  @Get('flat')
+  getFlat() {
+    return this.categoryService.getFlatCategoryTree();
   }
 }

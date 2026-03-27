@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { toSlug } from '@common/utils/slug';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
+import { CategoryTreeNode, FlatCategoryItem } from './dtos/tree-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -89,5 +90,78 @@ export class CategoryService {
         isActive: dto.isActive ?? true,
       },
     });
+  }
+
+  async getCategoryTreeWithLevel(): Promise<CategoryTreeNode[]> {
+    const categories = await this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+        isActive: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const map = new Map<string, CategoryTreeNode>();
+    const roots: CategoryTreeNode[] = [];
+
+    //build node
+    for (const cat of categories) {
+      map.set(cat.id, {
+        ...cat,
+        level: 1,
+        children: [],
+      });
+    }
+
+    //build tree
+    for (const cat of categories) {
+      const node = map.get(cat.id)!;
+
+      if (cat.parentId && map.has(cat.parentId)) {
+        map.get(cat.parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    const setLevel = (nodes: CategoryTreeNode[], level: number): void => {
+      for (const node of nodes) {
+        node.level = level;
+        if (node.children.length > 0) {
+          setLevel(node.children, level + 1);
+        }
+      }
+    };
+
+    setLevel(roots, 1);
+
+    return roots;
+  }
+
+  //UI
+  async getFlatCategoryTree(): Promise<FlatCategoryItem[]> {
+    const tree = await this.getCategoryTreeWithLevel();
+    const result: FlatCategoryItem[] = [];
+
+    const traverse = (nodes: CategoryTreeNode[]): void => {
+      for (const node of nodes) {
+        result.push({
+          id: node.id,
+          name: `${node.level > 1 ? '--'.repeat(node.level - 1) + ' ' : ''}${node.name}`,
+          level: node.level,
+          isActive: node.isActive,
+        });
+
+        if (node.children.length > 0) {
+          traverse(node.children);
+        }
+      }
+    };
+
+    traverse(tree);
+
+    return result;
   }
 }
