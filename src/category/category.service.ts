@@ -15,15 +15,35 @@ export class CategoryService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(dto: CreateCategoryDto, file: Express.Multer.File) {
-    const slug = toSlug(dto.slug || dto.name);
-
-    const existingSlug = await this.prisma.category.findUnique({
-      where: { slug },
+  //check level category
+  async getCategoryLevel(categoryId: string): Promise<number> {
+    let level = 1;
+    let current = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { parentId: true },
     });
 
-    if (existingSlug) {
-      throw new ConflictException('Slug đã tồn tại!');
+    while (current?.parentId) {
+      level++;
+      current = await this.prisma.category.findUnique({
+        where: { id: current.parentId },
+        select: { parentId: true },
+      });
+    }
+
+    return level;
+  }
+
+  async create(dto: CreateCategoryDto, file: Express.Multer.File) {
+    let slug = toSlug(dto.slug || dto.name);
+    let uniqueSlug = slug;
+    let counter = 1;
+
+    while (
+      await this.prisma.category.findUnique({ where: { slug: uniqueSlug } })
+    ) {
+      uniqueSlug = `${slug}-${counter}`;
+      counter++;
     }
 
     if (dto.parentId) {
@@ -33,6 +53,11 @@ export class CategoryService {
 
       if (!parent) {
         throw new BadRequestException('Không tìm thấy danh mục cha');
+      }
+
+      const parentLevel = await this.getCategoryLevel(dto.parentId);
+      if (parentLevel >= 3) {
+        throw new BadRequestException('Category con vượt quá level 3');
       }
     }
 
@@ -56,7 +81,7 @@ export class CategoryService {
     return this.prisma.category.create({
       data: {
         name: dto.name,
-        slug,
+        slug: uniqueSlug,
         description: dto.description,
         image: imageUrl,
         imagePublicId: publicId,
