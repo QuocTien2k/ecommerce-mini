@@ -9,6 +9,7 @@ import { toSlug } from '@common/utils/slug';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 import { CategoryTreeNode, FlatCategoryItem } from './dtos/tree-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -112,11 +113,18 @@ export class CategoryService {
     });
   }
 
-  async getCategoryTreeWithLevel(): Promise<CategoryTreeNode[]> {
+  async getCategoryTreeWithLevel(options?: {
+    isActive?: boolean;
+    maxLevel?: number;
+  }): Promise<CategoryTreeNode[]> {
+    const { isActive, maxLevel } = options || {};
+
     const categories = await this.prisma.category.findMany({
+      where: isActive !== undefined ? { isActive } : undefined,
       select: {
         id: true,
         name: true,
+        slug: true,
         parentId: true,
         isActive: true,
       },
@@ -149,6 +157,12 @@ export class CategoryService {
     const setLevel = (nodes: CategoryTreeNode[], level: number): void => {
       for (const node of nodes) {
         node.level = level;
+
+        if (maxLevel && level >= maxLevel) {
+          node.children = [];
+          continue;
+        }
+
         if (node.children.length > 0) {
           setLevel(node.children, level + 1);
         }
@@ -259,5 +273,63 @@ export class CategoryService {
         imagePublicId: publicId,
       },
     });
+  }
+
+  //list public level 2
+  async getPublicCategoryTree(): Promise<CategoryTreeNode[]> {
+    return this.getCategoryTreeWithLevel({
+      isActive: true,
+      maxLevel: 2,
+    });
+  }
+
+  //list for admin
+  async getAdminCategories(query: AdminCategoryQueryDto) {
+    const { search, isActive, parentId, page = 1, limit = 10 } = query;
+
+    const where: any = {};
+
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+
+    if (isActive !== undefined) {
+      where.isActive = isActive;
+    }
+
+    if (parentId) {
+      where.parentId = parentId;
+    }
+
+    const [total, categories] = await Promise.all([
+      this.prisma.category.count({ where }),
+      this.prisma.category.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          parentId: true,
+          isActive: true,
+          createdAt: true,
+        },
+      }),
+    ]);
+
+    return {
+      data: categories,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

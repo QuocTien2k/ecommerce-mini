@@ -4,7 +4,9 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -17,10 +19,50 @@ import { Role } from '@prisma/client';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
+
+  //  PUBLIC
+  // User: lấy menu (level 2)
+  @Get()
+  async getPublicCategories() {
+    const data = await this.categoryService.getPublicCategoryTree();
+
+    return {
+      message: 'Lấy danh mục thành công',
+      data,
+    };
+  }
+
+  // Admin
+  //list (pagination + filter)
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAdminCategories(@Query() query: AdminCategoryQueryDto) {
+    const data = await this.categoryService.getAdminCategories(query);
+
+    return {
+      message: 'Lấy danh sách danh mục thành công',
+      ...data,
+    };
+  }
+
+  // Admin: flat (dropdown chọn parent)
+  @Get('admin/flat')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getFlat() {
+    const data = await this.categoryService.getFlatCategoryTree();
+
+    return {
+      message: 'Lấy danh mục dạng flat thành công',
+      data,
+    };
+  }
 
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -38,17 +80,8 @@ export class CategoryController {
     };
   }
 
-  @Get('tree')
-  getTree() {
-    return this.categoryService.getCategoryTreeWithLevel();
-  }
-
-  @Get('flat')
-  getFlat() {
-    return this.categoryService.getFlatCategoryTree();
-  }
-
-  @Post('update')
+  // Admin: update
+  @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(FileInterceptor('file'))
