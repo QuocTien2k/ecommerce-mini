@@ -8,6 +8,7 @@ import { CreateCategoryDto } from './dtos/create-category.dto';
 import { toSlug } from '@common/utils/slug';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 import { CategoryTreeNode, FlatCategoryItem } from './dtos/tree-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -33,6 +34,25 @@ export class CategoryService {
     }
 
     return level;
+  }
+
+  //check circular
+  async isDescendant(parentId: string, currentId: string): Promise<boolean> {
+    let current = await this.prisma.category.findUnique({
+      where: { id: parentId },
+      select: { parentId: true },
+    });
+
+    while (current?.parentId) {
+      if (current.parentId === currentId) return true;
+
+      current = await this.prisma.category.findUnique({
+        where: { id: current.parentId },
+        select: { parentId: true },
+      });
+    }
+
+    return false;
   }
 
   async create(dto: CreateCategoryDto, file: Express.Multer.File) {
@@ -163,5 +183,81 @@ export class CategoryService {
     traverse(tree);
 
     return result;
+  }
+
+  async update(id: string, dto: UpdateCategoryDto, file?: Express.Multer.File) {
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      throw new BadRequestException('Không tìm thấy danh mục');
+    }
+
+    // HANDLE PARENT
+    if (dto.parentId !== undefined) {
+      if (dto.parentId === id) {
+        throw new BadRequestException('Không thể set parent là chính nó');
+      }
+
+      if (dto.parentId) {
+        const parent = await this.prisma.category.findUnique({
+          where: { id: dto.parentId },
+        });
+
+        if (!parent) {
+          throw new BadRequestException('Không tìm thấy danh mục cha');
+        }
+
+        // check circular
+        const isCircular = await this.isDescendant(dto.parentId, id);
+        if (isCircular) {
+          throw new BadRequestException('Không thể chọn danh mục con làm cha');
+        }
+
+        // check level
+        const parentLevel = await this.getCategoryLevel(dto.parentId);
+        if (parentLevel >= 3) {
+          throw new BadRequestException('Category con vượt quá level 3');
+        }
+      }
+    }
+
+    // HANDLE IMAGE
+    let imageUrl = category.image;
+    let publicId = category.imagePublicId;
+
+    if (file) {
+      if (!file.mimetype.startsWith('image/')) {
+        throw new BadRequestException('File phải là hình ảnh');
+      }
+
+      // upload mới
+      const result = await this.cloudinaryService.uploadImage(
+        file,
+        'categories/images',
+      );
+
+      // xóa ảnh cũ
+      if (category.imagePublicId) {
+        await this.cloudinaryService.deleteImage(category.imagePublicId);
+      }
+
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+    }
+
+    // UPDATE DATA
+    return this.prisma.category.update({
+      where: { id },
+      data: {
+        name: dto.name ?? category.name,
+        description: dto.description ?? category.description,
+        parentId: dto.parentId !== undefined ? dto.parentId : category.parentId,
+        isActive: dto.isActive ?? category.isActive,
+        image: imageUrl,
+        imagePublicId: publicId,
+      },
+    });
   }
 }

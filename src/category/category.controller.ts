@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -14,6 +16,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -43,5 +46,22 @@ export class CategoryController {
   @Get('flat')
   getFlat() {
     return this.categoryService.getFlatCategoryTree();
+  }
+
+  @Post('update')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdateCategoryDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.categoryService.update(id, dto, file);
+
+    return {
+      message: 'Cập nhật danh mục thành công',
+      data,
+    };
   }
 }
