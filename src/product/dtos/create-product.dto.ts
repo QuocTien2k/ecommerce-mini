@@ -37,14 +37,8 @@ export class CreateProductDto {
   price: number;
 
   @IsOptional()
-  @Type(() => Number)
   @IsInt()
-  @Min(0)
-  discountPrice?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(0)
+  @Min(1)
   @Max(100)
   discountPct?: number;
 
