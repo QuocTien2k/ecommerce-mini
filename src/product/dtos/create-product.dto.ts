@@ -2,15 +2,15 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsNumber,
   IsInt,
   Min,
   Max,
   IsBoolean,
   IsUUID,
   Length,
+  Matches,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class CreateProductDto {
   @IsString()
@@ -18,10 +18,13 @@ export class CreateProductDto {
   @Length(3, 255)
   name: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @Length(3, 255)
-  slug: string;
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: 'Slug không hợp lệ',
+  })
+  slug?: string;
 
   @IsOptional()
   @IsString()
@@ -51,7 +54,4 @@ export class CreateProductDto {
 
   @IsUUID()
   categoryId: string;
-
-  @IsUUID()
-  creatorId: string;
 }

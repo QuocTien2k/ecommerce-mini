@@ -4,8 +4,8 @@ model Product {
   slug          String   @unique
   description   String?
 
-  price         Float
-  discountPrice Float?
+  price         Decimal @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
   discountPct   Int?
 
   ratingAvg     Float  @default(0)
