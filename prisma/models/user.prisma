@@ -1,0 +1,22 @@
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?  @unique
+  fullname  String
+  password  String
+  avatar    String?
+  avatarPublicId String?
+  address   String?
+  role      Role     @default(USER)
+
+  products  Product[]   @relation("UserProducts")
+  ratings   Rating[]
+
+  refreshTokens RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
