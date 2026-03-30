@@ -47,4 +47,28 @@ export class ProductController {
       data,
     };
   }
+
+  @Patch(':id/deactivate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.productService.softDelete(id);
+
+    return {
+      message: 'Tạm ẩn sản phẩm thành công',
+      data,
+    };
+  }
+
+  @Patch(':id/activate')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async restore(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.productService.restore(id);
+
+    return {
+      message: 'Khôi phục sản phẩm thành công',
+      data,
+    };
+  }
 }

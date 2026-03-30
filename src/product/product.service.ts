@@ -13,6 +13,26 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
+  private async toggleActive(id: string, isActive: boolean) {
+    const existing = await this.prisma.product.findUnique({
+      where: { id },
+      select: { id: true, isActive: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Sản phẩm không tồn tại');
+    }
+
+    if (existing.isActive === isActive) {
+      return existing;
+    }
+
+    return this.prisma.product.update({
+      where: { id },
+      data: { isActive },
+    });
+  }
+
   calcDiscountPrice(price: number, pct?: number): number | null {
     if (!pct) return null;
 
@@ -180,5 +200,13 @@ export class ProductService {
       where: { id },
       data,
     });
+  }
+
+  softDelete(id: string) {
+    return this.toggleActive(id, false);
+  }
+
+  restore(id: string) {
+    return this.toggleActive(id, true);
   }
 }
