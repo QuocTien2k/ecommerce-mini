@@ -14,6 +14,7 @@ import {
   buildPaginatedResponse,
   getPagination,
 } from '@common/utils/pagination';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoryService {
@@ -21,6 +22,15 @@ export class CategoryService {
     private prisma: PrismaService,
     private cloudinaryService: CloudinaryService,
   ) {}
+
+  private readonly adminCategorySelect = {
+    id: true,
+    name: true,
+    slug: true,
+    parentId: true,
+    isActive: true,
+    createdAt: true,
+  };
 
   //check level category
   async getCategoryLevel(categoryId: string): Promise<number> {
@@ -293,22 +303,24 @@ export class CategoryService {
 
     const { page, limit, skip } = getPagination(query);
 
-    const where: any = {};
+    const where: Prisma.CategoryWhereInput = {};
 
     //search
-    if (search) {
+    if (search?.trim()) {
       where.name = {
-        contains: search,
+        contains: search.trim(),
         mode: 'insensitive',
       };
     }
 
     //filter
-    if (isActive !== undefined) {
+    if (typeof isActive === 'boolean') {
       where.isActive = isActive;
     }
 
-    if (parentId) {
+    if (parentId === 'null') {
+      where.parentId = null;
+    } else if (parentId) {
       where.parentId = parentId;
     }
 
@@ -318,14 +330,7 @@ export class CategoryService {
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          parentId: true,
-          isActive: true,
-          createdAt: true,
-        },
+        select: this.adminCategorySelect,
       }),
       this.prisma.category.count({ where }),
     ]);

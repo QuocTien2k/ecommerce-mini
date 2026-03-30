@@ -13,7 +13,7 @@ export class AdminCategoryQueryDto {
 
   @IsOptional()
   @IsUUID()
-  parentId?: string;
+  parentId?: string | 'null';
 
   @IsOptional()
   @Type(() => Number)
