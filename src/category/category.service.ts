@@ -10,6 +10,10 @@ import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 import { CategoryTreeNode, FlatCategoryItem } from './dtos/tree-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
+import {
+  buildPaginatedResponse,
+  getPagination,
+} from '@common/utils/pagination';
 
 @Injectable()
 export class CategoryService {
@@ -285,10 +289,13 @@ export class CategoryService {
 
   //list for admin
   async getAdminCategories(query: AdminCategoryQueryDto) {
-    const { search, isActive, parentId, page = 1, limit = 10 } = query;
+    const { search, isActive, parentId } = query;
+
+    const { page, limit, skip } = getPagination(query);
 
     const where: any = {};
 
+    //search
     if (search) {
       where.name = {
         contains: search,
@@ -296,6 +303,7 @@ export class CategoryService {
       };
     }
 
+    //filter
     if (isActive !== undefined) {
       where.isActive = isActive;
     }
@@ -304,12 +312,11 @@ export class CategoryService {
       where.parentId = parentId;
     }
 
-    const [total, categories] = await Promise.all([
-      this.prisma.category.count({ where }),
+    const [data, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
+        skip,
         take: limit,
         select: {
           id: true,
@@ -320,16 +327,9 @@ export class CategoryService {
           createdAt: true,
         },
       }),
+      this.prisma.category.count({ where }),
     ]);
 
-    return {
-      data: categories,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return buildPaginatedResponse(data, total, page, limit);
   }
 }

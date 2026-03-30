@@ -8,6 +8,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { toSlug } from '@common/utils/slug';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import {
+  buildPaginatedResponse,
+  getPagination,
+} from '@common/utils/pagination';
+import { GetProductsQueryDto } from './dtos/get-product.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
@@ -208,5 +214,140 @@ export class ProductService {
 
   restore(id: string) {
     return this.toggleActive(id, true);
+  }
+
+  async findAllForUser(query: GetProductsQueryDto) {
+    // pagination (default limit = 10)
+    const { page, limit, skip } = getPagination({
+      ...query,
+      limit: query.limit ?? 10,
+    });
+
+    // build where condition
+    const where: Prisma.ProductWhereInput = {
+      isActive: true,
+    };
+
+    if (query.categoryId) {
+      where.categoryId = query.categoryId;
+    }
+
+    if (query.search?.trim()) {
+      where.name = {
+        contains: query.search,
+        mode: 'insensitive',
+      };
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+
+          price: true,
+          discountPrice: true,
+          discountPct: true,
+
+          ratingAvg: true,
+          ratingCount: true,
+
+          isActive: true,
+
+          categoryId: true,
+
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+
+      this.prisma.product.count({
+        where,
+      }),
+    ]);
+
+    //convert decimal -> string
+    const mappedData = data.map((item) => ({
+      ...item,
+      price: item.price.toString(),
+      discountPrice: item.discountPrice?.toString() ?? null,
+    }));
+
+    // format response
+    return buildPaginatedResponse(mappedData, total, page, limit);
+  }
+
+  async findAllForAdmin(query: GetProductsQueryDto) {
+    const { page, limit, skip } = getPagination({
+      ...query,
+      limit: query.limit ?? 6,
+    });
+
+    const where: Prisma.ProductWhereInput = {};
+
+    if (query.categoryId) {
+      where.categoryId = query.categoryId;
+    }
+
+    if (query.search?.trim()) {
+      where.name = {
+        contains: query.search.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    // admin filter isActive
+    if (typeof query.isActive === 'boolean') {
+      where.isActive = query.isActive;
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+
+          price: true,
+          discountPrice: true,
+          discountPct: true,
+
+          ratingAvg: true,
+          ratingCount: true,
+
+          isActive: true,
+          categoryId: true,
+
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+
+      this.prisma.product.count({ where }),
+    ]);
+
+    // map Decimal -> string
+    const mappedData = data.map((item) => ({
+      ...item,
+      price: item.price.toString(),
+      discountPrice: item.discountPrice?.toString() ?? null,
+    }));
+
+    return buildPaginatedResponse(mappedData, total, page, limit);
   }
 }

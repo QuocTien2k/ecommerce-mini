@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +17,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from '@prisma/client';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { GetProductsQueryDto } from './dtos/get-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -68,6 +71,28 @@ export class ProductController {
 
     return {
       message: 'Khôi phục sản phẩm thành công',
+      data,
+    };
+  }
+
+  @Get()
+  async findAll(@Query() query: GetProductsQueryDto) {
+    const data = await this.productService.findAllForUser(query);
+
+    return {
+      message: 'Lấy danh sách sản phẩm thành công',
+      data,
+    };
+  }
+
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async findAllForAdmin(@Query() query: GetProductsQueryDto) {
+    const data = await this.productService.findAllForAdmin(query);
+
+    return {
+      message: 'Lấy danh sách sản phẩm thành công',
       data,
     };
   }
