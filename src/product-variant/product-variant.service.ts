@@ -52,30 +52,6 @@ export class ProductVariantService {
     //Normalize attributes
     const normalizedAttributes = this.normalizeAttributes(dto.attributes);
 
-    //Check duplicate variant
-    const existingVariants = await this.prisma.productVariant.findMany({
-      where: {
-        productId: dto.productId,
-        color: dto.color,
-      },
-      select: {
-        // id: true,
-        attributes: true,
-      },
-    });
-
-    const normalizedExisting = existingVariants.map((v) =>
-      this.normalizeAttributes(v.attributes as Record<string, string | number>),
-    );
-
-    const isDuplicate = normalizedExisting.includes(normalizedAttributes);
-
-    if (isDuplicate) {
-      throw new BadRequestException(
-        'Variant đã tồn tại với cùng màu sắc và thuộc tính',
-      );
-    }
-
     //Upload images
     if (!files || files.length === 0) {
       throw new BadRequestException('Phải upload ít nhất 1 ảnh');
@@ -89,18 +65,26 @@ export class ProductVariantService {
     const images = uploads.map((item) => item.secure_url);
     const imagePublicIds = uploads.map((item) => item.public_id);
 
-    //Create variant
-    return this.prisma.productVariant.create({
-      data: {
-        productId: dto.productId,
-        color: dto.color,
-        attributes: dto.attributes ?? null,
+    try {
+      //Create variant
+      return await this.prisma.productVariant.create({
+        data: {
+          productId: dto.productId,
+          color: dto.color,
 
-        images,
-        imagePublicIds,
+          attributes: dto.attributes ?? null,
+          attributesHash: normalizedAttributes,
 
-        stock: dto.stock ?? 0,
-      },
-    });
+          images,
+          imagePublicIds,
+
+          stock: dto.stock ?? 0,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Biến thể sản phẩm đã tồn tại');
+      }
+    }
   }
 }
