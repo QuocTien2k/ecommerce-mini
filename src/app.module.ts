@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
+import { ProductVariantModule } from './product-variant/product-variant.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProductModule } from './product/product.module';
     MailModule,
     CategoryModule,
     ProductModule,
+    ProductVariantModule,
   ],
   controllers: [AppController],
   providers: [AppService],
