@@ -6,6 +6,8 @@ import {
 import { CreateProductVariantDto } from './dtos/create-product-variant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
+import { UpdateProductVariantDto } from './dtos/update-product-variant.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductVariantService {
@@ -85,6 +87,129 @@ export class ProductVariantService {
       if (error.code === 'P2002') {
         throw new BadRequestException('Biến thể sản phẩm đã tồn tại');
       }
+    }
+  }
+
+  async update(
+    id: string,
+    dto: UpdateProductVariantDto,
+    files?: Express.Multer.File[],
+  ) {
+    const variant = await this.prisma.productVariant.findUnique({
+      where: { id },
+    });
+
+    if (!variant) {
+      throw new NotFoundException('Biến thể không tồn tại');
+    }
+
+    let images = [...variant.images];
+    let imagePublicIds = [...variant.imagePublicIds];
+
+    //Xóa ảnh theo publicId
+    if (dto.removeImagePublicIds?.length) {
+      const validPublicIds = dto.removeImagePublicIds.filter((id) =>
+        imagePublicIds.some((pubId) => pubId.endsWith(id)),
+      );
+
+      const fullPublicIdsToRemove = validPublicIds.map(
+        (id) => imagePublicIds.find((pubId) => pubId.endsWith(id))!,
+      );
+
+      //delete cloud
+      await Promise.all(
+        fullPublicIdsToRemove.map((publicId) =>
+          this.cloudinaryService.deleteImage(publicId),
+        ),
+      );
+
+      // filter theo index
+      const newImages: string[] = [];
+      const newPublicIds: string[] = [];
+
+      for (let i = 0; i < imagePublicIds.length; i++) {
+        if (!fullPublicIdsToRemove.includes(imagePublicIds[i])) {
+          newImages.push(images[i]);
+          newPublicIds.push(imagePublicIds[i]);
+        }
+      }
+
+      images = newImages;
+      imagePublicIds = newPublicIds;
+    }
+
+    //Upload ảnh mới
+    let uploadedPublicIds: string[] = [];
+
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        if (!file.mimetype.startsWith('image/')) {
+          throw new BadRequestException('File phải là hình ảnh');
+        }
+      });
+
+      const uploads = await this.cloudinaryService.uploadMultipleImages(
+        files,
+        'product-variants',
+      );
+
+      images.push(...uploads.map((i) => i.secure_url));
+      imagePublicIds.push(...uploads.map((i) => i.public_id));
+      uploadedPublicIds = uploads.map((i) => i.public_id);
+    }
+
+    //Validate ảnh
+    if (images.length === 0) {
+      throw new BadRequestException('Biến thể phải có ít nhất 1 ảnh');
+    }
+
+    //Recompute attributesHash nếu attributes thay đổi
+    let attributes:
+      | Prisma.InputJsonValue
+      | Prisma.NullableJsonNullValueInput
+      | undefined = variant.attributes as Prisma.InputJsonValue;
+    let attributesHash = variant.attributesHash;
+
+    if (dto.attributes !== undefined) {
+      const isEmpty = Object.keys(dto.attributes).length === 0;
+
+      attributes = isEmpty
+        ? Prisma.JsonNull
+        : (dto.attributes as Prisma.InputJsonValue);
+
+      attributesHash = isEmpty
+        ? null
+        : this.normalizeAttributes(dto.attributes);
+    }
+
+    try {
+      return await this.prisma.productVariant.update({
+        where: { id },
+        data: {
+          color: dto.color ?? variant.color,
+          attributes,
+          attributesHash,
+
+          stock: dto.stock ?? variant.stock,
+
+          images,
+          imagePublicIds,
+        },
+      });
+    } catch (error) {
+      // rollback uploaded images nếu DB fail
+      if (uploadedPublicIds.length) {
+        await Promise.all(
+          uploadedPublicIds.map((id) => this.cloudinaryService.deleteImage(id)),
+        );
+      }
+
+      if (error.code === 'P2002') {
+        throw new BadRequestException(
+          'Biến thể với màu sắc và thuộc tính này đã tồn tại',
+        );
+      }
+      throw error;
     }
   }
 }
