@@ -14,6 +14,26 @@ export class ProductVariantService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  private normalizeAttributes(
+    attributes?: Record<string, string | number>,
+  ): string | null {
+    if (!attributes || Object.keys(attributes).length === 0) {
+      return null;
+    }
+
+    const sortedKeys = Object.keys(attributes).sort();
+
+    const normalizedObject = sortedKeys.reduce(
+      (acc, key) => {
+        acc[key] = attributes[key];
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+
+    return JSON.stringify(normalizedObject);
+  }
+
   async create(dto: CreateProductVariantDto, files: Express.Multer.File[]) {
     //Check product
     const product = await this.prisma.product.findUnique({
@@ -27,6 +47,33 @@ export class ProductVariantService {
 
     if (!product.isActive) {
       throw new BadRequestException('Sản phẩm đã bị vô hiệu hóa');
+    }
+
+    //Normalize attributes
+    const normalizedAttributes = this.normalizeAttributes(dto.attributes);
+
+    //Check duplicate variant
+    const existingVariants = await this.prisma.productVariant.findMany({
+      where: {
+        productId: dto.productId,
+        color: dto.color,
+      },
+      select: {
+        // id: true,
+        attributes: true,
+      },
+    });
+
+    const normalizedExisting = existingVariants.map((v) =>
+      this.normalizeAttributes(v.attributes as Record<string, string | number>),
+    );
+
+    const isDuplicate = normalizedExisting.includes(normalizedAttributes);
+
+    if (isDuplicate) {
+      throw new BadRequestException(
+        'Variant đã tồn tại với cùng màu sắc và thuộc tính',
+      );
     }
 
     //Upload images
