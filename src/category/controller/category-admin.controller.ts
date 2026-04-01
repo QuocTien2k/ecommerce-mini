@@ -11,23 +11,23 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CategoryService } from './category.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { CreateCategoryDto } from './dtos/create-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
+import { CategoryService } from '@category/category.service';
+import { AdminCategoryQueryDto } from '@category/dtos/admin-category.dto';
+import { CreateCategoryDto } from '@category/dtos/create-category.dto';
+import { UpdateCategoryDto } from '@category/dtos/update-category.dto';
 
-@Controller('category')
-export class CategoryController {
+@Controller('admin/category')
+export class CategoryControllerAdmin {
   constructor(private readonly categoryService: CategoryService) {}
 
   // Admin
   //list (pagination + filter)
-  @Get('admin/list')
+  @Get('list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async getAdminCategories(@Query() query: AdminCategoryQueryDto) {
@@ -40,7 +40,7 @@ export class CategoryController {
   }
 
   // Admin: flat (dropdown chọn parent)
-  @Get('admin/flat')
+  @Get('flat')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async getFlat() {
@@ -48,18 +48,6 @@ export class CategoryController {
 
     return {
       message: 'Lấy danh mục dạng flat thành công',
-      data,
-    };
-  }
-
-  //  PUBLIC
-  // User: lấy menu (level 2)
-  @Get()
-  async getPublicCategories() {
-    const data = await this.categoryService.getPublicCategoryTree();
-
-    return {
-      message: 'Lấy danh mục thành công',
       data,
     };
   }

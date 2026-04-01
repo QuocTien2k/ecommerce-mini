@@ -18,7 +18,12 @@
       "@core/*": ["src/core/*"],
       "@common/*": ["src/common/*"],
       "@modules/*": ["src/modules/*"],
-      "@config/*": ["src/config/*"]
+      "@config/*": ["src/config/*"],
+      "@category/*": ["src/category/*"],
+      "@auth/*": ["src/auth/*"],
+      "@user/*": ["src/user/*"],
+      "@product/*": ["src/product/*"],
+      "@product-variant/*": ["src/product-variant/*"]
     },
 
     "incremental": true,
