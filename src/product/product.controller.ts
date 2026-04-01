@@ -23,13 +23,30 @@ import { GetProductsQueryDto } from './dtos/get-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
-  async findAll(@Query() query: GetProductsQueryDto) {
-    const data = await this.productService.findAllForUser(query);
-
+  // ADMIN ROUTES
+  @Get('admin/list')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async findAllForAdmin(@Query() query: GetProductsQueryDto) {
     return {
       message: 'Lấy danh sách sản phẩm thành công',
-      data,
+      data: await this.productService.findAllForAdmin(query),
+    };
+  }
+
+  @Get('admin/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async findOneForAdmin(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.productService.findOneForAdmin(id);
+  }
+
+  // PUBLIC ROUTES
+  @Get()
+  async findAll(@Query() query: GetProductsQueryDto) {
+    return {
+      message: 'Lấy danh sách sản phẩm thành công',
+      data: await this.productService.findAllForUser(query),
     };
   }
 
@@ -38,16 +55,15 @@ export class ProductController {
     return this.productService.findOneForUser(slug);
   }
 
+  // ACTIONS
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async create(@Body() dto: CreateProductDto, @Req() req: any) {
     const userId = req.user.sub;
-    const data = await this.productService.create(dto, userId);
-
     return {
       message: 'Tạo sản phẩm thành công',
-      data,
+      data: await this.productService.create(dto, userId),
     };
   }
 
@@ -58,11 +74,9 @@ export class ProductController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateProductDto,
   ) {
-    const data = await this.productService.update(id, dto);
-
     return {
       message: 'Cập nhật sản phẩm thành công',
-      data,
+      data: await this.productService.update(id, dto),
     };
   }
 
@@ -70,11 +84,9 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
-    const data = await this.productService.softDelete(id);
-
     return {
       message: 'Tạm ẩn sản phẩm thành công',
-      data,
+      data: await this.productService.softDelete(id),
     };
   }
 
@@ -82,30 +94,9 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async restore(@Param('id', new ParseUUIDPipe()) id: string) {
-    const data = await this.productService.restore(id);
-
     return {
       message: 'Khôi phục sản phẩm thành công',
-      data,
+      data: await this.productService.restore(id),
     };
-  }
-
-  @Get('admin')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async findAllForAdmin(@Query() query: GetProductsQueryDto) {
-    const data = await this.productService.findAllForAdmin(query);
-
-    return {
-      message: 'Lấy danh sách sản phẩm thành công',
-      data,
-    };
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async findOneForAdmin(@Param('id') id: string) {
-    return this.productService.findOneForAdmin(id);
   }
 }
