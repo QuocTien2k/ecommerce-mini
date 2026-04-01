@@ -14,10 +14,14 @@ import {
 } from '@common/utils/pagination';
 import { GetProductsQueryDto } from './dtos/get-product.dto';
 import { Prisma } from '@prisma/client';
+import { ProductVariantService } from 'src/product-variant/product-variant.service';
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private productVariantService: ProductVariantService,
+  ) {}
 
   private async toggleActive(id: string, isActive: boolean) {
     const existing = await this.prisma.product.findUnique({
@@ -216,6 +220,7 @@ export class ProductService {
     return this.toggleActive(id, true);
   }
 
+  //lists product for user
   async findAllForUser(query: GetProductsQueryDto) {
     // pagination (default limit = 10)
     const { page, limit, skip } = getPagination({
@@ -285,6 +290,58 @@ export class ProductService {
     return buildPaginatedResponse(mappedData, total, page, limit);
   }
 
+  //detail for user
+  async findOneForUser(slug: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      include: {
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        creator: {
+          select: { id: true, fullname: true },
+        },
+      },
+    });
+
+    if (!product || !product.isActive) {
+      throw new NotFoundException('Sản phẩm không tìm thấy');
+    }
+
+    const variants = await this.productVariantService.findByProductId(
+      product.id,
+    );
+
+    // filter + map variants cho user
+    const mappedVariants = variants.map((v) => ({
+      id: v.id,
+      color: v.color,
+      attributes: v.attributes,
+      images: v.images,
+      stock: v.stock,
+    }));
+
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+
+      price: product.price.toString(),
+      discountPrice: product.discountPrice?.toString() ?? null,
+      discountPct: product.discountPct,
+
+      ratingAvg: product.ratingAvg,
+      ratingCount: product.ratingCount,
+
+      category: product.category,
+      creator: product.creator,
+
+      variants: mappedVariants,
+    };
+  }
+
+  //lists product for admin
   async findAllForAdmin(query: GetProductsQueryDto) {
     const { page, limit, skip } = getPagination({
       ...query,
@@ -349,5 +406,34 @@ export class ProductService {
     }));
 
     return buildPaginatedResponse(mappedData, total, page, limit);
+  }
+
+  //detail for admin
+  async findOneForAdmin(productId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        creator: { select: { id: true, fullname: true } },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException(
+        `Sản phẩm có id ${productId} không tìm thấy!`,
+      );
+    }
+
+    const variants =
+      await this.productVariantService.findByProductId(productId);
+
+    return {
+      ...product,
+      price: product.price.toString(),
+      discountPrice: product.discountPrice?.toString() ?? null,
+      variants,
+    };
   }
 }

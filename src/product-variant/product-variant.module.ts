@@ -9,5 +9,6 @@ import { CloudinaryModule } from '@common/cloudinary/cloudinary.module';
   imports: [AuthModule, PrismaModule, CloudinaryModule],
   providers: [ProductVariantService],
   controllers: [ProductVariantController],
+  exports: [ProductVariantService],
 })
 export class ProductVariantModule {}

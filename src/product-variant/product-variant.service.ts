@@ -16,6 +16,24 @@ export class ProductVariantService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  async findByProductId(productId: string) {
+    return this.prisma.productVariant.findMany({
+      where: { productId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        color: true,
+        attributes: true,
+        attributesHash: true,
+        images: true,
+        imagePublicIds: true,
+        stock: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   private normalizeAttributes(
     attributes?: Record<string, string | number>,
   ): string | null {

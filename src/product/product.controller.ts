@@ -23,6 +23,21 @@ import { GetProductsQueryDto } from './dtos/get-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Get()
+  async findAll(@Query() query: GetProductsQueryDto) {
+    const data = await this.productService.findAllForUser(query);
+
+    return {
+      message: 'Lấy danh sách sản phẩm thành công',
+      data,
+    };
+  }
+
+  @Get(':slug')
+  async findOneForUser(@Param('slug') slug: string) {
+    return this.productService.findOneForUser(slug);
+  }
+
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -75,16 +90,6 @@ export class ProductController {
     };
   }
 
-  @Get()
-  async findAll(@Query() query: GetProductsQueryDto) {
-    const data = await this.productService.findAllForUser(query);
-
-    return {
-      message: 'Lấy danh sách sản phẩm thành công',
-      data,
-    };
-  }
-
   @Get('admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -95,5 +100,12 @@ export class ProductController {
       message: 'Lấy danh sách sản phẩm thành công',
       data,
     };
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async findOneForAdmin(@Param('id') id: string) {
+    return this.productService.findOneForAdmin(id);
   }
 }

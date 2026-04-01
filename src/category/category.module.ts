@@ -9,5 +9,6 @@ import { CloudinaryModule } from '@common/cloudinary/cloudinary.module';
   imports: [AuthModule, PrismaModule, CloudinaryModule],
   providers: [CategoryService],
   controllers: [CategoryController],
+  exports: [CategoryService],
 })
 export class CategoryModule {}
