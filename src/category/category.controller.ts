@@ -25,21 +25,9 @@ import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  //  PUBLIC
-  // User: lấy menu (level 2)
-  @Get()
-  async getPublicCategories() {
-    const data = await this.categoryService.getPublicCategoryTree();
-
-    return {
-      message: 'Lấy danh mục thành công',
-      data,
-    };
-  }
-
   // Admin
   //list (pagination + filter)
-  @Get('admin')
+  @Get('admin/list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async getAdminCategories(@Query() query: AdminCategoryQueryDto) {
@@ -64,6 +52,19 @@ export class CategoryController {
     };
   }
 
+  //  PUBLIC
+  // User: lấy menu (level 2)
+  @Get()
+  async getPublicCategories() {
+    const data = await this.categoryService.getPublicCategoryTree();
+
+    return {
+      message: 'Lấy danh mục thành công',
+      data,
+    };
+  }
+
+  // ACTIONS
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -80,7 +81,7 @@ export class CategoryController {
     };
   }
 
-  // Admin: update
+  //update
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
