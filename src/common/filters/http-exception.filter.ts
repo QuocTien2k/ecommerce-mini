@@ -19,6 +19,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     let message = 'Error';
     let errors: any = undefined;
+    let meta: any = undefined;
+
 
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
@@ -26,6 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof exceptionResponse === 'object') {
         message = exceptionResponse.message ?? 'Error';
         errors = exceptionResponse.errors;
+        meta = exceptionResponse.meta;
       }
     }
 
@@ -35,6 +38,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         code: status,
         message,
         errors,
+        meta,
       }),
     );
   }

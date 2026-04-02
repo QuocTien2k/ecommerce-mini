@@ -1,13 +1,14 @@
 import { ApiResponseKey } from 'src/enums/api-response-key.enum';
 import { HttpStatus } from '@nestjs/common';
 
-export class ApiResponse<T> {
+export class ApiResponse<T = unknown, M = any> {
   [ApiResponseKey.STATUS]: boolean;
   [ApiResponseKey.CODE]: number;
   [ApiResponseKey.MESSAGE]: string;
   [ApiResponseKey.DATA]?: T;
   [ApiResponseKey.ERRORS]?: Record<string, string[]>;
   [ApiResponseKey.TIMESTAMP]: string;
+  meta: M;
 
   constructor(options: {
     status: boolean;
@@ -15,6 +16,7 @@ export class ApiResponse<T> {
     message: string;
     data?: T;
     errors?: Record<string, string[]>;
+    meta?: M;
   }) {
     this.status = options.status;
     this.code = options.code ?? HttpStatus.OK;
@@ -26,6 +28,10 @@ export class ApiResponse<T> {
 
     if (options.errors !== undefined) {
       this.errors = options.errors;
+    }
+
+    if (options.meta !== undefined) {
+      this.meta = options.meta;
     }
 
     this.timestamp = new Date().toISOString();

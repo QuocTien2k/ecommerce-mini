@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
@@ -70,6 +71,56 @@ export class CategoryService {
     return false;
   }
 
+  //get subtree
+  async getAllDescendantIds(categoryId: string): Promise<string[]> {
+    const result: string[] = [];
+
+    const traverse = async (parentId: string) => {
+      const children = await this.prisma.category.findMany({
+        where: {
+          parentId,
+          deletedAt: null,
+        },
+        select: { id: true },
+      });
+
+      for (const child of children) {
+        result.push(child.id);
+        await traverse(child.id);
+      }
+    };
+
+    await traverse(categoryId);
+
+    return result;
+  }
+
+  //check product in tree
+  async countActiveProductsInTree(categoryId: string): Promise<number> {
+    const descendants = await this.getAllDescendantIds(categoryId);
+
+    const ids = [categoryId, ...descendants];
+
+    return this.prisma.product.count({
+      where: {
+        categoryId: { in: ids },
+        isActive: true,
+      },
+    });
+  }
+
+  //check children
+  async hasChildren(categoryId: string): Promise<boolean> {
+    const count = await this.prisma.category.count({
+      where: {
+        parentId: categoryId,
+        deletedAt: null,
+      },
+    });
+
+    return count > 0;
+  }
+
   async create(dto: CreateCategoryDto, file: Express.Multer.File) {
     let slug = toSlug(dto.slug || dto.name);
     let uniqueSlug = slug;
@@ -134,7 +185,10 @@ export class CategoryService {
     const { isActive, maxLevel } = options || {};
 
     const categories = await this.prisma.category.findMany({
-      where: isActive !== undefined ? { isActive } : undefined,
+      where: {
+        ...(isActive !== undefined && { isActive }),
+        deletedAt: null,
+      },
       select: {
         id: true,
         name: true,
@@ -303,7 +357,7 @@ export class CategoryService {
 
     const { page, limit, skip } = getPagination(query);
 
-    const where: Prisma.CategoryWhereInput = {};
+    const where: Prisma.CategoryWhereInput = { deletedAt: null };
 
     //search
     if (search?.trim()) {
@@ -336,5 +390,75 @@ export class CategoryService {
     ]);
 
     return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  //soft delete
+  async softDeleteCategory(categoryId: string) {
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category || category.deletedAt) {
+      throw new NotFoundException('Danh mục không tìm thấy!');
+    }
+
+    //check children
+    const hasChildren = await this.hasChildren(categoryId);
+    if (hasChildren) {
+      throw new BadRequestException(
+        'Không thể xóa vì danh mục vẫn còn danh mục con',
+      );
+    }
+
+    //check product active
+    const activeProductCount = await this.countActiveProductsInTree(categoryId);
+
+    if (activeProductCount > 0) {
+      throw new BadRequestException({
+        message: 'Danh mục có sản phẩm hoạt động',
+        meta: {
+          activeProductCount,
+        },
+      });
+    }
+
+    //soft delete
+    return this.prisma.category.update({
+      where: { id: categoryId },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
+
+  //restore
+  async restoreCategory(categoryId: string) {
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category || !category.deletedAt) {
+      throw new BadRequestException('Danh mục chưa bị xóa!');
+    }
+
+    //check parent có bị delete không
+    if (category.parentId) {
+      const parent = await this.prisma.category.findUnique({
+        where: { id: category.parentId },
+      });
+
+      if (parent?.deletedAt) {
+        throw new BadRequestException(
+          'Không thể khôi phục vì danh mục cha đã bị xóa',
+        );
+      }
+    }
+
+    return this.prisma.category.update({
+      where: { id: categoryId },
+      data: {
+        deletedAt: null,
+      },
+    });
   }
 }

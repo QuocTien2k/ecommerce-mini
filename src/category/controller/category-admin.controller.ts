@@ -86,4 +86,30 @@ export class CategoryControllerAdmin {
       data,
     };
   }
+
+  //soft delete
+  @Patch('soft/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.categoryService.softDeleteCategory(id);
+
+    return {
+      message: 'Xóa danh mục thành công',
+      data,
+    };
+  }
+
+  //restore
+  @Patch('restore/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async restore(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.categoryService.restoreCategory(id);
+
+    return {
+      message: 'Khôi phục danh mục thành công',
+      data,
+    };
+  }
 }

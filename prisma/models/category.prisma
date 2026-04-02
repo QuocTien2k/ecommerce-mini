@@ -11,6 +11,7 @@ model Category {
   children    Category[] @relation("CategoryHierarchy")
 
   isActive    Boolean   @default(true)
+  deletedAt   DateTime?
 
   products    Product[]
 
