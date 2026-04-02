@@ -1,3 +1,6 @@
+import { Roles } from '@auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@auth/guards/roles.guard';
 import {
   Body,
   Controller,
@@ -10,21 +13,17 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { CreateProductDto } from './dtos/create-product.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Role } from '@prisma/client';
-import { UpdateProductDto } from './dtos/update-product.dto';
-import { GetProductsQueryDto } from './dtos/get-product.dto';
+import { CreateProductDto } from '@product/dtos/create-product.dto';
+import { GetProductsQueryDto } from '@product/dtos/get-product.dto';
+import { UpdateProductDto } from '@product/dtos/update-product.dto';
+import { ProductService } from '@product/product.service';
 
-@Controller('product')
-export class ProductController {
+@Controller('admin/product')
+export class ProductControllerAdmin {
   constructor(private readonly productService: ProductService) {}
 
-  // ADMIN ROUTES
-  @Get('admin/list')
+  @Get('list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async findAllForAdmin(@Query() query: GetProductsQueryDto) {
@@ -34,28 +33,13 @@ export class ProductController {
     };
   }
 
-  @Get('admin/:id')
+  @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async findOneForAdmin(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.productService.findOneForAdmin(id);
   }
 
-  // PUBLIC ROUTES
-  @Get()
-  async findAll(@Query() query: GetProductsQueryDto) {
-    return {
-      message: 'Lấy danh sách sản phẩm thành công',
-      data: await this.productService.findAllForUser(query),
-    };
-  }
-
-  @Get(':slug')
-  async findOneForUser(@Param('slug') slug: string) {
-    return this.productService.findOneForUser(slug);
-  }
-
-  // ACTIONS
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
