@@ -1,0 +1,30 @@
+model CartItem {
+  id          String   @id @default(uuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+
+  quantity    Int      @default(1)
+
+  // snapshot để tránh sai lệch dữ liệu sau này
+  price       Decimal  @db.Decimal(10, 2)
+  productName String
+  productImage String?
+
+  // optional nhưng nên có
+  selectedAttributes Json? // size, color snapshot
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, variantId]) // 1 variant chỉ xuất hiện 1 lần trong cart
+  @@index([userId])
+  @@index([variantId])
+  @@map("cart_items")
+}

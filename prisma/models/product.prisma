@@ -21,6 +21,7 @@ model Product {
 
   variants      ProductVariant[]
   ratings       Rating[]
+  cartItems     CartItem[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
