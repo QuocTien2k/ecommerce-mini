@@ -1,3 +1,4 @@
+import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@auth/guards/roles.guard';
@@ -10,7 +11,6 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
@@ -43,8 +43,10 @@ export class ProductControllerAdmin {
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async create(@Body() dto: CreateProductDto, @Req() req: any) {
-    const userId = req.user.sub;
+  async create(
+    @Body() dto: CreateProductDto,
+    @CurrentUser('sub') userId: string,
+  ) {
     return {
       message: 'Tạo sản phẩm thành công',
       data: await this.productService.create(dto, userId),

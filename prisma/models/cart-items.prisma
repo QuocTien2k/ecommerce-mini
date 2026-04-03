@@ -12,7 +12,7 @@ model CartItem {
 
   quantity    Int      @default(1)
 
-  // snapshot để tránh sai lệch dữ liệu sau này
+  // snapshot
   price       Decimal  @db.Decimal(10, 2)
   productName String
   productImage String?
