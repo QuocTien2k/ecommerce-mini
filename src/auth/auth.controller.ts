@@ -19,6 +19,7 @@ import { ConfigService } from '@nestjs/config';
 import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -108,9 +109,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Req() req: any) {
-    const userId = req.user.sub;
-
+  async getMe(@CurrentUser('sub') userId: string) {
     return this.authService.getMe(userId);
   }
 }
