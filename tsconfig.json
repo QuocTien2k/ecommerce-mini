@@ -23,7 +23,8 @@
       "@auth/*": ["src/auth/*"],
       "@user/*": ["src/user/*"],
       "@product/*": ["src/product/*"],
-      "@product-variant/*": ["src/product-variant/*"]
+      "@product-variant/*": ["src/product-variant/*"],
+      "@cart-items/*": ["src/cart-items/*"]
     },
 
     "incremental": true,
