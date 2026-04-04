@@ -16,6 +16,15 @@ export class ProductVariantService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  async findById(variantId: string, options?: { includeProduct?: boolean }) {
+    return this.prisma.productVariant.findUnique({
+      where: { id: variantId },
+      include: {
+        product: options?.includeProduct ?? false,
+      },
+    });
+  }
+
   async findByProductId(productId: string) {
     return this.prisma.productVariant.findMany({
       where: { productId },

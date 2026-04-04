@@ -15,7 +15,7 @@ type CartPricingResult = {
 
 @Injectable()
 export class CartPricingService {
-  static calculateCart(items: PricingItemInput[]): CartPricingResult {
+  calculateCart(items: PricingItemInput[]): CartPricingResult {
     const itemTotals: Prisma.Decimal[] = [];
 
     let totalQuantity = 0;
