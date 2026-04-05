@@ -8,12 +8,12 @@ import { ProductVariantService } from '@product-variant/product-variant.service'
 import { CartPricingService } from 'src/cart-pricing/cart-pricing.service';
 import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { buildCartResponse } from './mappers/cart.mapper';
+import { UpdateCartItemDto } from './dtos/update-cart.dto';
 
 @Injectable()
 export class CartItemsService {
   constructor(
     private prisma: PrismaService,
-    private productVariantService: ProductVariantService,
     private cartPricingService: CartPricingService,
   ) {}
 
@@ -89,6 +89,83 @@ export class CartItemsService {
         });
       }
 
+      const items = await tx.cartItem.findMany({
+        where: { userId },
+        include: { variant: true },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const pricingInput = items.map((i) => ({
+        price: i.price,
+        quantity: i.quantity,
+      }));
+
+      const { itemTotals, totalPrice, totalQuantity } =
+        this.cartPricingService.calculateCart(pricingInput);
+
+      return buildCartResponse(
+        items.map((i) => ({
+          ...i,
+          productImage: i.productImage ?? undefined,
+        })),
+        itemTotals,
+        totalQuantity,
+        totalPrice,
+      );
+    });
+  }
+
+  async updateCartItem(
+    userId: string,
+    cartItemId: string,
+    dto: UpdateCartItemDto,
+  ) {
+    const { quantity } = dto;
+
+    return await this.prisma.$transaction(async (tx) => {
+      const existing = await tx.cartItem.findUnique({
+        where: { id: cartItemId },
+      });
+
+      if (!existing || existing.userId !== userId) {
+        throw new NotFoundException('Giỏ hàng không tồn tại');
+      }
+
+      // nếu quantity = 0 → xoá
+      if (quantity === 0) {
+        await tx.cartItem.delete({
+          where: { id: cartItemId },
+        });
+      } else {
+        const variant = await tx.productVariant.findUnique({
+          where: { id: existing.variantId },
+        });
+
+        if (!variant) {
+          throw new NotFoundException('Chi tiết sản phẩm không tồn tại');
+        }
+
+        if (variant.stock < quantity) {
+          throw new BadRequestException('Số lượng vượt tồn kho');
+        }
+
+        // tránh race condition
+        const updated = await tx.cartItem.updateMany({
+          where: {
+            id: cartItemId,
+            userId,
+          },
+          data: {
+            quantity,
+          },
+        });
+
+        if (updated.count === 0) {
+          throw new BadRequestException('Cập nhật thất bại, thử lại');
+        }
+      }
+
+      // lấy lại cart
       const items = await tx.cartItem.findMany({
         where: { userId },
         include: { variant: true },
