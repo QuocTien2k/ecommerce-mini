@@ -21,8 +21,11 @@ export class CartItemsService {
     const { variantId, quantity } = dto;
 
     return await this.prisma.$transaction(async (tx) => {
-      const variant = await this.productVariantService.findById(variantId, {
-        includeProduct: true,
+      const variant = await tx.productVariant.findUnique({
+        where: { id: variantId },
+        include: {
+          product: true,
+        },
       });
 
       if (!variant) {
@@ -53,8 +56,13 @@ export class CartItemsService {
           throw new BadRequestException('Số lượng vượt tồn kho');
         }
 
-        await tx.cartItem.update({
-          where: { id: existing.id },
+        const updated = await tx.cartItem.updateMany({
+          where: {
+            id: existing.id,
+            quantity: {
+              lte: variant.stock - quantity, //không vượt stock
+            },
+          },
           data: {
             quantity: {
               increment: quantity,
@@ -76,8 +84,7 @@ export class CartItemsService {
             price: variant.product.price,
             productName: variant.product.name,
             productImage: variant.images?.[0] ?? undefined,
-            selectedAttributes:
-              variant.attributes === null ? undefined : variant.attributes,
+            selectedAttributes: variant.attributes ?? undefined,
           },
         });
       }
