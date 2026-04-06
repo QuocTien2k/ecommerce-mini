@@ -9,6 +9,7 @@ import { CartPricingService } from 'src/cart-pricing/cart-pricing.service';
 import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { buildCartResponse } from './mappers/cart.mapper';
 import { UpdateCartItemDto } from './dtos/update-cart.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CartItemsService {
@@ -23,9 +24,7 @@ export class CartItemsService {
     return await this.prisma.$transaction(async (tx) => {
       const variant = await tx.productVariant.findUnique({
         where: { id: variantId },
-        include: {
-          product: true,
-        },
+        include: { product: true },
       });
 
       if (!variant) {
@@ -40,37 +39,23 @@ export class CartItemsService {
         throw new BadRequestException('Sản phẩm đã hết!');
       }
 
-      //check cart exisiting
+      // Kiểm tra item
       const existing = await tx.cartItem.findUnique({
-        where: {
-          userId_variantId: {
-            userId,
-            variantId,
-          },
-        },
+        where: { userId_variantId: { userId, variantId } },
       });
 
       if (existing) {
-        //validate before increment
+        // Cập nhật số lượng
         if (existing.quantity + quantity > variant.stock) {
           throw new BadRequestException('Số lượng vượt tồn kho');
         }
 
-        const updated = await tx.cartItem.updateMany({
-          where: {
-            id: existing.id,
-            quantity: {
-              lte: variant.stock - quantity, //không vượt stock
-            },
-          },
-          data: {
-            quantity: {
-              increment: quantity,
-            },
-          },
+        await tx.cartItem.update({
+          where: { id: existing.id },
+          data: { quantity: { increment: quantity } },
         });
       } else {
-        // case empty cart
+        // Thêm mới
         if (quantity > variant.stock) {
           throw new BadRequestException('Số lượng vượt tồn kho');
         }
@@ -89,29 +74,8 @@ export class CartItemsService {
         });
       }
 
-      const items = await tx.cartItem.findMany({
-        where: { userId },
-        include: { variant: true },
-        orderBy: { createdAt: 'desc' },
-      });
-
-      const pricingInput = items.map((i) => ({
-        price: i.price,
-        quantity: i.quantity,
-      }));
-
-      const { itemTotals, totalPrice, totalQuantity } =
-        this.cartPricingService.calculateCart(pricingInput);
-
-      return buildCartResponse(
-        items.map((i) => ({
-          ...i,
-          productImage: i.productImage ?? undefined,
-        })),
-        itemTotals,
-        totalQuantity,
-        totalPrice,
-      );
+      // refresh cart và trả về response
+      return this.refreshCartAndBuildResponse(tx, userId);
     });
   }
 
@@ -131,11 +95,8 @@ export class CartItemsService {
         throw new NotFoundException('Giỏ hàng không tồn tại');
       }
 
-      // nếu quantity = 0 → xoá
       if (quantity === 0) {
-        await tx.cartItem.delete({
-          where: { id: cartItemId },
-        });
+        await tx.cartItem.delete({ where: { id: cartItemId } });
       } else {
         const variant = await tx.productVariant.findUnique({
           where: { id: existing.variantId },
@@ -149,15 +110,9 @@ export class CartItemsService {
           throw new BadRequestException('Số lượng vượt tồn kho');
         }
 
-        // tránh race condition
         const updated = await tx.cartItem.updateMany({
-          where: {
-            id: cartItemId,
-            userId,
-          },
-          data: {
-            quantity,
-          },
+          where: { id: cartItemId, userId },
+          data: { quantity },
         });
 
         if (updated.count === 0) {
@@ -165,36 +120,12 @@ export class CartItemsService {
         }
       }
 
-      // lấy lại cart
-      const items = await tx.cartItem.findMany({
-        where: { userId },
-        include: { variant: true },
-        orderBy: { createdAt: 'desc' },
-      });
-
-      const pricingInput = items.map((i) => ({
-        price: i.price,
-        quantity: i.quantity,
-      }));
-
-      const { itemTotals, totalPrice, totalQuantity } =
-        this.cartPricingService.calculateCart(pricingInput);
-
-      return buildCartResponse(
-        items.map((i) => ({
-          ...i,
-          productImage: i.productImage ?? undefined,
-        })),
-        itemTotals,
-        totalQuantity,
-        totalPrice,
-      );
+      return this.refreshCartAndBuildResponse(tx, userId);
     });
   }
 
   async deleteCartItem(userId: string, cartItemId: string) {
     return await this.prisma.$transaction(async (tx) => {
-      //check cart item
       const existing = await tx.cartItem.findUnique({
         where: { id: cartItemId },
       });
@@ -203,36 +134,38 @@ export class CartItemsService {
         throw new NotFoundException('Không tìm thấy sản phẩm trong giỏ hàng');
       }
 
-      //delete
-      await tx.cartItem.delete({
-        where: { id: cartItemId },
-      });
+      await tx.cartItem.delete({ where: { id: cartItemId } });
 
-      //callback cart
-      const items = await tx.cartItem.findMany({
-        where: { userId },
-        include: { variant: true },
-        orderBy: { createdAt: 'desc' },
-      });
-
-      //calculate price
-      const pricingInput = items.map((i) => ({
-        price: i.price,
-        quantity: i.quantity,
-      }));
-
-      const { itemTotals, totalPrice, totalQuantity } =
-        this.cartPricingService.calculateCart(pricingInput);
-
-      return buildCartResponse(
-        items.map((i) => ({
-          ...i,
-          productImage: i.productImage ?? undefined,
-        })),
-        itemTotals,
-        totalQuantity,
-        totalPrice,
-      );
+      return this.refreshCartAndBuildResponse(tx, userId);
     });
+  }
+
+  private async refreshCartAndBuildResponse(
+    tx: Prisma.TransactionClient,
+    userId: string,
+  ) {
+    const items = await tx.cartItem.findMany({
+      where: { userId },
+      include: { variant: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const pricingInput = items.map((i) => ({
+      price: i.price,
+      quantity: i.quantity,
+    }));
+
+    const { itemTotals, totalPrice, totalQuantity } =
+      this.cartPricingService.calculateCart(pricingInput);
+
+    return buildCartResponse(
+      items.map((i) => ({
+        ...i,
+        productImage: i.productImage ?? undefined,
+      })),
+      itemTotals,
+      totalQuantity,
+      totalPrice,
+    );
   }
 }
