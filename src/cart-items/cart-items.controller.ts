@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
@@ -33,10 +35,25 @@ export class CartItemsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async updateCart(
-    @Param('cartItemId') cartItemId: string,
+    @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
     @Body() dto: UpdateCartItemDto,
     @CurrentUser('sub') userId: string,
   ) {
     return await this.cartItemsService.updateCartItem(userId, cartItemId, dto);
+  }
+
+  @Delete(':cartItemId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async deleteCartItem(
+    @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
+    @CurrentUser('sub') userId: string,
+  ) {
+    const data = await this.cartItemsService.deleteCartItem(userId, cartItemId);
+
+    return {
+      message: 'Xóa sản phẩm thành công',
+      data,
+    };
   }
 }

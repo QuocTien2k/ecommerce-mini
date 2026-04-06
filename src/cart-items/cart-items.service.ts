@@ -191,4 +191,48 @@ export class CartItemsService {
       );
     });
   }
+
+  async deleteCartItem(userId: string, cartItemId: string) {
+    return await this.prisma.$transaction(async (tx) => {
+      //check cart item
+      const existing = await tx.cartItem.findUnique({
+        where: { id: cartItemId },
+      });
+
+      if (!existing || existing.userId !== userId) {
+        throw new NotFoundException('Không tìm thấy sản phẩm trong giỏ hàng');
+      }
+
+      //delete
+      await tx.cartItem.delete({
+        where: { id: cartItemId },
+      });
+
+      //callback cart
+      const items = await tx.cartItem.findMany({
+        where: { userId },
+        include: { variant: true },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      //calculate price
+      const pricingInput = items.map((i) => ({
+        price: i.price,
+        quantity: i.quantity,
+      }));
+
+      const { itemTotals, totalPrice, totalQuantity } =
+        this.cartPricingService.calculateCart(pricingInput);
+
+      return buildCartResponse(
+        items.map((i) => ({
+          ...i,
+          productImage: i.productImage ?? undefined,
+        })),
+        itemTotals,
+        totalQuantity,
+        totalPrice,
+      );
+    });
+  }
 }
