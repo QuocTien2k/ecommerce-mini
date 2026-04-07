@@ -18,6 +18,32 @@ export class CartItemsService {
     private cartPricingService: CartPricingService,
   ) {}
 
+  async getMyCart(userId: string) {
+    const items = await this.prisma.cartItem.findMany({
+      where: { userId },
+      include: { variant: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const pricingInput = items.map((i) => ({
+      price: i.price,
+      quantity: i.quantity,
+    }));
+
+    const { itemTotals, totalPrice, totalQuantity } =
+      this.cartPricingService.calculateCart(pricingInput);
+
+    return buildCartResponse(
+      items.map((i) => ({
+        ...i,
+        productImage: i.productImage ?? undefined,
+      })),
+      itemTotals,
+      totalQuantity,
+      totalPrice,
+    );
+  }
+
   async addToCart(userId: string, dto: AddToCartDto) {
     const { variantId, quantity } = dto;
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -20,6 +21,13 @@ import { UpdateCartItemDto } from './dtos/update-cart.dto';
 @Controller('cart-items')
 export class CartItemsController {
   constructor(private readonly cartItemsService: CartItemsService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getMyCart(@CurrentUser('sub') userId: string) {
+    return await this.cartItemsService.getMyCart(userId);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
