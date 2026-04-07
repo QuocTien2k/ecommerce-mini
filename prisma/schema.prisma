@@ -8,9 +8,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+  PENDING        // user vừa đặt (chưa xử lý)
+  CONFIRMED      // admin xác nhận (hợp lệ, còn hàng)
+
+  PROCESSING     // đang lấy hàng / đóng gói
+  READY_TO_SHIP  // đã ra kho
+
+  SHIPPING       // đang vận chuyển
+  DELIVERED      // giao thành công
+
+  CANCELLED      // hủy (bất kỳ stage trước delivered)
+}
 enum Role {
   USER
   ADMIN
+}
+enum VoucherType {
+  PERCENT   // giảm theo %
+  FIXED     // giảm số tiền cố định
 }
 model RefreshToken {
   id          String   @id @default(uuid())
@@ -57,7 +73,7 @@ model CartItem {
 
   quantity    Int      @default(1)
 
-  // snapshot để tránh sai lệch dữ liệu sau này
+  // snapshot
   price       Decimal  @db.Decimal(10, 2)
   productName String
   productImage String?
@@ -95,6 +111,63 @@ model Category {
 
   @@index([parentId])
   @@map("categories")
+}
+model OrderItem {
+  id          String   @id @default(uuid())
+
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+
+  productId   String
+  variantId   String
+
+  quantity    Int
+
+  // snapshot
+  price       Decimal  @db.Decimal(10, 2)
+  productName String
+  productImage String?
+  selectedAttributes Json?
+
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_items")
+}
+model Order {
+  id            String   @id @default(uuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  status        OrderStatus @default(PENDING)
+
+  //Pricing
+  subtotal        Decimal @db.Decimal(12, 2) // tổng trước giảm
+  discountAmount  Decimal @default(0) @db.Decimal(12, 2)
+  totalPrice      Decimal @db.Decimal(12, 2)
+
+  //Voucher snapshot
+  voucherCode     String?
+  voucherType     VoucherType? // PERCENT | FIXED
+  voucherValue    Decimal? @db.Decimal(10, 2)
+
+  //Receiver snapshot
+  receiverName    String
+  receiverPhone   String
+  receiverAddress String
+
+  //Metadata
+  note            String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
 }
 model ProductVariant {
   id              String   @id @default(uuid())
@@ -183,6 +256,7 @@ model User {
   products  Product[]   @relation("UserProducts")
   ratings   Rating[]
   cartItems CartItem[]
+  orders    Order[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]
@@ -191,4 +265,29 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+model Voucher {
+  id          String   @id @default(uuid())
+
+  code        String   @unique
+  type        VoucherType
+
+  value       Decimal  @db.Decimal(10, 2) // % hoặc số tiền
+  maxDiscount Decimal? @db.Decimal(10, 2) // giới hạn giảm (cho PERCENT)
+
+  minOrderValue Decimal? @db.Decimal(12, 2)
+
+  usageLimit   Int?     // tổng số lượt dùng
+  usedCount    Int      @default(0)
+
+  isActive     Boolean  @default(true)
+
+  startAt      DateTime?
+  endAt        DateTime?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([code])
+  @@map("vouchers")
 }

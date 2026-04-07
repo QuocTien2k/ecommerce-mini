@@ -12,6 +12,7 @@ model User {
   products  Product[]   @relation("UserProducts")
   ratings   Rating[]
   cartItems CartItem[]
+  orders    Order[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]
