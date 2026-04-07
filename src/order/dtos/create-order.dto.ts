@@ -5,17 +5,11 @@ import {
   Length,
   IsArray,
   ValidateNested,
-  IsUUID,
-  Min,
-  IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './create-order-item.input';
 
 export class CreateOrderDto {
-  @IsUUID()
-  userId: string;
-
   // Voucher (optional)
   @IsOptional()
   @IsString()
