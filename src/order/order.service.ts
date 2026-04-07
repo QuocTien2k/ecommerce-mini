@@ -16,27 +16,29 @@ export class OrderService {
   ) {}
 
   async createOrder(userId: string, dto: CreateOrderDto) {
-    const {
-      items,
-      voucherCode,
-      receiverName,
-      receiverPhone,
-      receiverAddress,
-      note,
-    } = dto;
+    const { items, voucherCode, note } = dto;
 
     //FALLBACK: Nếu frontend không truyền receiver thì lấy từ thông tin User
-    if (!dto.receiverName || !dto.receiverPhone || !dto.receiverAddress) {
-      const user = await this.userService.findById(userId);
+    const user = await this.userService.findById(userId);
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-      // Fallback receiver info từ User profile
-      dto.receiverName = dto.receiverName || (user.fullname ?? 'Không có tên');
-      dto.receiverPhone = dto.receiverPhone || (user.phone ?? '');
-      dto.receiverAddress = dto.receiverAddress || (user.address ?? '');
+    // Resolve receiver snapshot (single source)
+    const resolvedReceiverName =
+      dto.receiverName ?? user.fullname ?? 'Không có tên';
+
+    const resolvedReceiverPhone = dto.receiverPhone ?? user.phone ?? '';
+
+    const resolvedReceiverAddress = dto.receiverAddress ?? user.address ?? '';
+
+    if (!resolvedReceiverPhone) {
+      throw new BadRequestException('Số điện thoại nhận hàng là bắt buộc');
+    }
+
+    if (!resolvedReceiverAddress) {
+      throw new BadRequestException('Địa chỉ nhận hàng là bắt buộc');
     }
 
     if (!items || items.length === 0) {
@@ -81,8 +83,14 @@ export class OrderService {
       let subtotal = new Prisma.Decimal(0);
       const orderItemsData: any[] = [];
 
+      const variantMap = new Map<string, (typeof variants)[number]>();
+
+      for (const v of variants) {
+        variantMap.set(v.id, v);
+      }
+
       for (const item of normalizedItems) {
-        const variant = variants.find((v) => v.id === item.variantId)!;
+        const variant = variantMap.get(item.variantId)!;
         const product = variant.product;
 
         if (!product.isActive) {
@@ -117,9 +125,7 @@ export class OrderService {
         });
 
         if (!appliedVoucher || !appliedVoucher.isActive) {
-          throw new BadRequestException(
-            'Mã voucher không hợp lệ hoặc đã bị vô hiệu hóa',
-          );
+          throw new BadRequestException('Voucher không hợp lệ');
         }
 
         const now = new Date();
@@ -128,31 +134,39 @@ export class OrderService {
           (appliedVoucher.startAt && appliedVoucher.startAt > now) ||
           (appliedVoucher.endAt && appliedVoucher.endAt < now)
         ) {
-          throw new BadRequestException(
-            'Voucher đã hết hạn hoặc chưa bắt đầu áp dụng',
-          );
-        }
-
-        if (
-          appliedVoucher.usageLimit &&
-          appliedVoucher.usedCount >= appliedVoucher.usageLimit
-        ) {
-          throw new BadRequestException('Voucher đã hết lượt sử dụng');
+          throw new BadRequestException('Voucher không khả dụng');
         }
 
         if (
           appliedVoucher.minOrderValue &&
           subtotal.lt(appliedVoucher.minOrderValue)
         ) {
-          throw new BadRequestException(
-            `Giá trị đơn hàng tối thiểu để dùng voucher là ${appliedVoucher.minOrderValue}`,
-          );
+          throw new BadRequestException('Không đủ giá trị đơn hàng');
         }
 
+        // 👉 ATOMIC CONSUME
+        const updated = await tx.voucher.updateMany({
+          where: {
+            id: appliedVoucher.id,
+            isActive: true,
+            OR: [
+              { usageLimit: null }, // không giới hạn
+              { usedCount: { lt: appliedVoucher.usageLimit } },
+            ],
+          },
+          data: {
+            usedCount: { increment: 1 },
+          },
+        });
+
+        if (updated.count === 0) {
+          throw new BadRequestException('Voucher đã hết lượt sử dụng');
+        }
+
+        // thành công => tính discount
         if (appliedVoucher.type === 'FIXED') {
           discountAmount = new Prisma.Decimal(appliedVoucher.value);
         } else {
-          // PERCENT
           discountAmount = subtotal.mul(appliedVoucher.value).div(100);
 
           if (appliedVoucher.maxDiscount) {
@@ -163,7 +177,6 @@ export class OrderService {
           }
         }
 
-        // Đảm bảo discount không vượt quá subtotal
         if (discountAmount.gt(subtotal)) {
           discountAmount = subtotal;
         }
@@ -173,23 +186,25 @@ export class OrderService {
 
       // Check and update stock (Atomic)
       for (const item of normalizedItems) {
-        const variant = await tx.productVariant.findUnique({
-          where: { id: item.variantId },
-          select: { stock: true, id: true },
-        });
-
-        if (!variant || variant.stock < item.quantity) {
-          throw new BadRequestException(
-            `Sản phẩm này không đủ tồn kho. Mã biến thể: ${item.variantId}, Tồn kho: ${variant?.stock || 0}, Yêu cầu: ${item.quantity}`,
-          );
-        }
-
-        await tx.productVariant.update({
-          where: { id: item.variantId },
+        const updated = await tx.productVariant.updateMany({
+          where: {
+            id: item.variantId,
+            stock: {
+              gte: item.quantity, // điều kiện đủ stock
+            },
+          },
           data: {
-            stock: { decrement: item.quantity },
+            stock: {
+              decrement: item.quantity,
+            },
           },
         });
+
+        if (updated.count === 0) {
+          throw new BadRequestException(
+            `Không đủ tồn kho cho biến thể ${item.variantId}`,
+          );
+        }
       }
 
       //Create Order + OrderItems
@@ -204,9 +219,9 @@ export class OrderService {
           voucherType: appliedVoucher?.type || null,
           voucherValue: appliedVoucher?.value || null,
           // Receiver snapshot
-          receiverName,
-          receiverPhone,
-          receiverAddress,
+          receiverName: resolvedReceiverName,
+          receiverPhone: resolvedReceiverPhone,
+          receiverAddress: resolvedReceiverAddress,
           // Metadata
           note: note || null,
           // Relation
@@ -218,16 +233,6 @@ export class OrderService {
           items: true,
         },
       });
-
-      //Update voucher usage count
-      if (appliedVoucher) {
-        await tx.voucher.update({
-          where: { id: appliedVoucher.id },
-          data: {
-            usedCount: { increment: 1 },
-          },
-        });
-      }
 
       return order;
     });
