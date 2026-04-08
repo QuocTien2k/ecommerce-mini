@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, User } from '@prisma/client';
+import { OrderStatus, Prisma, User } from '@prisma/client';
 import { UserService } from '@user/user.service';
 import { CreateOrderItemDto } from './dtos/create-order-item.input';
+import { NotificationsGateway } from '@notification/notification.gateway';
+import { ORDER_STATUS_LABEL } from './mapper/order-status.mapper';
 
 type OrderItemData = {
   productId: string;
@@ -41,6 +43,7 @@ export class OrderService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
+    private notificationsGateway: NotificationsGateway,
   ) {}
 
   private normalizeItems(items: CreateOrderItemDto[]) {
@@ -322,5 +325,62 @@ export class OrderService {
 
       return this.createOrderRecord(tx, ctx);
     });
+  }
+
+  private validTransitions: Record<OrderStatus, OrderStatus[]> = {
+    PENDING: ['CONFIRMED', 'CANCELLED'],
+    CONFIRMED: ['PROCESSING', 'CANCELLED'],
+    PROCESSING: ['READY_TO_SHIP', 'CANCELLED'],
+    READY_TO_SHIP: ['SHIPPING'],
+    SHIPPING: ['DELIVERED'],
+    DELIVERED: [],
+    CANCELLED: [],
+  };
+
+  async updateOrderStatus(orderId: string, newStatus: OrderStatus) {
+    const result = await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Không tìm thấy đơn hàng');
+      }
+
+      if (!this.validTransitions[order.status].includes(newStatus)) {
+        throw new BadRequestException(
+          `Không thể chuyển từ ${order.status} sang ${newStatus}`,
+        );
+      }
+
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: { status: newStatus },
+      });
+
+      const label = ORDER_STATUS_LABEL[newStatus];
+
+      await tx.notification.create({
+        data: {
+          userId: updatedOrder.userId,
+          title: 'Cập nhật đơn hàng',
+          message: `Đơn hàng ${updatedOrder.id} đã chuyển sang ${label}`,
+          orderId: updatedOrder.id,
+        },
+      });
+
+      return updatedOrder;
+    });
+
+    //Emit sau khi transaction thành công
+    this.notificationsGateway.sendToUser(result.userId, {
+      type: 'ORDER_STATUS_UPDATED',
+      orderId: result.id,
+      status: result.status,
+      statusLabel: ORDER_STATUS_LABEL[result.status],
+      message: `Đơn hàng ${result.id} đã chuyển sang ${ORDER_STATUS_LABEL[result.status]}`,
+    });
+
+    return result;
   }
 }

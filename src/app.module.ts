@@ -12,6 +12,7 @@ import { ProductVariantModule } from './product-variant/product-variant.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
 import { CartPricingModule } from './cart-pricing/cart-pricing.module';
 import { OrderModule } from './order/order.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { OrderModule } from './order/order.module';
     CartItemsModule,
     CartPricingModule,
     OrderModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

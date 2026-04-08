@@ -25,7 +25,8 @@
       "@product/*": ["src/product/*"],
       "@product-variant/*": ["src/product-variant/*"],
       "@cart-items/*": ["src/cart-items/*"],
-      "@order/*": ["src/order/*"]
+      "@order/*": ["src/order/*"],
+      "@notification/*": ["src/notification/*"]
     },
 
     "incremental": true,
