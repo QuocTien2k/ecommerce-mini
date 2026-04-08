@@ -112,6 +112,26 @@ model Category {
   @@index([parentId])
   @@map("categories")
 }
+model Notification {
+  id        String   @id @default(uuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  title     String
+  message   String
+
+  isRead    Boolean  @default(false)
+
+  // optional reference (liên kết order)
+  orderId String?
+  order   Order? @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("notifications")
+}
 model OrderItem {
   id          String   @id @default(uuid())
 
@@ -164,6 +184,7 @@ model Order {
   updatedAt       DateTime @updatedAt
 
   items           OrderItem[]
+  notifications Notification[]
 
   @@index([userId])
   @@index([status])
@@ -257,6 +278,7 @@ model User {
   ratings   Rating[]
   cartItems CartItem[]
   orders    Order[]
+  notifications Notification[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]

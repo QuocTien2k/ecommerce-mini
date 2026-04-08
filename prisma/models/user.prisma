@@ -13,6 +13,7 @@ model User {
   ratings   Rating[]
   cartItems CartItem[]
   orders    Order[]
+  notifications Notification[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]

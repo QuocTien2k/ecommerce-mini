@@ -28,6 +28,7 @@ model Order {
   updatedAt       DateTime @updatedAt
 
   items           OrderItem[]
+  notifications Notification[]
 
   @@index([userId])
   @@index([status])
