@@ -342,10 +342,26 @@ export class OrderService {
     CANCELLED: [],
   };
 
+  private async restoreStock(tx: Prisma.TransactionClient, orderId: string) {
+    const items = await tx.orderItem.findMany({
+      where: { orderId },
+    });
+
+    for (const item of items) {
+      await tx.productVariant.update({
+        where: { id: item.variantId },
+        data: {
+          stock: { increment: item.quantity },
+        },
+      });
+    }
+  }
+
   async updateOrderStatus(orderId: string, newStatus: OrderStatus) {
     const result = await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
+        include: { items: true },
       });
 
       if (!order) {
@@ -358,23 +374,50 @@ export class OrderService {
         );
       }
 
-      const updatedOrder = await tx.order.update({
+      const updated = await tx.order.updateMany({
+        where: {
+          id: orderId,
+          status: order.status, // đảm bảo chưa bị request khác thay đổi
+        },
+        data: {
+          status: newStatus,
+        },
+      });
+
+      if (updated.count === 0) {
+        throw new BadRequestException(
+          'Đơn hàng đã bị thay đổi bởi request khác, vui lòng thử lại',
+        );
+      }
+
+      //Restore stock
+      if (newStatus === 'CANCELLED') {
+        for (const item of order.items) {
+          await tx.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+              stock: { increment: item.quantity },
+            },
+          });
+        }
+      }
+
+      const updatedOrder = await tx.order.findUnique({
         where: { id: orderId },
-        data: { status: newStatus },
       });
 
       const label = ORDER_STATUS_LABEL[newStatus];
 
       await tx.notification.create({
         data: {
-          userId: updatedOrder.userId,
+          userId: updatedOrder!.userId,
           title: 'Cập nhật đơn hàng',
-          message: `Đơn hàng ${updatedOrder.id} đã chuyển sang ${label}`,
-          orderId: updatedOrder.id,
+          message: `Đơn hàng ${updatedOrder!.id} đã chuyển sang ${label}`,
+          orderId: updatedOrder!.id,
         },
       });
 
-      return updatedOrder;
+      return updatedOrder!;
     });
 
     //Emit sau khi transaction thành công
