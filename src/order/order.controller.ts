@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -14,6 +16,7 @@ import { Role } from '@prisma/client';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { UpdateOrderStatusDto } from './dtos/update-order.dto';
+import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 
 @Controller('order')
 export class OrderController {
@@ -45,5 +48,15 @@ export class OrderController {
       message: 'Cập nhật trạng thái đơn hàng thành công',
       data: updated,
     };
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  getOrders(
+    @Query() query: GetOrdersQueryDto,
+    @CurrentUser('sub') userId: string,
+    @CurrentUser('role') role: string,
+  ) {
+    return this.ordersService.getOrders(query, userId, role);
   }
 }

@@ -10,6 +10,11 @@ import { UserService } from '@user/user.service';
 import { CreateOrderItemDto } from './dtos/create-order-item.input';
 import { NotificationsGateway } from '@notification/notification.gateway';
 import { ORDER_STATUS_LABEL } from './mapper/order-status.mapper';
+import {
+  buildPaginatedResponse,
+  getPagination,
+} from '@common/utils/pagination';
+import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 
 type OrderItemData = {
   productId: string;
@@ -382,5 +387,63 @@ export class OrderService {
     });
 
     return result;
+  }
+
+  private buildStatusFilter(status?: string): Prisma.OrderWhereInput {
+    if (!status) return {};
+
+    // validate enum
+    const isValid = Object.values(OrderStatus).includes(status as OrderStatus);
+    if (!isValid) {
+      throw new BadRequestException('Invalid order status');
+    }
+
+    return {
+      status: status as OrderStatus,
+    };
+  }
+
+  async getOrders(query: GetOrdersQueryDto, userId: string, role: string) {
+    const { page, limit, skip } = getPagination({
+      ...query,
+      limit: 6,
+    });
+
+    const { status } = query;
+
+    // filter theo status
+    const statusFilter = this.buildStatusFilter(status);
+
+    // filter theo role
+    const roleFilter = role === 'ADMIN' ? {} : { userId };
+
+    const where: Prisma.OrderWhereInput = {
+      ...statusFilter,
+      ...roleFilter,
+    };
+
+    // query song song
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          items: true,
+        },
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    // map label
+    const mapped = orders.map((order) => ({
+      ...order,
+      statusLabel: ORDER_STATUS_LABEL[order.status],
+    }));
+
+    return buildPaginatedResponse(mapped, total, page, limit);
   }
 }
