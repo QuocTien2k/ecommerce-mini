@@ -13,6 +13,7 @@ import { CartItemsModule } from './cart-items/cart-items.module';
 import { CartPricingModule } from './cart-pricing/cart-pricing.module';
 import { OrderModule } from './order/order.module';
 import { NotificationModule } from './notification/notification.module';
+import { VoucherModule } from './voucher/voucher.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotificationModule } from './notification/notification.module';
     CartPricingModule,
     OrderModule,
     NotificationModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],
