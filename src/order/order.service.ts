@@ -342,11 +342,10 @@ export class OrderService {
     CANCELLED: [],
   };
 
-  private async restoreStock(tx: Prisma.TransactionClient, orderId: string) {
-    const items = await tx.orderItem.findMany({
-      where: { orderId },
-    });
-
+  private async restoreStock(
+    tx: Prisma.TransactionClient,
+    items: { variantId: string; quantity: number }[],
+  ) {
     for (const item of items) {
       await tx.productVariant.update({
         where: { id: item.variantId },
@@ -392,14 +391,7 @@ export class OrderService {
 
       //Restore stock
       if (newStatus === 'CANCELLED') {
-        for (const item of order.items) {
-          await tx.productVariant.update({
-            where: { id: item.variantId },
-            data: {
-              stock: { increment: item.quantity },
-            },
-          });
-        }
+        await this.restoreStock(tx, order.items);
       }
 
       const updatedOrder = await tx.order.findUnique({
