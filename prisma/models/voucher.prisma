@@ -12,10 +12,16 @@ model Voucher {
   usageLimit   Int?     // tổng số lượt dùng
   usedCount    Int      @default(0)
 
+  scope VoucherScope @default(ORDER)
+
   isActive     Boolean  @default(true)
 
   startAt      DateTime?
   endAt        DateTime?
+
+  userVouchers UserVoucher[]
+  products   Product[]   //  scope = PRODUCT
+  categories Category[]  //  scope = CATEGORY
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

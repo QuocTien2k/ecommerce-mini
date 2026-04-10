@@ -1,0 +1,17 @@
+model UserVoucher {
+  id        String @id @default(uuid())
+
+  userId    String
+  voucherId String
+
+  used      Boolean @default(false)
+
+  assignedAt DateTime @default(now())
+  usedAt     DateTime?
+  usagePerUser Int?
+
+  user     User    @relation(fields: [userId], references: [id])
+  voucher  Voucher @relation(fields: [voucherId], references: [id])
+
+  @@unique([userId, voucherId])
+}

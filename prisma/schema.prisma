@@ -24,6 +24,11 @@ enum Role {
   USER
   ADMIN
 }
+enum VoucherScope {
+  ORDER
+  PRODUCT
+  CATEGORY
+}
 enum VoucherType {
   PERCENT   // giảm theo %
   FIXED     // giảm số tiền cố định
@@ -105,6 +110,7 @@ model Category {
   deletedAt   DateTime?
 
   products    Product[]
+  vouchers Voucher[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -238,6 +244,7 @@ model Product {
   variants      ProductVariant[]
   ratings       Rating[]
   cartItems     CartItem[]
+  vouchers Voucher[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -263,6 +270,23 @@ model Rating {
   @@index([productId])
   @@map("ratings")
 }
+model UserVoucher {
+  id        String @id @default(uuid())
+
+  userId    String
+  voucherId String
+
+  used      Boolean @default(false)
+
+  assignedAt DateTime @default(now())
+  usedAt     DateTime?
+  usagePerUser Int?
+
+  user     User    @relation(fields: [userId], references: [id])
+  voucher  Voucher @relation(fields: [voucherId], references: [id])
+
+  @@unique([userId, voucherId])
+}
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -279,6 +303,7 @@ model User {
   cartItems CartItem[]
   orders    Order[]
   notifications Notification[]
+  userVouchers UserVoucher[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]
@@ -302,10 +327,16 @@ model Voucher {
   usageLimit   Int?     // tổng số lượt dùng
   usedCount    Int      @default(0)
 
+  scope VoucherScope @default(ORDER)
+
   isActive     Boolean  @default(true)
 
   startAt      DateTime?
   endAt        DateTime?
+
+  userVouchers UserVoucher[]
+  products   Product[]   //  scope = PRODUCT
+  categories Category[]  //  scope = CATEGORY
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

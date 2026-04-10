@@ -14,6 +14,7 @@ model Category {
   deletedAt   DateTime?
 
   products    Product[]
+  vouchers Voucher[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
