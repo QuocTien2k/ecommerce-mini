@@ -15,6 +15,7 @@ import {
   getPagination,
 } from '@common/utils/pagination';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
+import { OrderMapper } from './mapper/order.mapper';
 
 type OrderItemData = {
   productId: string;
@@ -474,11 +475,32 @@ export class OrderService {
     ]);
 
     // map label
-    const mapped = orders.map((order) => ({
-      ...order,
-      statusLabel: ORDER_STATUS_LABEL[order.status],
-    }));
+    const mapped = orders.map((order) => OrderMapper.toList(order));
 
     return buildPaginatedResponse(mapped, total, page, limit);
+  }
+
+  async getOrderDetail(orderId: string, userId: string, role: string) {
+    const roleFilter = role === 'ADMIN' ? {} : { userId };
+
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        ...roleFilter,
+      },
+      include: {
+        items: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Không tìm thấy đơn hàng');
+    }
+
+    return OrderMapper.toDetail(order);
   }
 }

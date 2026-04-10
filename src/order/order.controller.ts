@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -36,7 +37,7 @@ export class OrderController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   async updateStatus(
-    @Param('id') orderId: string,
+    @Param('id', new ParseUUIDPipe()) orderId: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
     const updated = await this.ordersService.updateOrderStatus(
@@ -55,8 +56,18 @@ export class OrderController {
   getOrders(
     @Query() query: GetOrdersQueryDto,
     @CurrentUser('sub') userId: string,
-    @CurrentUser('role') role: string,
+    @CurrentUser('role') role: Role,
   ) {
     return this.ordersService.getOrders(query, userId, role);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  getOrderDetail(
+    @Param('id', new ParseUUIDPipe()) orderId: string,
+    @CurrentUser('sub') userId: string,
+    @CurrentUser('role') role: Role,
+  ) {
+    return this.ordersService.getOrderDetail(orderId, userId, role);
   }
 }
