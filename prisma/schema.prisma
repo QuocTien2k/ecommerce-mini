@@ -333,6 +333,7 @@ model Voucher {
   scope VoucherScope @default(ORDER)
 
   isActive     Boolean  @default(true)
+  isDeleted    Boolean @default(false)
 
   startAt      DateTime?
   endAt        DateTime?

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -18,10 +19,38 @@ import { AssignVoucherDto } from './dtos/assign-voucher.dto';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
 import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
+import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 
 @Controller('voucher')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
+
+  @Get('user')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  async getMyVouchers(
+    @CurrentUser('sub') userId: string,
+    @Query() query: GetMyVouchersDto,
+  ) {
+    const data = await this.voucherService.getMyVouchers(userId, query);
+
+    return {
+      message: 'Lấy danh sách voucher thành công!',
+      data,
+    };
+  }
+
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getVouchersAdmin(@Query() query: GetVouchersAdminDto) {
+    const data = await this.voucherService.getVouchersAdmin(query);
+
+    return {
+      message: 'Lấy danh sách voucher thành công!',
+      data,
+    };
+  }
 
   @Post('')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -49,29 +78,17 @@ export class VoucherController {
     };
   }
 
-  @Get('user')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.USER)
-  async getMyVouchers(
-    @CurrentUser('sub') userId: string,
-    @Query() query: GetMyVouchersDto,
-  ) {
-    const data = await this.voucherService.getMyVouchers(userId, query);
-
-    return {
-      message: 'Lấy danh sách voucher thành công!',
-      data,
-    };
-  }
-
-  @Get('admin')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async getVouchersAdmin(@Query() query: GetVouchersAdminDto) {
-    const data = await this.voucherService.getVouchersAdmin(query);
+  async updateVoucher(
+    @Param('id', new ParseUUIDPipe()) voucherId: string,
+    @Body() dto: UpdateVoucherDto,
+  ) {
+    const data = await this.voucherService.updateVoucher(voucherId, dto);
 
     return {
-      message: 'Lấy danh sách voucher thành công!',
+      message: 'Cập nhật voucher thành công!',
       data,
     };
   }

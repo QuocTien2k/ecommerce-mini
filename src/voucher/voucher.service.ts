@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVoucherDto } from './dtos/create-voucher.dto';
-import { Prisma, VoucherScope, VoucherType } from '@prisma/client';
+import { Prisma, Voucher, VoucherScope, VoucherType } from '@prisma/client';
 import { AssignVoucherDto } from './dtos/assign-voucher.dto';
 import {
   buildPaginatedResponse,
@@ -14,6 +14,7 @@ import {
 import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
 import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { VoucherStatus } from './enum/voucher-status.enum';
+import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 
 @Injectable()
 export class VoucherService {
@@ -181,6 +182,7 @@ export class VoucherService {
       userId,
 
       voucher: {
+        isDeleted: false,
         isActive: true,
         AND: [
           {
@@ -274,7 +276,10 @@ export class VoucherService {
 
     const [data, total] = await Promise.all([
       this.prisma.voucher.findMany({
-        where,
+        where: {
+          ...where,
+          isDeleted: false,
+        },
         orderBy: {
           createdAt: 'desc',
         },
@@ -286,5 +291,67 @@ export class VoucherService {
     ]);
 
     return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  private validateUpdate(dto: UpdateVoucherDto, current: Voucher) {
+    const now = new Date();
+
+    if (dto.startAt && dto.endAt) {
+      if (new Date(dto.startAt) > new Date(dto.endAt)) {
+        throw new BadRequestException('startAt phải trước endAt');
+      }
+    }
+
+    if (dto.startAt && new Date(dto.startAt) < now) {
+      throw new BadRequestException('startAt không được ở quá khứ');
+    }
+
+    if (dto.endAt && new Date(dto.endAt) < now) {
+      throw new BadRequestException('endAt không hợp lệ');
+    }
+
+    // usageLimit: không cho giảm dưới usedCount
+    if (dto.usageLimit != null) {
+      if (dto.usageLimit < current.usedCount) {
+        throw new BadRequestException(
+          'usageLimit không được nhỏ hơn usedCount',
+        );
+      }
+    }
+  }
+
+  async updateVoucher(voucherId: string, dto: UpdateVoucherDto) {
+    const voucher = await this.prisma.voucher.findUnique({
+      where: { id: voucherId },
+    });
+
+    if (!voucher) {
+      throw new NotFoundException('Voucher không tồn tại');
+    }
+
+    if (voucher.isDeleted) {
+      throw new BadRequestException('Voucher đã bị xoá');
+    }
+
+    // check assign
+    const assigned = await this.prisma.userVoucher.findFirst({
+      where: { voucherId: voucherId },
+      select: { id: true },
+    });
+
+    if (assigned) {
+      throw new BadRequestException('Voucher đã được assign, không thể update');
+    }
+
+    this.validateUpdate(dto, voucher);
+
+    return this.prisma.voucher.update({
+      where: { id: voucherId },
+      data: {
+        ...dto,
+        startAt: dto.startAt ? new Date(dto.startAt) : undefined,
+        endAt: dto.endAt ? new Date(dto.endAt) : undefined,
+      },
+    });
   }
 }
