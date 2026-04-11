@@ -92,4 +92,16 @@ export class VoucherController {
       data,
     };
   }
+
+  @Patch('soft/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async softDelete(@Param('id', new ParseUUIDPipe()) voucherId: string) {
+    const data = await this.voucherService.softDeleteVoucher(voucherId);
+
+    return {
+      message: 'Đã xóa voucher thành công!',
+      data,
+    };
+  }
 }

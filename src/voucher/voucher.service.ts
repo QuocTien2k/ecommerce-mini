@@ -143,6 +143,10 @@ export class VoucherService {
       throw new BadRequestException('Voucher chưa active');
     }
 
+    if (voucher.isDeleted) {
+      throw new BadRequestException('Voucher đã bị xoá');
+    }
+
     const now = new Date();
 
     if (voucher.startAt && voucher.startAt > now) {
@@ -274,12 +278,14 @@ export class VoucherService {
 
     const where = this.buildAdminWhere(query);
 
+    const finalWhere = {
+      ...where,
+      isDeleted: false,
+    };
+
     const [data, total] = await Promise.all([
       this.prisma.voucher.findMany({
-        where: {
-          ...where,
-          isDeleted: false,
-        },
+        where: finalWhere,
         orderBy: {
           createdAt: 'desc',
         },
@@ -287,7 +293,7 @@ export class VoucherService {
         take: limit,
       }),
 
-      this.prisma.voucher.count({ where }),
+      this.prisma.voucher.count({ where: finalWhere }),
     ]);
 
     return buildPaginatedResponse(data, total, page, limit);
@@ -351,6 +357,39 @@ export class VoucherService {
         ...dto,
         startAt: dto.startAt ? new Date(dto.startAt) : undefined,
         endAt: dto.endAt ? new Date(dto.endAt) : undefined,
+      },
+    });
+  }
+
+  async softDeleteVoucher(voucherId: string) {
+    const voucher = await this.prisma.voucher.findUnique({
+      where: { id: voucherId },
+    });
+
+    if (!voucher) {
+      throw new NotFoundException('Voucher không tồn tại');
+    }
+
+    // đã assign → không cho xoá
+    const assigned = await this.prisma.userVoucher.findFirst({
+      where: { voucherId },
+      select: { id: true },
+    });
+
+    if (assigned) {
+      throw new BadRequestException('Voucher đã được assign, không thể xoá');
+    }
+
+    // đã bị xoá trước đó
+    if (voucher.isDeleted) {
+      throw new BadRequestException('Voucher đã bị xoá trước đó');
+    }
+
+    return this.prisma.voucher.update({
+      where: { id: voucherId },
+      data: {
+        isDeleted: true,
+        isActive: false,
       },
     });
   }
