@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVoucherDto } from './dtos/create-voucher.dto';
 import { Prisma, VoucherScope, VoucherType } from '@prisma/client';
+import { AssignVoucherDto } from './dtos/assign-voucher.dto';
 
 @Injectable()
 export class VoucherService {
@@ -109,5 +114,49 @@ export class VoucherService {
 
       throw error;
     }
+  }
+
+  async assignVoucherToUsers(voucherId: string, dto: AssignVoucherDto) {
+    const { userIds, usagePerUser } = dto;
+
+    const voucher = await this.prisma.voucher.findUnique({
+      where: { id: voucherId },
+    });
+
+    if (!voucher) {
+      throw new NotFoundException('Voucher không tồn tại');
+    }
+
+    if (!voucher.isActive) {
+      throw new BadRequestException('Voucher chưa active');
+    }
+
+    const now = new Date();
+
+    if (voucher.startAt && voucher.startAt > now) {
+      throw new BadRequestException('Voucher chưa đến thời gian sử dụng');
+    }
+
+    if (voucher.endAt && voucher.endAt < now) {
+      throw new BadRequestException('Voucher đã hết hạn');
+    }
+
+    //build data
+    const data: Prisma.UserVoucherCreateManyInput[] = userIds.map((userId) => ({
+      userId,
+      voucherId,
+      usagePerUser,
+      usedCount: 0,
+    }));
+
+    //insert bulk
+    const result = await this.prisma.userVoucher.createMany({
+      data,
+      skipDuplicates: true,
+    });
+
+    return {
+      assigned: result.count,
+    };
   }
 }

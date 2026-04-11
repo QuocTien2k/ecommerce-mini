@@ -276,6 +276,7 @@ model UserVoucher {
   userId    String
   voucherId String
 
+  usedCount Int @default(0)
   used      Boolean @default(false)
 
   assignedAt DateTime @default(now())
