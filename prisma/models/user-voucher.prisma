@@ -10,6 +10,8 @@ model UserVoucher {
   assignedAt DateTime @default(now())
   usedAt     DateTime?
   usagePerUser Int?
+  
+  remainingUsage Int? // = usagePerUser - usedCount
 
   user     User    @relation(fields: [userId], references: [id])
   voucher  Voucher @relation(fields: [voucherId], references: [id])

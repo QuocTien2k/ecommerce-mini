@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
@@ -13,6 +15,9 @@ import { Role } from '@prisma/client';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { CreateVoucherDto } from './dtos/create-voucher.dto';
 import { AssignVoucherDto } from './dtos/assign-voucher.dto';
+import { CurrentUser } from '@auth/decorators/current-user.decorator';
+import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
+import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 
 @Controller('voucher')
 export class VoucherController {
@@ -40,6 +45,33 @@ export class VoucherController {
     const data = await this.voucherService.assignVoucherToUsers(voucherId, dto);
     return {
       message: 'Gửi voucher thành công!',
+      data,
+    };
+  }
+
+  @Get('user')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  async getMyVouchers(
+    @CurrentUser('sub') userId: string,
+    @Query() query: GetMyVouchersDto,
+  ) {
+    const data = await this.voucherService.getMyVouchers(userId, query);
+
+    return {
+      message: 'Lấy danh sách voucher thành công!',
+      data,
+    };
+  }
+
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getVouchersAdmin(@Query() query: GetVouchersAdminDto) {
+    const data = await this.voucherService.getVouchersAdmin(query);
+
+    return {
+      message: 'Lấy danh sách voucher thành công!',
       data,
     };
   }

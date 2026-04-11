@@ -7,6 +7,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVoucherDto } from './dtos/create-voucher.dto';
 import { Prisma, VoucherScope, VoucherType } from '@prisma/client';
 import { AssignVoucherDto } from './dtos/assign-voucher.dto';
+import {
+  buildPaginatedResponse,
+  getPagination,
+} from '@common/utils/pagination';
+import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
+import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
+import { VoucherStatus } from './enum/voucher-status.enum';
 
 @Injectable()
 export class VoucherService {
@@ -41,6 +48,10 @@ export class VoucherService {
     const now = new Date();
     if (dto.startAt && new Date(dto.startAt).getTime() < now.getTime()) {
       throw new BadRequestException('startAt không được ở quá khứ');
+    }
+
+    if (dto.endAt && new Date(dto.endAt).getTime() < now.getTime()) {
+      throw new BadRequestException('endAt không hợp lệ (đã ở quá khứ)');
     }
 
     // scope validation
@@ -141,11 +152,13 @@ export class VoucherService {
       throw new BadRequestException('Voucher đã hết hạn');
     }
 
+    const usage = usagePerUser ?? 1;
+
     //build data
     const data: Prisma.UserVoucherCreateManyInput[] = userIds.map((userId) => ({
       userId,
       voucherId,
-      usagePerUser,
+      usagePerUser: usage,
       usedCount: 0,
     }));
 
@@ -158,5 +171,120 @@ export class VoucherService {
     return {
       assigned: result.count,
     };
+  }
+
+  async getMyVouchers(userId: string, query: GetMyVouchersDto) {
+    const { page, limit, skip } = getPagination(query);
+    const now = new Date();
+
+    const where: Prisma.UserVoucherWhereInput = {
+      userId,
+
+      voucher: {
+        isActive: true,
+        AND: [
+          {
+            OR: [{ startAt: null }, { startAt: { lte: now } }],
+          },
+          {
+            OR: [{ endAt: null }, { endAt: { gte: now } }],
+          },
+        ],
+      },
+
+      // còn lượt dùng
+      OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.userVoucher.findMany({
+        where,
+        include: {
+          voucher: true,
+        },
+        orderBy: {
+          assignedAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.userVoucher.count({ where }),
+    ]);
+
+    return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  private buildAdminWhere(dto: GetVouchersAdminDto): Prisma.VoucherWhereInput {
+    const { search, type, scope, isActive, status } = dto;
+    const now = new Date();
+
+    let statusCondition: Prisma.VoucherWhereInput = {};
+
+    if (status === VoucherStatus.UPCOMING) {
+      statusCondition = {
+        startAt: { gt: now },
+      };
+    }
+
+    if (status === VoucherStatus.ACTIVE) {
+      statusCondition = {
+        isActive: true,
+        AND: [
+          {
+            OR: [{ startAt: null }, { startAt: { lte: now } }],
+          },
+          {
+            OR: [{ endAt: null }, { endAt: { gte: now } }],
+          },
+        ],
+      };
+    }
+
+    if (status === VoucherStatus.EXPIRED) {
+      statusCondition = {
+        OR: [{ endAt: { lt: now } }, { isActive: false }],
+      };
+    }
+
+    return {
+      ...(search && {
+        code: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      }),
+
+      ...(type && { type }),
+      ...(scope && { scope }),
+
+      ...(isActive !== undefined && { isActive }),
+
+      ...statusCondition,
+    };
+  }
+
+  async getVouchersAdmin(query: GetVouchersAdminDto) {
+    const { page, limit, skip } = getPagination({
+      ...query,
+      limit: query.limit ?? 8,
+    });
+
+    const where = this.buildAdminWhere(query);
+
+    const [data, total] = await Promise.all([
+      this.prisma.voucher.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+
+      this.prisma.voucher.count({ where }),
+    ]);
+
+    return buildPaginatedResponse(data, total, page, limit);
   }
 }
