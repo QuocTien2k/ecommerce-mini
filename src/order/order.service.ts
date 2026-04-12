@@ -18,46 +18,12 @@ import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 import { OrderMapper } from './mapper/order.mapper';
 import { VoucherService } from '@voucher/voucher.service';
 import { DecimalUtil } from '@common/utils/decimal';
-
-type OrderItemData = {
-  productId: string;
-  variantId: string;
-  quantity: number;
-  price: Prisma.Decimal;
-  productName: string;
-  productImage: string | null;
-  selectedAttributes?: any;
-};
-
-type ApplyVoucherResult = {
-  subtotal: number; // tổng tiền trước voucher (từ voucher service)
-  discount: number; // số tiền được giảm
-  finalTotal: number; // tổng sau giảm (không dùng trong order)
-  appliedSubtotal: number; // tổng tiền áp dụng voucher
-  voucherId: string;
-  voucherCode?: string;
-  type?: VoucherType; // VoucherType
-  value?: number; // giá trị voucher
-};
-
-type NormalizedItem = { variantId: string; quantity: number };
-
-type CreateOrderContext = {
-  userId: string;
-  receiver: {
-    receiverName: string;
-    receiverPhone: string;
-    receiverAddress: string;
-  };
-  orderItemsData: OrderItemData[];
-  subtotal: Prisma.Decimal; // tổng tiền gốc (trước voucher)
-  discountAmount: Prisma.Decimal; // số tiền giảm thực tế
-  totalPrice: Prisma.Decimal; // tổng thanh toán cuối cùng
-  voucherCode: string | null;
-  voucherType: VoucherType | null;
-  voucherValue: Prisma.Decimal | null;
-  note?: string;
-};
+import {
+  OrderItemData,
+  ApplyVoucherResult,
+  NormalizedItem,
+  CreateOrderContext,
+} from './types/order.type';
 
 @Injectable()
 export class OrderService {
