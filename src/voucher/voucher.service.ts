@@ -15,6 +15,7 @@ import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
 import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { VoucherStatus } from './enum/voucher-status.enum';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
+import { ApplyVoucherDto } from './dtos/apply-voucher.dto';
 
 @Injectable()
 export class VoucherService {
@@ -392,5 +393,153 @@ export class VoucherService {
         isActive: false,
       },
     });
+  }
+
+  async applyVoucher(
+    userId: string,
+    dto: ApplyVoucherDto,
+  ): Promise<ApplyVoucherResult> {
+    const { voucherCode, items } = dto;
+
+    // 1. Fetch voucher + relations
+    const voucher = await this.prisma.voucher.findUnique({
+      where: { code: voucherCode },
+      include: {
+        products: { select: { id: true } },
+        categories: { select: { id: true } },
+        userVouchers: {
+          where: { userId },
+        },
+      },
+    });
+
+    if (!voucher || voucher.isDeleted || !voucher.isActive) {
+      throw new BadRequestException('Voucher không hợp lệ');
+    }
+
+    // 2. Validate thời gian
+    const now = new Date();
+    if (voucher.startAt && voucher.startAt > now) {
+      throw new BadRequestException('Voucher chưa bắt đầu');
+    }
+
+    if (voucher.endAt && voucher.endAt < now) {
+      throw new BadRequestException('Voucher đã hết hạn');
+    }
+
+    // 3. Validate global usage
+    if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+      throw new BadRequestException('Voucher đã hết lượt sử dụng');
+    }
+
+    // 4. Validate userVoucher
+    const userVoucher = voucher.userVouchers[0];
+
+    if (!userVoucher) {
+      throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
+    }
+
+    const remaining =
+      userVoucher.remainingUsage ??
+      (userVoucher.usagePerUser != null
+        ? userVoucher.usagePerUser - userVoucher.usedCount
+        : null);
+
+    if (remaining != null && remaining <= 0) {
+      throw new BadRequestException('Bạn đã dùng hết voucher này');
+    }
+
+    // 5. Fetch product data (price + category)
+    const productIds = items.map((i) => i.productId);
+
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: {
+        id: true,
+        price: true,
+        discountPrice: true,
+        categoryId: true,
+      },
+    });
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    // 6. Build cart
+    const enrichedItems = items.map((i) => {
+      const product = productMap.get(i.productId);
+      if (!product) {
+        throw new BadRequestException('Product không tồn tại');
+      }
+
+      const price = Number(product.discountPrice ?? product.price);
+
+      return {
+        ...i,
+        price,
+        categoryId: product.categoryId,
+      };
+    });
+
+    // 7. Subtotal
+    const subtotal = enrichedItems.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0,
+    );
+
+    // 8. minOrderValue
+    if (voucher.minOrderValue && subtotal < Number(voucher.minOrderValue)) {
+      throw new BadRequestException('Không đạt giá trị đơn tối thiểu');
+    }
+
+    // 9. Scope filtering
+    let applicableItems = enrichedItems;
+
+    if (voucher.scope === VoucherScope.PRODUCT) {
+      const allowed = new Set(voucher.products.map((p) => p.id));
+      applicableItems = enrichedItems.filter((i) => allowed.has(i.productId));
+    }
+
+    if (voucher.scope === VoucherScope.CATEGORY) {
+      const allowed = new Set(voucher.categories.map((c) => c.id));
+      applicableItems = enrichedItems.filter((i) => allowed.has(i.categoryId));
+    }
+
+    const appliedSubtotal = applicableItems.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0,
+    );
+
+    if (appliedSubtotal <= 0) {
+      throw new BadRequestException(
+        'Voucher không áp dụng được cho đơn hàng này',
+      );
+    }
+
+    // 10. Calculate discount
+    let discount = 0;
+
+    if (voucher.type === VoucherType.PERCENT) {
+      discount = appliedSubtotal * (Number(voucher.value) / 100);
+
+      if (voucher.maxDiscount) {
+        discount = Math.min(discount, Number(voucher.maxDiscount));
+      }
+    }
+
+    if (voucher.type === VoucherType.FIXED) {
+      discount = Number(voucher.value);
+      discount = Math.min(discount, appliedSubtotal);
+    }
+
+    // 11. Final
+    const finalTotal = subtotal - discount;
+
+    return {
+      subtotal,
+      discount,
+      finalTotal,
+      appliedSubtotal,
+      voucherId: voucher.id,
+    };
   }
 }
