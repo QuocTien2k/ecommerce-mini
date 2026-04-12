@@ -18,6 +18,7 @@ import { CreateOrderDto } from './dtos/create-order.dto';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { UpdateOrderStatusDto } from './dtos/update-order.dto';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
+import { OrderMapper } from './mapper/order.mapper';
 
 @Controller('order')
 export class OrderController {
@@ -30,7 +31,12 @@ export class OrderController {
     @Body() dto: CreateOrderDto,
     @CurrentUser('sub') userId: string,
   ) {
-    return await this.ordersService.createOrder(userId, dto);
+    const order = await this.ordersService.createOrder(userId, dto);
+
+    return {
+      message: 'Tạo đơn hàng thành công',
+      data: OrderMapper.toDetail(order),
+    };
   }
 
   @Patch(':id')

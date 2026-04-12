@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrderStatus, Prisma, User } from '@prisma/client';
+import { OrderStatus, Prisma, User, VoucherType } from '@prisma/client';
 import { UserService } from '@user/user.service';
 import { CreateOrderItemDto } from './dtos/create-order-item.input';
 import { NotificationsGateway } from '@notification/notification.gateway';
@@ -16,6 +16,8 @@ import {
 } from '@common/utils/pagination';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 import { OrderMapper } from './mapper/order.mapper';
+import { VoucherService } from '@voucher/voucher.service';
+import { DecimalUtil } from '@common/utils/decimal';
 
 type OrderItemData = {
   productId: string;
@@ -25,6 +27,17 @@ type OrderItemData = {
   productName: string;
   productImage: string | null;
   selectedAttributes?: any;
+};
+
+type ApplyVoucherResult = {
+  subtotal: number; // tổng tiền trước voucher (từ voucher service)
+  discount: number; // số tiền được giảm
+  finalTotal: number; // tổng sau giảm (không dùng trong order)
+  appliedSubtotal: number; // tổng tiền áp dụng voucher
+  voucherId: string;
+  voucherCode?: string;
+  type?: VoucherType; // VoucherType
+  value?: number; // giá trị voucher
 };
 
 type NormalizedItem = { variantId: string; quantity: number };
@@ -37,10 +50,12 @@ type CreateOrderContext = {
     receiverAddress: string;
   };
   orderItemsData: OrderItemData[];
-  subtotal: Prisma.Decimal;
-  discountAmount: Prisma.Decimal;
-  totalPrice: Prisma.Decimal;
-  appliedVoucher: any; // có thể định Voucher type rõ hơn nếu muốn
+  subtotal: Prisma.Decimal; // tổng tiền gốc (trước voucher)
+  discountAmount: Prisma.Decimal; // số tiền giảm thực tế
+  totalPrice: Prisma.Decimal; // tổng thanh toán cuối cùng
+  voucherCode: string | null;
+  voucherType: VoucherType | null;
+  voucherValue: Prisma.Decimal | null;
   note?: string;
 };
 
@@ -49,6 +64,7 @@ export class OrderService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
+    private voucherService: VoucherService,
     private notificationsGateway: NotificationsGateway,
   ) {}
 
@@ -119,74 +135,6 @@ export class OrderService {
     return { orderItemsData, subtotal };
   }
 
-  private async applyVoucher(
-    tx: Prisma.TransactionClient,
-    voucherCode: string | undefined,
-    subtotal: Prisma.Decimal,
-  ) {
-    if (!voucherCode)
-      return { discountAmount: new Prisma.Decimal(0), appliedVoucher: null };
-
-    const appliedVoucher = await tx.voucher.findUnique({
-      where: { code: voucherCode },
-    });
-
-    if (!appliedVoucher || !appliedVoucher.isActive) {
-      throw new BadRequestException('Voucher không hợp lệ');
-    }
-
-    const now = new Date();
-    if (
-      (appliedVoucher.startAt && appliedVoucher.startAt > now) ||
-      (appliedVoucher.endAt && appliedVoucher.endAt < now)
-    ) {
-      throw new BadRequestException('Voucher không khả dụng');
-    }
-
-    if (
-      appliedVoucher.minOrderValue &&
-      subtotal.lt(appliedVoucher.minOrderValue)
-    ) {
-      throw new BadRequestException('Không đủ giá trị đơn hàng');
-    }
-
-    const whereCondition = {
-      id: appliedVoucher.id,
-      isActive: true,
-      ...(appliedVoucher.usageLimit
-        ? { usedCount: { lt: appliedVoucher.usageLimit } } // nếu usageLimit có giá trị
-        : {}), // nếu null → bỏ điều kiện
-    };
-
-    // Atomic consume
-    const updated = await tx.voucher.updateMany({
-      where: whereCondition,
-      data: { usedCount: { increment: 1 } },
-    });
-
-    if (updated.count === 0) {
-      throw new BadRequestException('Voucher đã hết lượt sử dụng');
-    }
-
-    // Tính discount
-    let discountAmount: Prisma.Decimal;
-    if (appliedVoucher.type === 'FIXED') {
-      discountAmount = new Prisma.Decimal(appliedVoucher.value);
-    } else {
-      discountAmount = subtotal.mul(appliedVoucher.value).div(100);
-      if (appliedVoucher.maxDiscount) {
-        discountAmount = Prisma.Decimal.min(
-          discountAmount,
-          new Prisma.Decimal(appliedVoucher.maxDiscount),
-        );
-      }
-    }
-
-    if (discountAmount.gt(subtotal)) discountAmount = subtotal;
-
-    return { discountAmount, appliedVoucher };
-  }
-
   private async updateStock(
     tx: Prisma.TransactionClient,
     normalizedItems: NormalizedItem[],
@@ -221,7 +169,9 @@ export class OrderService {
       subtotal,
       discountAmount,
       totalPrice,
-      appliedVoucher,
+      voucherCode,
+      voucherType,
+      voucherValue,
       note,
     } = ctx;
 
@@ -233,9 +183,9 @@ export class OrderService {
         totalPrice,
 
         // Voucher snapshot
-        voucherCode: appliedVoucher?.code || null,
-        voucherType: appliedVoucher?.type || null,
-        voucherValue: appliedVoucher?.value || null,
+        voucherCode,
+        voucherType,
+        voucherValue,
 
         // Receiver snapshot
         receiverName: receiver.receiverName,
@@ -245,7 +195,7 @@ export class OrderService {
         // Metadata
         note: note || null,
 
-        // Relation: order items
+        // Relation
         items: {
           create: orderItemsData,
         },
@@ -281,55 +231,287 @@ export class OrderService {
     }
   }
 
+  // async createOrder(userId: string, dto: CreateOrderDto) {
+  //   const user = await this.userService.findById(userId);
+  //   if (!user) {
+  //     throw new NotFoundException('Không tìm thấy người dùng!');
+  //   }
+
+  //   //Resolve receiver info
+  //   const receiver = this.resolveReceiver(dto, user);
+
+  //   //Validate input
+  //   this.validateInput(dto, receiver);
+
+  //   //Transaction
+  //   return this.prisma.$transaction(async (tx) => {
+  //     //Normalize items
+  //     const normalizedItems = this.normalizeItems(dto.items);
+
+  //     //Build order items + subtotal
+  //     const { orderItemsData, subtotal } = await this.buildOrderItems(
+  //       tx,
+  //       normalizedItems,
+  //     );
+
+  //     //Apply voucher
+  //     const { discountAmount, appliedVoucher } = await this.applyVoucher(
+  //       tx,
+  //       dto.voucherCode,
+  //       subtotal,
+  //     );
+
+  //     //Tính tổng
+  //     const totalPrice = subtotal.sub(discountAmount);
+
+  //     //Update stock
+  //     await this.updateStock(tx, normalizedItems);
+
+  //     //Tạo order
+  //     const ctx: CreateOrderContext = {
+  //       userId,
+  //       receiver,
+  //       orderItemsData,
+  //       subtotal,
+  //       discountAmount,
+  //       totalPrice,
+  //       appliedVoucher,
+  //       note: dto.note,
+  //     };
+
+  //     return this.createOrderRecord(tx, ctx);
+  //   });
+  // }
+
+  // async createOrder(userId: string, dto: CreateOrderDto) {
+  //   const user = await this.userService.findById(userId);
+
+  //   if (!user) {
+  //     throw new NotFoundException('Không tìm thấy người dùng!');
+  //   }
+
+  //   const receiver = this.resolveReceiver(dto, user);
+
+  //   this.validateInput(dto, receiver);
+
+  //   return this.prisma.$transaction(async (tx) => {
+  //     // 1. Normalize items (merge quantity theo variant)
+  //     const normalizedItems = this.normalizeItems(dto.items);
+
+  //     const variantIds = normalizedItems.map((i) => i.variantId);
+
+  //     // 2. Fetch variants + product snapshot data
+  //     const variants = await tx.productVariant.findMany({
+  //       where: { id: { in: variantIds } },
+  //       include: { product: true },
+  //     });
+
+  //     if (variants.length !== variantIds.length) {
+  //       throw new NotFoundException('Một hoặc nhiều biến thể không tồn tại');
+  //     }
+
+  //     const variantMap = new Map(variants.map((v) => [v.id, v]));
+
+  //     let subtotal = new Prisma.Decimal(0);
+
+  //     const orderItemsData: OrderItemData[] = [];
+
+  //     for (const item of normalizedItems) {
+  //       const variant = variantMap.get(item.variantId)!;
+  //       const product = variant.product;
+
+  //       if (!product.isActive) {
+  //         throw new BadRequestException(
+  //           `Sản phẩm "${product.name}" hiện ngừng kinh doanh`,
+  //         );
+  //       }
+
+  //       const price = new Prisma.Decimal(
+  //         product.discountPrice ?? product.price,
+  //       );
+
+  //       const lineTotal = DecimalUtil.mul(price, item.quantity);
+  //       subtotal = DecimalUtil.add(subtotal, lineTotal);
+
+  //       orderItemsData.push({
+  //         productId: product.id,
+  //         variantId: variant.id,
+  //         quantity: item.quantity,
+  //         price,
+  //         productName: product.name,
+  //         productImage: variant.images?.[0] ?? null,
+  //         selectedAttributes: variant.attributes ?? undefined,
+  //       });
+  //     }
+
+  //     // 3. Apply voucher (SOURCE OF TRUTH)
+  //     let voucherResult: ApplyVoucherResult | null = null;
+
+  //     if (dto.voucherCode) {
+  //       voucherResult = await this.voucherService.applyVoucher(userId, {
+  //         voucherCode: dto.voucherCode,
+  //         items: dto.items,
+  //       });
+  //     }
+
+  //     const discountAmount = new Prisma.Decimal(voucherResult?.discount ?? 0);
+
+  //     const finalSubtotal = new Prisma.Decimal(
+  //       voucherResult?.subtotal ?? subtotal,
+  //     );
+
+  //     const totalPrice = DecimalUtil.sub(finalSubtotal, discountAmount);
+
+  //     // 4. Update stock (atomic check)
+  //     for (const item of normalizedItems) {
+  //       const updated = await tx.productVariant.updateMany({
+  //         where: {
+  //           id: item.variantId,
+  //           stock: { gte: item.quantity },
+  //         },
+  //         data: {
+  //           stock: { decrement: item.quantity },
+  //         },
+  //       });
+
+  //       if (updated.count === 0) {
+  //         throw new BadRequestException(
+  //           `Không đủ tồn kho cho biến thể ${item.variantId}`,
+  //         );
+  //       }
+  //     }
+
+  //     // 5. Update voucher usage (IMPORTANT - prevent race condition)
+  //     if (voucherResult) {
+  //       await tx.voucher.update({
+  //         where: { id: voucherResult.voucherId },
+  //         data: {
+  //           usedCount: { increment: 1 },
+  //         },
+  //       });
+
+  //       await tx.userVoucher.updateMany({
+  //         where: {
+  //           userId,
+  //           voucherId: voucherResult.voucherId,
+  //         },
+  //         data: {
+  //           usedCount: { increment: 1 },
+  //           remainingUsage: { decrement: 1 },
+  //         },
+  //       });
+  //     }
+
+  //     // 6. Create order
+  //     const order = await tx.order.create({
+  //       data: {
+  //         userId,
+
+  //         subtotal: finalSubtotal,
+  //         discountAmount,
+  //         totalPrice,
+
+  //         voucherCode: voucherResult?.voucherCode ?? null,
+  //         voucherType: voucherResult?.type ?? null,
+  //         voucherValue: voucherResult?.value ?? null,
+
+  //         receiverName: receiver.receiverName,
+  //         receiverPhone: receiver.receiverPhone,
+  //         receiverAddress: receiver.receiverAddress,
+
+  //         note: dto.note ?? null,
+
+  //         items: {
+  //           create: orderItemsData,
+  //         },
+  //       },
+  //       include: {
+  //         items: true,
+  //       },
+  //     });
+
+  //     return order;
+  //   });
+  // }
+
   async createOrder(userId: string, dto: CreateOrderDto) {
     const user = await this.userService.findById(userId);
     if (!user) {
       throw new NotFoundException('Không tìm thấy người dùng!');
     }
 
-    //Resolve receiver info
     const receiver = this.resolveReceiver(dto, user);
-
-    //Validate input
     this.validateInput(dto, receiver);
 
-    //Transaction
     return this.prisma.$transaction(async (tx) => {
-      //Normalize items
+      //Normalize items (merge quantity theo variant)
       const normalizedItems = this.normalizeItems(dto.items);
 
-      //Build order items + subtotal
+      //Build order items + tính subtotal gốc (không voucher)
       const { orderItemsData, subtotal } = await this.buildOrderItems(
         tx,
         normalizedItems,
       );
 
-      //Apply voucher
-      const { discountAmount, appliedVoucher } = await this.applyVoucher(
-        tx,
-        dto.voucherCode,
-        subtotal,
-      );
+      //Apply voucher (nếu có)
+      let voucherResult: ApplyVoucherResult | null = null;
+      let discountAmount = new Prisma.Decimal(0);
 
-      //Tính tổng
-      const totalPrice = subtotal.sub(discountAmount);
+      if (dto.voucherCode) {
+        voucherResult = await this.voucherService.applyVoucher(userId, {
+          voucherCode: dto.voucherCode,
+          items: orderItemsData.map((i) => ({
+            productId: i.productId,
+            quantity: i.quantity,
+          })),
+        });
+
+        discountAmount = new Prisma.Decimal(voucherResult.discount);
+      }
+
+      const totalPrice = DecimalUtil.sub(subtotal, discountAmount);
 
       //Update stock
       await this.updateStock(tx, normalizedItems);
 
+      //Update voucher usage (nếu có voucher)
+      if (voucherResult) {
+        await tx.voucher.update({
+          where: { id: voucherResult.voucherId },
+          data: {
+            usedCount: { increment: 1 },
+          },
+        });
+
+        await tx.userVoucher.updateMany({
+          where: {
+            userId,
+            voucherId: voucherResult.voucherId,
+          },
+          data: {
+            usedCount: { increment: 1 },
+            ...(true && { remainingUsage: { decrement: 1 } }),
+          },
+        });
+      }
+
       //Tạo order
-      const ctx: CreateOrderContext = {
+      const order = await this.createOrderRecord(tx, {
         userId,
         receiver,
         orderItemsData,
         subtotal,
         discountAmount,
         totalPrice,
-        appliedVoucher,
+        voucherCode: voucherResult?.voucherCode ?? null,
+        voucherType: voucherResult?.type ?? null,
+        voucherValue: voucherResult
+          ? new Prisma.Decimal(voucherResult.value ?? 0)
+          : null,
         note: dto.note,
-      };
+      });
 
-      return this.createOrderRecord(tx, ctx);
+      return order;
     });
   }
 
