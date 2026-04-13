@@ -1,0 +1,35 @@
+model Payment {
+  id                     String         @id @default(uuid())
+
+  // relations
+  orderId                String         @unique
+  order                  Order          @relation(fields: [orderId], references: [id])
+
+  userId                 String
+  user                   User           @relation(fields: [userId], references: [id])
+
+  // payment info
+  method                 PaymentMethod
+  status                 PaymentStatus  @default(PENDING)
+
+  amount                 Decimal        @db.Decimal(12, 2)
+
+  // gateway mapping
+  transactionRef         String         @unique
+  gatewayTransactionId   String?
+
+  // time
+  paidAt                 DateTime?
+  expiredAt              DateTime?
+
+  // debug
+  rawResponse            Json?
+
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([method])
+  @@map("payments")
+}

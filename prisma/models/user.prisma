@@ -15,6 +15,7 @@ model User {
   orders    Order[]
   notifications Notification[]
   userVouchers UserVoucher[]
+  payments  Payment[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]

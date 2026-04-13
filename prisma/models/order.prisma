@@ -29,6 +29,7 @@ model Order {
 
   items           OrderItem[]
   notifications Notification[]
+  payment Payment?
 
   @@index([userId])
   @@index([status])

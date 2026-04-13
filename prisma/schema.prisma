@@ -20,6 +20,18 @@ enum OrderStatus {
 
   CANCELLED      // hủy (bất kỳ stage trước delivered)
 }
+enum PaymentMethod {
+  COD
+  VNPAY
+  MOMO
+}
+
+enum PaymentStatus {
+  PENDING     // vừa tạo, chưa thanh toán
+  SUCCESS     // thanh toán thành công
+  FAILED      // thất bại
+  CANCELLED   // user huỷ / hết hạn
+}
 enum Role {
   USER
   ADMIN
@@ -191,10 +203,46 @@ model Order {
 
   items           OrderItem[]
   notifications Notification[]
+  payment Payment?
 
   @@index([userId])
   @@index([status])
   @@map("orders")
+}
+model Payment {
+  id                     String         @id @default(uuid())
+
+  // relations
+  orderId                String         @unique
+  order                  Order          @relation(fields: [orderId], references: [id])
+
+  userId                 String
+  user                   User           @relation(fields: [userId], references: [id])
+
+  // payment info
+  method                 PaymentMethod
+  status                 PaymentStatus  @default(PENDING)
+
+  amount                 Decimal        @db.Decimal(12, 2)
+
+  // gateway mapping
+  transactionRef         String         @unique
+  gatewayTransactionId   String?
+
+  // time
+  paidAt                 DateTime?
+  expiredAt              DateTime?
+
+  // debug
+  rawResponse            Json?
+
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([method])
+  @@map("payments")
 }
 model ProductVariant {
   id              String   @id @default(uuid())
@@ -307,6 +355,7 @@ model User {
   orders    Order[]
   notifications Notification[]
   userVouchers UserVoucher[]
+  payments  Payment[]
 
   refreshTokens RefreshToken[]
   passwordResetTokens PasswordResetToken[]
