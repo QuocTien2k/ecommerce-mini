@@ -27,7 +27,8 @@
       "@cart-items/*": ["src/cart-items/*"],
       "@order/*": ["src/order/*"],
       "@notification/*": ["src/notification/*"],
-      "@voucher/*": ["src/voucher/*"]
+      "@voucher/*": ["src/voucher/*"],
+      "@payment/*": ["src/payment/*"]
     },
 
     "incremental": true,

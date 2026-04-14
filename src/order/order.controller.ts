@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -19,6 +20,7 @@ import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { UpdateOrderStatusDto } from './dtos/update-order.dto';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 import { OrderMapper } from './mapper/order.mapper';
+import { Request } from 'express';
 
 @Controller('order')
 export class OrderController {
@@ -30,12 +32,21 @@ export class OrderController {
   async createOrder(
     @Body() dto: CreateOrderDto,
     @CurrentUser('sub') userId: string,
+    @Req() req: Request,
   ) {
-    const order = await this.ordersService.createOrder(userId, dto);
+    const ipAddr =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+      req.socket?.remoteAddress ||
+      '127.0.0.1';
+
+    const result = await this.ordersService.createOrder(userId, dto, ipAddr);
 
     return {
       message: 'Tạo đơn hàng thành công',
-      data: OrderMapper.toDetail(order),
+      data: {
+        order: OrderMapper.toDetail(result.order),
+        payment: result.payment,
+      },
     };
   }
 

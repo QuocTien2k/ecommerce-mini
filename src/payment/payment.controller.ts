@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Query,
   Req,
@@ -55,5 +57,15 @@ export class PaymentController {
     const result = await this.paymentService.handleVnpayReturn(query);
 
     return result;
+  }
+
+  @Get('status/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getPaymentStatus(
+    @Param('id', new ParseUUIDPipe()) orderId: string,
+    @CurrentUser('sub') userId: string,
+  ) {
+    return await this.paymentService.getPaymentStatus(userId, orderId);
   }
 }

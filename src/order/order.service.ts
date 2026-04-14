@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrderStatus, Prisma, User, VoucherType } from '@prisma/client';
+import {
+  OrderStatus,
+  PaymentMethod,
+  Prisma,
+  User,
+  VoucherType,
+} from '@prisma/client';
 import { UserService } from '@user/user.service';
 import { CreateOrderItemDto } from './dtos/create-order-item.input';
 import { NotificationsGateway } from '@notification/notification.gateway';
@@ -24,6 +30,7 @@ import {
   NormalizedItem,
   CreateOrderContext,
 } from './types/order.type';
+import { PaymentService } from 'src/payment/payment.service';
 
 @Injectable()
 export class OrderService {
@@ -31,6 +38,7 @@ export class OrderService {
     private prisma: PrismaService,
     private userService: UserService,
     private voucherService: VoucherService,
+    private paymentService: PaymentService,
     private notificationsGateway: NotificationsGateway,
   ) {}
 
@@ -400,7 +408,7 @@ export class OrderService {
   //   });
   // }
 
-  async createOrder(userId: string, dto: CreateOrderDto) {
+  async createOrder(userId: string, dto: CreateOrderDto, ipAddr: string) {
     const user = await this.userService.findById(userId);
     if (!user) {
       throw new NotFoundException('Không tìm thấy người dùng!');
@@ -409,7 +417,7 @@ export class OrderService {
     const receiver = this.resolveReceiver(dto, user);
     this.validateInput(dto, receiver);
 
-    return this.prisma.$transaction(async (tx) => {
+    const order = await this.prisma.$transaction(async (tx) => {
       //Normalize items (merge quantity theo variant)
       const normalizedItems = this.normalizeItems(dto.items);
 
@@ -462,7 +470,7 @@ export class OrderService {
       }
 
       //Tạo order
-      const order = await this.createOrderRecord(tx, {
+      return await this.createOrderRecord(tx, {
         userId,
         receiver,
         orderItemsData,
@@ -476,9 +484,30 @@ export class OrderService {
           : null,
         note: dto.note,
       });
-
-      return order;
     });
+
+    //PAYMENT
+    if (dto.paymentMethod === PaymentMethod.VNPAY) {
+      const { paymentUrl, paymentId } =
+        await this.paymentService.createVnpayPayment(userId, order.id, ipAddr);
+
+      return {
+        order,
+        payment: {
+          method: PaymentMethod.VNPAY,
+          paymentId,
+          paymentUrl,
+        },
+      };
+    }
+
+    return {
+      order,
+      payment: {
+        method: PaymentMethod.COD,
+        status: 'PENDING',
+      },
+    };
   }
 
   private validTransitions: Record<OrderStatus, OrderStatus[]> = {

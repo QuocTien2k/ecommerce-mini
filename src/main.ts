@@ -27,23 +27,23 @@ async function bootstrap() {
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
         const errors: Record<string, string[]> = {};
 
-        validationErrors.forEach((error) => {
-          const field = error.property;
+        const extractErrors = (errs: ValidationError[], parentPath = '') => {
+          for (const err of errs) {
+            const fieldPath = parentPath
+              ? `${parentPath}.${err.property}`
+              : err.property;
 
-          if (error.constraints) {
-            errors[field] = Object.values(error.constraints);
-          }
+            if (err.constraints) {
+              errors[fieldPath] = Object.values(err.constraints);
+            }
 
-          // handle nested object nếu cần
-          if (error.children && error.children.length > 0) {
-            error.children.forEach((child) => {
-              const childField = `${field}.${child.property}`;
-              if (child.constraints) {
-                errors[childField] = Object.values(child.constraints);
-              }
-            });
+            if (err.children && err.children.length > 0) {
+              extractErrors(err.children, fieldPath);
+            }
           }
-        });
+        };
+
+        extractErrors(validationErrors);
 
         return new BadRequestException({
           message: 'Validation failed',

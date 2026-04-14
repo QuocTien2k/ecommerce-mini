@@ -41,7 +41,11 @@ export class PaymentService {
     }
   }
 
-  async createVnpayPayment(userId: string, orderId: string, ipAddr: string) {
+  async createVnpayPayment(
+    userId: string,
+    orderId: string,
+    ipAddr: string,
+  ): Promise<{ paymentUrl: string; paymentId: string }> {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
@@ -120,7 +124,7 @@ export class PaymentService {
 
     //Build URL
     const paymentUrl = vnpay.buildPaymentUrl({
-      vnp_Amount: order.totalPrice.toNumber() * 100,
+      vnp_Amount: order.totalPrice.toNumber(),
       vnp_IpAddr: ipAddr,
       vnp_TxnRef: payment.transactionRef,
       vnp_OrderInfo: `Thanh toan don hang ${order.id}`,
@@ -323,7 +327,7 @@ export class PaymentService {
     }
   }
 
-  async getPaymentStatus(orderId: string, userId: string) {
+  async getPaymentStatus(userId: string, orderId: string) {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,

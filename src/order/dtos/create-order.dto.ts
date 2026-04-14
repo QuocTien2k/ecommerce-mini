@@ -5,28 +5,34 @@ import {
   Length,
   IsArray,
   ValidateNested,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './create-order-item.input';
+import { PaymentMethod } from '@prisma/client';
 
 export class CreateOrderDto {
   // Voucher (optional)
   @IsOptional()
   @IsString()
   @Length(3, 50)
-  voucherCode?: string;
+  voucherCode?: string | null;
 
   // Receiver snapshot
   @IsString()
   @Length(2, 100)
   receiverName: string;
 
-  @IsPhoneNumber('VN') // chuẩn VN
+  @IsPhoneNumber('VN')
   receiverPhone: string;
 
   @IsString()
   @Length(5, 255)
   receiverAddress: string;
+
+  // Payment
+  @IsEnum(PaymentMethod)
+  paymentMethod: PaymentMethod;
 
   // Metadata
   @IsOptional()
