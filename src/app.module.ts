@@ -14,6 +14,7 @@ import { CartPricingModule } from './cart-pricing/cart-pricing.module';
 import { OrderModule } from './order/order.module';
 import { NotificationModule } from './notification/notification.module';
 import { VoucherModule } from './voucher/voucher.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { VoucherModule } from './voucher/voucher.module';
     OrderModule,
     NotificationModule,
     VoucherModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
