@@ -19,6 +19,7 @@ model Payment {
   gatewayTransactionId   String?
 
   // time
+  cancelledAt            DateTime?
   paidAt                 DateTime?
   expiredAt              DateTime?
 

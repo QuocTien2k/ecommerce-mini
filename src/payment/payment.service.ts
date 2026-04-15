@@ -327,6 +327,107 @@ export class PaymentService {
     }
   }
 
+  async cancelPayment(userId: string, orderId: string) {
+    const now = new Date();
+
+    return this.prisma.$transaction(async (tx) => {
+      const payment = await tx.payment.findFirst({
+        where: {
+          orderId,
+          userId,
+        },
+        include: {
+          order: true,
+        },
+      });
+
+      if (!payment) {
+        throw new NotFoundException('Payment not found');
+      }
+
+      // Idempotent: already cancelled
+      if (payment.status === PaymentStatus.CANCELLED) {
+        return {
+          success: true,
+          message: 'Payment already cancelled',
+        };
+      }
+
+      //Block if already successful
+      if (payment.status === PaymentStatus.SUCCESS) {
+        throw new BadRequestException('Cannot cancel successful payment');
+      }
+
+      //Order must still be in cancellable state
+      //ONLY allow cancel if order is still not processed
+      const cancellableOrderStates: OrderStatus[] = [OrderStatus.PENDING];
+
+      if (!cancellableOrderStates.includes(payment.order.status)) {
+        throw new BadRequestException(
+          `Cannot cancel payment. Order status is ${payment.order.status}`,
+        );
+      }
+
+      //Expired payment → treat as CANCELLED
+      if (payment.expiredAt && payment.expiredAt < now) {
+        await tx.payment.update({
+          where: { id: payment.id },
+          data: {
+            status: PaymentStatus.CANCELLED,
+            rawResponse: { reason: 'expired_auto_cancel' },
+          },
+        });
+
+        // order already safe to cancel
+        await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.CANCELLED,
+          },
+        });
+
+        return {
+          success: true,
+          message: 'Payment expired and cancelled',
+        };
+      }
+
+      //Core cancel (race-safe with IPN)
+      const result = await tx.payment.updateMany({
+        where: {
+          id: payment.id,
+          status: PaymentStatus.PENDING,
+        },
+        data: {
+          status: PaymentStatus.CANCELLED,
+          rawResponse: { reason: 'user_cancelled' },
+          cancelledAt: now,
+        },
+      });
+
+      // If already processed (SUCCESS/FAILED)
+      if (result.count === 0) {
+        return {
+          success: false,
+          message: 'Payment already processed, cannot cancel',
+        };
+      }
+
+      //order cancellation
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.CANCELLED,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Payment cancelled successfully',
+      };
+    });
+  }
+
   async getPaymentStatus(userId: string, orderId: string) {
     const order = await this.prisma.order.findFirst({
       where: {
