@@ -1,28 +1,31 @@
 import { DecimalUtil } from '@common/utils/decimal';
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 import {
-  VNPay,
-  ProductCode,
-  VnpLocale,
-  dateFormat,
-  HashAlgorithm,
-} from 'vnpay';
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+  Prisma,
+} from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { VNPay, ProductCode, VnpLocale, dateFormat } from 'vnpay';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigService,
+    @Inject('VNPAY_CLIENT') private readonly vnpay: VNPay,
   ) {}
 
   /* CASE VNPAY*/
+  private VNPayProvider = {};
+
   assertValidVnpayQuery(
     query: VnpayQueryRaw,
   ): asserts query is VnpayQueryRaw & {
@@ -113,17 +116,8 @@ export class PaymentService {
       });
     });
 
-    //Init VNPay
-    const vnpay = new VNPay({
-      tmnCode: this.configService.getOrThrow('VNPAY_TMN_CODE'),
-      secureSecret: this.configService.getOrThrow('VNPAY_HASH_SECRET'),
-      vnpayHost: this.configService.getOrThrow('VNPAY_URL'),
-      testMode: this.configService.get('NODE_ENV') !== 'production',
-      hashAlgorithm: HashAlgorithm.SHA512,
-    });
-
     //Build URL
-    const paymentUrl = vnpay.buildPaymentUrl({
+    const paymentUrl = this.vnpay.buildPaymentUrl({
       vnp_Amount: order.totalPrice.toNumber(),
       vnp_IpAddr: ipAddr,
       vnp_TxnRef: payment.transactionRef,
@@ -142,17 +136,9 @@ export class PaymentService {
   }
 
   async handleVnpayIpn(query: VnpayQueryRaw) {
-    //Init VNPay
-    const vnpay = new VNPay({
-      tmnCode: this.configService.getOrThrow('VNPAY_TMN_CODE'),
-      secureSecret: this.configService.getOrThrow('VNPAY_HASH_SECRET'),
-      vnpayHost: this.configService.getOrThrow('VNPAY_URL'),
-      hashAlgorithm: HashAlgorithm.SHA512,
-    });
-
     //Verify checksum
     this.assertValidVnpayQuery(query);
-    const isValid = vnpay.verifyReturnUrl(query);
+    const isValid = this.vnpay.verifyReturnUrl(query);
 
     if (!isValid) {
       return {
@@ -269,16 +255,9 @@ export class PaymentService {
   }
 
   async handleVnpayReturn(query: VnpayQueryRaw) {
-    const vnpay = new VNPay({
-      tmnCode: this.configService.getOrThrow('VNPAY_TMN_CODE'),
-      secureSecret: this.configService.getOrThrow('VNPAY_HASH_SECRET'),
-      vnpayHost: this.configService.getOrThrow('VNPAY_URL'),
-      hashAlgorithm: HashAlgorithm.SHA512,
-    });
-
     // Verify checksum
     this.assertValidVnpayQuery(query);
-    const isValid = vnpay.verifyReturnUrl(query);
+    const isValid = this.vnpay.verifyReturnUrl(query);
 
     if (!isValid) {
       return {
@@ -327,105 +306,71 @@ export class PaymentService {
     }
   }
 
-  async cancelPayment(userId: string, orderId: string) {
+  async cancelPayment(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    orderId: string,
+  ) {
     const now = new Date();
 
-    return this.prisma.$transaction(async (tx) => {
-      const payment = await tx.payment.findFirst({
-        where: {
-          orderId,
-          userId,
-        },
-        include: {
-          order: true,
-        },
-      });
-
-      if (!payment) {
-        throw new NotFoundException('Payment not found');
-      }
-
-      // Idempotent: already cancelled
-      if (payment.status === PaymentStatus.CANCELLED) {
-        return {
-          success: true,
-          message: 'Payment already cancelled',
-        };
-      }
-
-      //Block if already successful
-      if (payment.status === PaymentStatus.SUCCESS) {
-        throw new BadRequestException('Cannot cancel successful payment');
-      }
-
-      //Order must still be in cancellable state
-      //ONLY allow cancel if order is still not processed
-      const cancellableOrderStates: OrderStatus[] = [OrderStatus.PENDING];
-
-      if (!cancellableOrderStates.includes(payment.order.status)) {
-        throw new BadRequestException(
-          `Cannot cancel payment. Order status is ${payment.order.status}`,
-        );
-      }
-
-      //Expired payment → treat as CANCELLED
-      if (payment.expiredAt && payment.expiredAt < now) {
-        await tx.payment.update({
-          where: { id: payment.id },
-          data: {
-            status: PaymentStatus.CANCELLED,
-            rawResponse: { reason: 'expired_auto_cancel' },
-          },
-        });
-
-        // order already safe to cancel
-        await tx.order.update({
-          where: { id: orderId },
-          data: {
-            status: OrderStatus.CANCELLED,
-          },
-        });
-
-        return {
-          success: true,
-          message: 'Payment expired and cancelled',
-        };
-      }
-
-      //Core cancel (race-safe with IPN)
-      const result = await tx.payment.updateMany({
-        where: {
-          id: payment.id,
-          status: PaymentStatus.PENDING,
-        },
-        data: {
-          status: PaymentStatus.CANCELLED,
-          rawResponse: { reason: 'user_cancelled' },
-          cancelledAt: now,
-        },
-      });
-
-      // If already processed (SUCCESS/FAILED)
-      if (result.count === 0) {
-        return {
-          success: false,
-          message: 'Payment already processed, cannot cancel',
-        };
-      }
-
-      //order cancellation
-      await tx.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.CANCELLED,
-        },
-      });
-
-      return {
-        success: true,
-        message: 'Payment cancelled successfully',
-      };
+    const payment = await tx.payment.findFirst({
+      where: {
+        orderId,
+        userId,
+      },
+      include: {
+        order: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
+
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+
+    if (payment.status === PaymentStatus.CANCELLED) {
+      return { success: true, message: 'Already cancelled' };
+    }
+
+    if (payment.status === PaymentStatus.SUCCESS) {
+      throw new BadRequestException('Cannot cancel successful payment');
+    }
+
+    if (payment.expiredAt && payment.expiredAt < now) {
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: PaymentStatus.FAILED, // nên là FAILED
+          rawResponse: { reason: 'expired' },
+        },
+      });
+
+      return { success: true, message: 'Expired payment' };
+    }
+
+    const result = await tx.payment.updateMany({
+      where: {
+        id: payment.id,
+        status: PaymentStatus.PENDING,
+      },
+      data: {
+        status: PaymentStatus.CANCELLED,
+        rawResponse: { reason: 'user_cancelled' },
+        cancelledAt: now,
+      },
+    });
+
+    if (result.count === 0) {
+      return {
+        success: false,
+        message: 'Payment already processed',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Cancelled',
+    };
   }
 
   async getPaymentStatus(userId: string, orderId: string) {
