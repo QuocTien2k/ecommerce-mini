@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   OrderStatus,
   PaymentMethod,
+  PaymentStatus,
   Prisma,
   User,
   VoucherType,
@@ -511,11 +512,11 @@ export class OrderService {
   }
 
   private validTransitions: Record<OrderStatus, OrderStatus[]> = {
-    PENDING: ['CONFIRMED', 'CANCELLED'],
-    CONFIRMED: ['PROCESSING', 'CANCELLED'],
-    PROCESSING: ['READY_TO_SHIP', 'CANCELLED'],
-    READY_TO_SHIP: ['SHIPPING'],
-    SHIPPING: ['DELIVERED'],
+    PENDING: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+    CONFIRMED: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+    PROCESSING: [OrderStatus.READY_TO_SHIP, OrderStatus.CANCELLED],
+    READY_TO_SHIP: [OrderStatus.SHIPPING],
+    SHIPPING: [OrderStatus.DELIVERED],
     DELIVERED: [],
     CANCELLED: [],
   };
@@ -538,43 +539,45 @@ export class OrderService {
     const result = await this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
-        include: { items: true },
+        include: { items: true, payment: true },
       });
 
       if (!order) {
         throw new NotFoundException('Không tìm thấy đơn hàng');
       }
 
-      if (!this.validTransitions[order.status].includes(newStatus)) {
+      const allowedNext = this.validTransitions[order.status] ?? [];
+      if (!allowedNext.includes(newStatus)) {
         throw new BadRequestException(
-          `Không thể chuyển từ ${order.status} sang ${newStatus}`,
+          `Không thể chuyển trạng thái từ ${order.status} sang ${newStatus}`,
         );
       }
 
-      const updated = await tx.order.updateMany({
+      const isVNPay = order.payment?.method === PaymentMethod.VNPAY;
+      const isPaymentSuccess = order.payment?.status === PaymentStatus.SUCCESS;
+
+      if (isVNPay && !isPaymentSuccess && newStatus !== OrderStatus.CANCELLED) {
+        throw new BadRequestException(
+          'Đơn VNPay chỉ được cập nhật khi thanh toán SUCCESS hoặc CANCELLED',
+        );
+      }
+
+      const updatedOrder = await tx.order.update({
         where: {
           id: orderId,
-          status: order.status, // đảm bảo chưa bị request khác thay đổi
+          status: order.status,
         },
         data: {
           status: newStatus,
         },
       });
 
-      if (updated.count === 0) {
-        throw new BadRequestException(
-          'Đơn hàng đã bị thay đổi bởi request khác, vui lòng thử lại',
-        );
-      }
-
       //Restore stock
-      if (newStatus === 'CANCELLED') {
+      const wasCancelled = order.status !== OrderStatus.CANCELLED;
+      const isNowCancelled = newStatus === OrderStatus.CANCELLED;
+      if (wasCancelled && isNowCancelled) {
         await this.restoreStock(tx, order.items);
       }
-
-      const updatedOrder = await tx.order.findUnique({
-        where: { id: orderId },
-      });
 
       const label = ORDER_STATUS_LABEL[newStatus];
 
