@@ -29,8 +29,8 @@ import {
   NormalizedItem,
   CreateOrderContext,
   Receiver,
-} from '../common/types/order.type';
-import { PaymentService } from 'src/payment/payment.service';
+} from '@common/types/order.type';
+import { PaymentService } from '@payment/payment.service';
 
 @Injectable()
 export class OrderService {
