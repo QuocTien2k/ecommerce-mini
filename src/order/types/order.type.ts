@@ -19,6 +19,8 @@ export type ApplyVoucherResult = {
   voucherCode?: string;
   type?: VoucherType;
   value?: number;
+  usageLimit?: number | null;
+  remainingUsage?: number | null;
 };
 
 export type NormalizedItem = {

@@ -451,23 +451,42 @@ export class OrderService {
 
       //Update voucher usage (nếu có voucher)
       if (voucherResult) {
-        await tx.voucher.update({
-          where: { id: voucherResult.voucherId },
+        const voucherUpdateResult = await tx.voucher.updateMany({
+          where: {
+            id: voucherResult.voucherId,
+            // chỉ update nếu chưa vượt limit
+            ...(voucherResult.usageLimit != null && {
+              usedCount: { lt: voucherResult.usageLimit },
+            }),
+          },
           data: {
             usedCount: { increment: 1 },
           },
         });
 
-        await tx.userVoucher.updateMany({
+        if (voucherUpdateResult.count === 0) {
+          throw new BadRequestException('Voucher đã hết lượt sử dụng');
+        }
+
+        const userVoucherUpdateResult = await tx.userVoucher.updateMany({
           where: {
             userId,
             voucherId: voucherResult.voucherId,
+            ...(voucherResult.remainingUsage != null && {
+              remainingUsage: { gt: 0 },
+            }),
           },
           data: {
             usedCount: { increment: 1 },
-            ...(true && { remainingUsage: { decrement: 1 } }),
+            ...(voucherResult.remainingUsage != null && {
+              remainingUsage: { decrement: 1 },
+            }),
           },
         });
+
+        if (userVoucherUpdateResult.count === 0) {
+          throw new BadRequestException('Bạn đã dùng hết voucher này');
+        }
       }
 
       //Tạo order
