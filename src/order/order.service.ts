@@ -502,11 +502,18 @@ export class OrderService {
       };
     }
 
+    //CODE
+    const { paymentId } = await this.paymentService.createCodPayment(
+      userId,
+      order.id,
+    );
+
     return {
       order,
       payment: {
         method: PaymentMethod.COD,
-        status: 'PENDING',
+        paymentId,
+        status: PaymentStatus.PENDING,
       },
     };
   }
@@ -556,6 +563,10 @@ export class OrderService {
       const isVNPay = order.payment?.method === PaymentMethod.VNPAY;
       const isPaymentSuccess = order.payment?.status === PaymentStatus.SUCCESS;
 
+      if (!order.payment) {
+        throw new BadRequestException('Đơn hàng chưa có thanh toán');
+      }
+
       if (isVNPay && !isPaymentSuccess && newStatus !== OrderStatus.CANCELLED) {
         throw new BadRequestException(
           'Đơn VNPay chỉ được cập nhật khi thanh toán SUCCESS hoặc CANCELLED',
@@ -572,11 +583,40 @@ export class OrderService {
         },
       });
 
+      // Sau khi update order thành công
+      if (
+        updatedOrder.status === OrderStatus.DELIVERED &&
+        order.payment?.method === PaymentMethod.COD &&
+        order.payment.status === PaymentStatus.PENDING
+      ) {
+        await tx.payment.updateMany({
+          where: {
+            orderId: order.id,
+            status: PaymentStatus.PENDING,
+          },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            paidAt: new Date(),
+          },
+        });
+      }
+
       //Restore stock
       const wasCancelled = order.status !== OrderStatus.CANCELLED;
       const isNowCancelled = newStatus === OrderStatus.CANCELLED;
       if (wasCancelled && isNowCancelled) {
         await this.restoreStock(tx, order.items);
+
+        await tx.payment.updateMany({
+          where: {
+            orderId: order.id,
+            status: PaymentStatus.PENDING,
+          },
+          data: {
+            status: PaymentStatus.CANCELLED,
+            cancelledAt: new Date(),
+          },
+        });
       }
 
       const label = ORDER_STATUS_LABEL[newStatus];

@@ -23,9 +23,64 @@ export class PaymentService {
     @Inject('VNPAY_CLIENT') private readonly vnpay: VNPay,
   ) {}
 
-  /* CASE VNPAY*/
-  private VNPayProvider = {};
+  /*Case COD*/
+  async createCodPayment(
+    userId: string,
+    orderId: string,
+  ): Promise<{ paymentId: string }> {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId,
+      },
+    });
 
+    if (!order) {
+      throw new NotFoundException('Không tìm thấy đơn hàng');
+    }
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new BadRequestException('Đơn hàng không hợp lệ!');
+    }
+
+    const payment = await this.prisma.$transaction(async (tx) => {
+      const existing = await tx.payment.findUnique({
+        where: { orderId: order.id },
+      });
+
+      if (existing) {
+        if (existing.status === PaymentStatus.SUCCESS) {
+          throw new BadRequestException('Đơn hàng đã được thanh toán');
+        }
+
+        if (existing.status === PaymentStatus.PENDING) {
+          return existing;
+        }
+
+        // FAILED / CANCELLED → recreate
+        await tx.payment.delete({
+          where: { id: existing.id },
+        });
+      }
+
+      return tx.payment.create({
+        data: {
+          orderId: order.id,
+          userId,
+          method: PaymentMethod.COD,
+          status: PaymentStatus.PENDING,
+          amount: order.totalPrice,
+          transactionRef: `COD-${order.id}-${Date.now()}`,
+        },
+      });
+    });
+
+    return {
+      paymentId: payment.id,
+    };
+  }
+
+  /* Case VNPAY*/
   assertValidVnpayQuery(
     query: VnpayQueryRaw,
   ): asserts query is VnpayQueryRaw & {
