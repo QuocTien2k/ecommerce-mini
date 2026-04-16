@@ -16,6 +16,7 @@ import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { VoucherStatus } from './enum/voucher-status.enum';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 import { ApplyVoucherDto } from './dtos/apply-voucher.dto';
+import { ApplyVoucherResult } from '@common/types/voucher.type';
 
 @Injectable()
 export class VoucherService {
@@ -540,6 +541,11 @@ export class VoucherService {
       finalTotal,
       appliedSubtotal,
       voucherId: voucher.id,
+      voucherCode: voucher.code,
+      type: voucher.type,
+      value: Number(voucher.value),
+      usageLimit: voucher.usageLimit ?? null,
+      remainingUsage: remaining ?? null,
     };
   }
 }

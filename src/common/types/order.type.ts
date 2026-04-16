@@ -10,31 +10,20 @@ export type OrderItemData = {
   selectedAttributes?: any;
 };
 
-export type ApplyVoucherResult = {
-  subtotal: number;
-  discount: number;
-  finalTotal: number;
-  appliedSubtotal: number;
-  voucherId: string;
-  voucherCode?: string;
-  type?: VoucherType;
-  value?: number;
-  usageLimit?: number | null;
-  remainingUsage?: number | null;
-};
-
 export type NormalizedItem = {
   variantId: string;
   quantity: number;
 };
 
+export type Receiver = {
+  receiverName: string;
+  receiverPhone: string;
+  receiverAddress: string;
+};
+
 export type CreateOrderContext = {
   userId: string;
-  receiver: {
-    receiverName: string;
-    receiverPhone: string;
-    receiverAddress: string;
-  };
+  receiver: Receiver;
   orderItemsData: OrderItemData[];
   subtotal: Prisma.Decimal;
   discountAmount: Prisma.Decimal;
