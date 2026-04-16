@@ -605,6 +605,63 @@ export class OrderService {
     return result;
   }
 
+  async cancelOrder(userId: string, orderId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({
+        where: { id: orderId, userId },
+        include: { payment: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Không tìm thấy đơn hàng');
+      }
+
+      if (order.status === OrderStatus.CANCELLED) {
+        return { success: true, message: 'Đơn hàng đã bị hủy trước đó' };
+      }
+
+      if (order.payment?.status === PaymentStatus.SUCCESS) {
+        throw new BadRequestException(
+          'Không thể huỷ đơn đã thanh toán thành công',
+        );
+      }
+
+      const allowedNext = this.validTransitions[order.status] ?? [];
+      if (!allowedNext.includes(OrderStatus.CANCELLED)) {
+        throw new BadRequestException(
+          `Không thể huỷ đơn ở trạng thái ${order.status}`,
+        );
+      }
+
+      //Cancel payment
+      if (order.payment) {
+        await this.paymentService.cancelPayment(tx, userId, orderId);
+      }
+
+      //Update order status
+      const updatedOrder = await tx.order.update({
+        where: {
+          id: orderId,
+          status: order.status, // optimistic lock
+        },
+        data: {
+          status: OrderStatus.CANCELLED,
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      //Restore stock
+      await this.restoreStock(tx, updatedOrder.items);
+
+      return {
+        success: true,
+        order: updatedOrder,
+      };
+    });
+  }
+
   private buildStatusFilter(status?: string): Prisma.OrderWhereInput {
     if (!status) return {};
 

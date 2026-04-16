@@ -68,6 +68,21 @@ export class OrderController {
     };
   }
 
+  @Patch(':id/cancel')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async cancelOrder(
+    @Param('id', new ParseUUIDPipe()) orderId: string,
+    @CurrentUser('sub') userId: string,
+  ) {
+    const data = await this.ordersService.cancelOrder(userId, orderId);
+
+    return {
+      message: 'Hủy đơn hàng thành công',
+      data,
+    };
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   getOrders(
