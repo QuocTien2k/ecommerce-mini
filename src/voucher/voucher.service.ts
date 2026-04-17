@@ -17,10 +17,14 @@ import { VoucherStatus } from './enum/voucher-status.enum';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 import { ApplyVoucherDto } from './dtos/apply-voucher.dto';
 import { ApplyVoucherResult } from '@common/types/voucher.type';
+import { NotificationsGateway } from '@notification/notification.gateway';
 
 @Injectable()
 export class VoucherService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsGateway: NotificationsGateway,
+  ) {}
 
   /* Case create */
   private validate(dto: CreateVoucherDto) {
@@ -134,51 +138,68 @@ export class VoucherService {
   async assignVoucherToUsers(voucherId: string, dto: AssignVoucherDto) {
     const { userIds, usagePerUser } = dto;
 
-    const voucher = await this.prisma.voucher.findUnique({
-      where: { id: voucherId },
+    const result = await this.prisma.$transaction(async (tx) => {
+      const voucher = await tx.voucher.findUnique({
+        where: { id: voucherId },
+      });
+
+      if (!voucher) throw new NotFoundException('Voucher không tồn tại');
+      if (!voucher.isActive)
+        throw new BadRequestException('Voucher chưa active');
+      if (voucher.isDeleted) throw new BadRequestException('Voucher đã bị xoá');
+
+      const now = new Date();
+
+      if (voucher.startAt && voucher.startAt > now) {
+        throw new BadRequestException('Voucher chưa đến thời gian sử dụng');
+      }
+
+      if (voucher.endAt && voucher.endAt < now) {
+        throw new BadRequestException('Voucher đã hết hạn');
+      }
+
+      const usage = usagePerUser ?? 1;
+
+      const data: Prisma.UserVoucherCreateManyInput[] = userIds.map(
+        (userId) => ({
+          userId,
+          voucherId,
+          usagePerUser: usage,
+          usedCount: 0,
+        }),
+      );
+
+      const inserted = await tx.userVoucher.createMany({
+        data,
+        skipDuplicates: true,
+      });
+
+      const notifications = userIds.map((userId) => ({
+        userId,
+        title: 'Bạn vừa nhận voucher mới',
+        message: `Voucher ${voucher.code} đã được cấp cho bạn`,
+        voucherId,
+      }));
+
+      await tx.notification.createMany({
+        data: notifications,
+      });
+
+      return {
+        assigned: inserted.count,
+        userIds,
+        voucher,
+      };
     });
 
-    if (!voucher) {
-      throw new NotFoundException('Voucher không tồn tại');
-    }
-
-    if (!voucher.isActive) {
-      throw new BadRequestException('Voucher chưa active');
-    }
-
-    if (voucher.isDeleted) {
-      throw new BadRequestException('Voucher đã bị xoá');
-    }
-
-    const now = new Date();
-
-    if (voucher.startAt && voucher.startAt > now) {
-      throw new BadRequestException('Voucher chưa đến thời gian sử dụng');
-    }
-
-    if (voucher.endAt && voucher.endAt < now) {
-      throw new BadRequestException('Voucher đã hết hạn');
-    }
-
-    const usage = usagePerUser ?? 1;
-
-    //build data
-    const data: Prisma.UserVoucherCreateManyInput[] = userIds.map((userId) => ({
-      userId,
-      voucherId,
-      usagePerUser: usage,
-      usedCount: 0,
-    }));
-
-    //insert bulk
-    const result = await this.prisma.userVoucher.createMany({
-      data,
-      skipDuplicates: true,
+    result.userIds.forEach((userId) => {
+      this.notificationsGateway.sendToUser(userId, {
+        type: 'VOUCHER_ASSIGNED',
+        voucherId: result.voucher.id,
+        voucherCode: result.voucher.code,
+        message: `Bạn vừa nhận voucher ${result.voucher.code}`,
+      });
     });
-
-    return {
-      assigned: result.count,
-    };
   }
 
   /* Case get list vouchers*/
