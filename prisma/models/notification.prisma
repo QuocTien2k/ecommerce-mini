@@ -13,6 +13,9 @@ model Notification {
   orderId String?
   order   Order? @relation(fields: [orderId], references: [id])
 
+  voucherId String?
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
   createdAt DateTime @default(now())
 
   @@index([userId])

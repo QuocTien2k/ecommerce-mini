@@ -23,6 +23,7 @@ model Voucher {
   userVouchers UserVoucher[]
   products   Product[]   //  scope = PRODUCT
   categories Category[]  //  scope = CATEGORY
+  notifications Notification[]
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
