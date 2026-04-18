@@ -655,7 +655,7 @@ export class OrderService {
     const order = await this.prisma.order.findFirst({
       where: {
         userId,
-        status: 'DELIVERED',
+        status: OrderStatus.DELIVERED,
         items: {
           some: {
             productId,

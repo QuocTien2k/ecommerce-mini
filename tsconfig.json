@@ -29,7 +29,8 @@
       "@order/*": ["src/order/*"],
       "@notification/*": ["src/notification/*"],
       "@voucher/*": ["src/voucher/*"],
-      "@payment/*": ["src/payment/*"]
+      "@payment/*": ["src/payment/*"],
+      "@rating/*": ["src/rating/*"]
     },
 
     "incremental": true,
