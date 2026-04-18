@@ -2,10 +2,19 @@ import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@auth/guards/roles.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { RatingService } from '@rating/rating.service';
 import { CreateRatingDto } from '@rating/dtos/create-rating.dto';
+import { UpdateRatingDto } from '@rating/dtos/update-rating.sto';
 
 @Controller('rating')
 export class RatingController {
@@ -21,6 +30,22 @@ export class RatingController {
     const data = await this.ratingService.create(userId, dto);
     return {
       message: 'Đánh giá sản phẩm thành công!',
+      data,
+    };
+  }
+
+  @Patch(':productId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async update(
+    @CurrentUser('sub') userId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+    @Body() dto: UpdateRatingDto,
+  ) {
+    const data = await this.ratingService.update(userId, productId, dto);
+
+    return {
+      message: 'Cập nhật đánh giá thành công!',
       data,
     };
   }
