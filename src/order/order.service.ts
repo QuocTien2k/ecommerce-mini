@@ -42,6 +42,7 @@ export class OrderService {
     private notificationsGateway: NotificationsGateway,
   ) {}
 
+  /* case create order */
   private normalizeItems(items: CreateOrderItemDto[]) {
     const quantityMap = new Map<string, number>();
 
@@ -380,6 +381,7 @@ export class OrderService {
     };
   }
 
+  /* case update status order */
   private validTransitions: Record<OrderStatus, OrderStatus[]> = {
     PENDING: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
     CONFIRMED: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
@@ -507,6 +509,7 @@ export class OrderService {
     return result;
   }
 
+  /* case cancel order */
   async cancelOrder(userId: string, orderId: string) {
     return this.prisma.$transaction(async (tx) => {
       const order = await tx.order.findFirst({
@@ -564,6 +567,7 @@ export class OrderService {
     });
   }
 
+  /* case list order and order item*/
   private buildStatusFilter(status?: string): Prisma.OrderWhereInput {
     if (!status) return {};
 
@@ -641,5 +645,28 @@ export class OrderService {
     }
 
     return OrderMapper.toDetail(order);
+  }
+
+  //support for rating
+  async canUserRateProduct(
+    userId: string,
+    productId: string,
+  ): Promise<boolean> {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        userId,
+        status: 'DELIVERED',
+        items: {
+          some: {
+            productId,
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return !!order; //order ? true : false
   }
 }
