@@ -18,7 +18,6 @@ export class RatingService {
   ) {}
 
   /*Case create*/
-
   private async ensureNotRated(
     tx: Prisma.TransactionClient,
     userId: string,
@@ -199,6 +198,51 @@ export class RatingService {
       );
 
       return rating;
+    });
+  }
+
+  /*Case delete*/
+  private async updateProductStatsOnDelete(
+    tx: Prisma.TransactionClient,
+    productId: string,
+    oldValue: number,
+  ) {
+    const stats = await tx.product.findUnique({
+      where: { id: productId },
+      select: {
+        ratingSum: true,
+        ratingCount: true,
+      },
+    });
+
+    const newSum = (stats?.ratingSum || 0) - oldValue;
+    const newCount = Math.max((stats?.ratingCount || 0) - 1, 0);
+
+    const newAvg = newCount > 0 ? Number((newSum / newCount).toFixed(1)) : 0;
+
+    await tx.product.update({
+      where: { id: productId },
+      data: {
+        ratingSum: newSum,
+        ratingCount: newCount,
+        ratingAvg: newAvg,
+      },
+    });
+  }
+
+  async delete(userId: string, productId: string) {
+    await this.ensureProductExists(productId);
+
+    const existing = await this.getExistingRating(userId, productId);
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.rating.delete({
+        where: {
+          productId_userId: { productId, userId },
+        },
+      });
+
+      await this.updateProductStatsOnDelete(tx, productId, existing.value);
     });
   }
 }

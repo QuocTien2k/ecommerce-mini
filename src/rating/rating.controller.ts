@@ -5,6 +5,7 @@ import { RolesGuard } from '@auth/guards/roles.guard';
 import {
   Body,
   Controller,
+  Delete,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -46,6 +47,21 @@ export class RatingController {
 
     return {
       message: 'Cập nhật đánh giá thành công!',
+      data,
+    };
+  }
+
+  @Delete(':productId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async delete(
+    @CurrentUser('sub') userId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+  ) {
+    const data = await this.ratingService.delete(userId, productId);
+
+    return {
+      message: 'Xóa đánh giá thành công!',
       data,
     };
   }
