@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderService } from '@order/order.service';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateRatingDto } from '@rating/dtos/create-rating.dto';
 import { UpdateRatingDto } from '@rating/dtos/update-rating.sto';
@@ -16,19 +17,25 @@ export class RatingService {
     private orderService: OrderService,
   ) {}
 
-  async create(userId: string, dto: CreateRatingDto) {
-    const { productId, value } = dto;
+  /*Case create*/
 
-    const product = await this.prisma.product.findUnique({
-      where: { id: productId },
-      select: { id: true },
+  private async ensureNotRated(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    productId: string,
+  ) {
+    const existing = await tx.rating.findUnique({
+      where: {
+        productId_userId: { productId, userId },
+      },
     });
 
-    if (!product) {
-      throw new NotFoundException('Sản phẩm không tồn tại');
+    if (existing) {
+      throw new BadRequestException('Bạn đã đánh giá sản phẩm này rồi!');
     }
+  }
 
-    //check rating (đã mua & delivered)
+  private async ensureUserCanRate(userId: string, productId: string) {
     const canRate = await this.orderService.canUserRateProduct(
       userId,
       productId,
@@ -39,63 +46,9 @@ export class RatingService {
         'Bạn chỉ có thể đánh giá các sản phẩm mà bạn đã mua!',
       );
     }
-
-    //create rating + update product stats
-    return this.prisma.$transaction(async (tx) => {
-      const existing = await tx.rating.findUnique({
-        where: {
-          productId_userId: {
-            productId,
-            userId,
-          },
-        },
-      });
-
-      if (existing) {
-        throw new BadRequestException('Bạn đã đánh giá sản phẩm này rồi!');
-      }
-
-      let rating;
-
-      try {
-        rating = await tx.rating.create({
-          data: {
-            productId,
-            userId,
-            value,
-          },
-        });
-      } catch (err: any) {
-        // Prisma unique constraint
-        if (err.code === 'P2002') {
-          throw new BadRequestException('Bạn đã đánh giá sản phẩm này rồi!');
-        }
-        throw err;
-      }
-
-      const stats = await tx.rating.aggregate({
-        where: { productId },
-        _avg: { value: true },
-        _count: { value: true },
-      });
-
-      const ratingAvg =
-        stats._avg.value !== null ? Number(stats._avg.value.toFixed(1)) : 0; // làm tròn 1 chữ số thập phân
-
-      await tx.product.update({
-        where: { id: productId },
-        data: {
-          ratingAvg,
-          ratingCount: stats._count.value,
-        },
-      });
-
-      return rating;
-    });
   }
 
-  async update(userId: string, productId: string, dto: UpdateRatingDto) {
-    const { value } = dto;
+  private async ensureProductExists(productId: string) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { id: true },
@@ -104,52 +57,146 @@ export class RatingService {
     if (!product) {
       throw new NotFoundException('Sản phẩm không tồn tại');
     }
+  }
 
-    const existing = await this.prisma.rating.findUnique({
-      where: {
-        productId_userId: {
-          productId,
+  private async createRating(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    dto: CreateRatingDto,
+  ) {
+    try {
+      return await tx.rating.create({
+        data: {
           userId,
+          productId: dto.productId,
+          value: dto.value,
         },
+      });
+    } catch (err: any) {
+      if (err.code === 'P2002') {
+        throw new BadRequestException('Bạn đã đánh giá sản phẩm này rồi!');
+      }
+      throw err;
+    }
+  }
+
+  private async updateProductStatsOnCreate(
+    tx: Prisma.TransactionClient,
+    productId: string,
+    value: number,
+  ) {
+    const stats = await tx.product.findUnique({
+      where: { id: productId },
+      select: {
+        ratingSum: true,
+        ratingCount: true,
       },
     });
 
-    if (!existing) {
+    const newSum = (stats?.ratingSum || 0) + value;
+    const newCount = (stats?.ratingCount || 0) + 1;
+    const newAvg = Number((newSum / newCount).toFixed(1));
+
+    await tx.product.update({
+      where: { id: productId },
+      data: {
+        ratingSum: newSum,
+        ratingCount: newCount,
+        ratingAvg: newAvg,
+      },
+    });
+  }
+
+  async create(userId: string, dto: CreateRatingDto) {
+    await this.ensureProductExists(dto.productId);
+    await this.ensureUserCanRate(userId, dto.productId);
+
+    return this.prisma.$transaction(async (tx) => {
+      await this.ensureNotRated(tx, userId, dto.productId);
+
+      const rating = await this.createRating(tx, userId, dto);
+
+      await this.updateProductStatsOnCreate(tx, dto.productId, dto.value);
+
+      return rating;
+    });
+  }
+
+  /*Case update*/
+  private async getExistingRating(userId: string, productId: string) {
+    const rating = await this.prisma.rating.findUnique({
+      where: {
+        productId_userId: { productId, userId },
+      },
+    });
+
+    if (!rating) {
       throw new NotFoundException('Bạn chưa đánh giá sản phẩm này');
     }
 
+    return rating;
+  }
+
+  private async updateRating(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    productId: string,
+    value: number,
+  ) {
+    return tx.rating.update({
+      where: {
+        productId_userId: { productId, userId },
+      },
+      data: { value },
+    });
+  }
+
+  private async updateProductStatsOnUpdate(
+    tx: Prisma.TransactionClient,
+    productId: string,
+    oldValue: number,
+    newValue: number,
+  ) {
+    const diff = newValue - oldValue;
+
+    const stats = await tx.product.findUnique({
+      where: { id: productId },
+      select: {
+        ratingSum: true,
+        ratingCount: true,
+      },
+    });
+
+    const newSum = (stats?.ratingSum || 0) + diff;
+    const count = stats?.ratingCount || 0;
+
+    const newAvg = count > 0 ? Number((newSum / count).toFixed(1)) : 0;
+
+    await tx.product.update({
+      where: { id: productId },
+      data: {
+        ratingSum: newSum,
+        ratingAvg: newAvg,
+      },
+    });
+  }
+
+  async update(userId: string, productId: string, dto: UpdateRatingDto) {
+    const { value } = dto;
+
+    await this.ensureProductExists(productId);
+
+    const existing = await this.getExistingRating(userId, productId);
+
     return this.prisma.$transaction(async (tx) => {
-      // update rating
-      const rating = await tx.rating.updateMany({
-        where: {
-          productId,
-          userId,
-        },
-        data: {
-          value,
-        },
-      });
+      const rating = await this.updateRating(tx, userId, productId, value);
 
-      if (rating.count === 0) {
-        throw new NotFoundException('Bạn chưa đánh giá sản phẩm này');
-      }
-      //recompute stats (safe)
-      const stats = await tx.rating.aggregate({
-        where: { productId },
-        _avg: { value: true },
-        _count: { value: true },
-      });
-
-      const ratingAvg =
-        stats._avg.value !== null ? Number(stats._avg.value.toFixed(1)) : 0; // làm trò
-
-      await tx.product.update({
-        where: { id: productId },
-        data: {
-          ratingAvg,
-          ratingCount: stats._count.value,
-        },
-      });
+      await this.updateProductStatsOnUpdate(
+        tx,
+        productId,
+        existing.value,
+        value,
+      );
 
       return rating;
     });
