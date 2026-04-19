@@ -6,6 +6,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -20,6 +21,21 @@ import { UpdateRatingDto } from '@rating/dtos/update-rating.sto';
 @Controller('rating')
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
+
+  @Get(':productId/me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getMyRating(
+    @CurrentUser('sub') userId: string,
+    @Param('productId', new ParseUUIDPipe()) productId: string,
+  ) {
+    const data = await this.ratingService.getMyRating(userId, productId);
+
+    return {
+      message: 'Lấy đánh giá của bạn thành công!',
+      data,
+    };
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)

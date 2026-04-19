@@ -245,4 +245,13 @@ export class RatingService {
       await this.updateProductStatsOnDelete(tx, productId, existing.value);
     });
   }
+
+  /*Case get*/
+  async getMyRating(userId: string, productId: string) {
+    return this.prisma.rating.findUnique({
+      where: {
+        productId_userId: { productId, userId },
+      },
+    });
+  }
 }
