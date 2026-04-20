@@ -1,0 +1,37 @@
+model Order {
+  id            String   @id @default(uuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  status        OrderStatus @default(PENDING)
+
+  //Pricing
+  subtotal        Decimal @db.Decimal(12, 2) // tổng trước giảm
+  discountAmount  Decimal @default(0) @db.Decimal(12, 2)
+  totalPrice      Decimal @db.Decimal(12, 2)
+
+  //Voucher snapshot
+  voucherCode     String?
+  voucherType     VoucherType? // PERCENT | FIXED
+  voucherValue    Decimal? @db.Decimal(10, 2)
+
+  //Receiver snapshot
+  receiverName    String
+  receiverPhone   String
+  receiverAddress String
+
+  //Metadata
+  note            String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           OrderItem[]
+  notifications Notification[]
+  payment Payment?
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}

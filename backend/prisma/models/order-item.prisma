@@ -1,0 +1,22 @@
+model OrderItem {
+  id          String   @id @default(uuid())
+
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+
+  productId   String
+  variantId   String
+
+  quantity    Int
+
+  // snapshot
+  price       Decimal  @db.Decimal(10, 2)
+  productName String
+  productImage String?
+  selectedAttributes Json?
+
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_items")
+}

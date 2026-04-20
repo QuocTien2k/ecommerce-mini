@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+
+    "baseUrl": "./",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@common/*": ["src/common/*"],
+      "@modules/*": ["src/modules/*"],
+      "@config/*": ["src/config/*"],
+      "@prisma/*": ["src/prisma/*"],
+      "@category/*": ["src/category/*"],
+      "@auth/*": ["src/auth/*"],
+      "@user/*": ["src/user/*"],
+      "@product/*": ["src/product/*"],
+      "@product-variant/*": ["src/product-variant/*"],
+      "@cart-items/*": ["src/cart-items/*"],
+      "@order/*": ["src/order/*"],
+      "@notification/*": ["src/notification/*"],
+      "@voucher/*": ["src/voucher/*"],
+      "@payment/*": ["src/payment/*"],
+      "@rating/*": ["src/rating/*"]
+    },
+
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}

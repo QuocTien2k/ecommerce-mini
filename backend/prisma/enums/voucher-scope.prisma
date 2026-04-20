@@ -1,0 +1,5 @@
+enum VoucherScope {
+  ORDER
+  PRODUCT
+  CATEGORY
+}
