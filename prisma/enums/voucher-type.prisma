@@ -1,4 +1,0 @@
-enum VoucherType {
-  PERCENT   // giảm theo %
-  FIXED     // giảm số tiền cố định
-}
