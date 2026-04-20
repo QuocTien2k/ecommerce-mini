@@ -32,6 +32,7 @@
       "@payment/*": ["src/payment/*"],
       "@rating/*": ["src/rating/*"]
     },
+    "ignoreDeprecations": "6.0",
 
     "incremental": true,
     "skipLibCheck": true,
