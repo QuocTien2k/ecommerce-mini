@@ -1,5 +1,6 @@
+import { store } from "@/app/store";
 import { api, refreshClient } from "./axios";
-import { store } from "@/store";
+
 import { clearAuth, setCredentials } from "@/features/auth/auth.slice";
 import { decodeToken } from "@/lib/jwt";
 

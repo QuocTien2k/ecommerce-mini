@@ -4,8 +4,8 @@ import "./index.css";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "@/store";
 import { setupInterceptors } from "@/shared/api/interceptors";
+import { store } from "./app/store.ts";
 
 setupInterceptors();
 createRoot(document.getElementById("root")!).render(
