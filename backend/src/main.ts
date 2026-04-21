@@ -60,6 +60,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.use(cookieParser());
 
+  app.enableCors({
+    origin: configService.get('FRONTEND_URL'),
+    credentials: true,
+  });
+
   const port = configService.get<number>('PORT') || 3000;
 
   await app.listen(port);
