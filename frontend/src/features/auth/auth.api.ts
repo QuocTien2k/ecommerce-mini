@@ -1,4 +1,4 @@
-import { api } from "@/shared/api/axios";
+import { api } from "@shared/api/axios";
 
 export const authApi = {
   login: (email: string, password: string) =>

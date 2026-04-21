@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/app/hooks";
+import { useAppSelector } from "@app/hooks";
 import { Navigate, Outlet } from "react-router-dom";
 
 interface Props {
