@@ -1,6 +1,7 @@
-import { api } from "./axios";
+import { api, refreshClient } from "./axios";
 import { store } from "@/store";
 import { clearAuth, setCredentials } from "@/features/auth/auth.slice";
+import { decodeToken } from "@/lib/jwt";
 
 let isRefreshing = false;
 let queue: Array<(token: string | null) => void> = [];
@@ -49,21 +50,32 @@ export function setupInterceptors() {
       isRefreshing = true;
 
       try {
-        const res = await api.post("/auth/refresh");
+        const res = await refreshClient.post("/auth/refresh");
         const newAccessToken = res.data.accessToken;
+        const decoded = decodeToken(newAccessToken);
 
         // update redux
-        store.dispatch(setCredentials({ accessToken: newAccessToken }));
+        store.dispatch(
+          setCredentials({
+            accessToken: newAccessToken,
+            role: decoded.role,
+          }),
+        );
 
         processQueue(newAccessToken);
 
         // retry request gốc
+        if (!originalRequest.headers) originalRequest.headers = {};
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
-      } catch (err) {
-        store.dispatch(clearAuth());
+      } catch (err: any) {
+        // refresh fail → logout
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          store.dispatch(clearAuth());
+        }
         processQueue(null);
+
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
