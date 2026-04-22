@@ -1,9 +1,11 @@
+import type { Role } from "@/types/role";
+import { isValidRole } from "@/utils/role";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface AuthState {
   accessToken: string | null;
-  role: string | null;
+  role: Role | null;
   isAuthenticated: boolean;
 }
 
@@ -21,9 +23,18 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{ accessToken: string; role: string }>,
     ) => {
-      state.accessToken = action.payload.accessToken;
-      state.role = action.payload.role;
-      state.isAuthenticated = true;
+      const { accessToken, role } = action.payload;
+
+      state.accessToken = accessToken;
+
+      if (isValidRole(role)) {
+        state.role = role;
+        state.isAuthenticated = true;
+      } else {
+        // fallback an toàn
+        state.role = null;
+        state.isAuthenticated = false;
+      }
     },
 
     clearAuth: (state) => {

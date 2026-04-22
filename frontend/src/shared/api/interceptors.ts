@@ -1,8 +1,6 @@
 import { store } from "@/app/store";
 import { api, refreshClient } from "./axios";
-
 import { clearAuth, setCredentials } from "@/features/auth/auth.slice";
-import { decodeToken } from "@/lib/jwt";
 
 let isRefreshing = false;
 let queue: Array<(token: string | null) => void> = [];
@@ -53,13 +51,20 @@ export function setupInterceptors() {
       try {
         const res = await refreshClient.post("/auth/refresh");
         const newAccessToken = res.data.accessToken;
-        const decoded = decodeToken(newAccessToken);
 
-        // update redux
+        const meRes = await api.get("/auth/me", {
+          headers: {
+            Authorization: `Bearer ${newAccessToken}`,
+          },
+        });
+
+        const roleFromServer = meRes.data.role;
+
+        //redux
         store.dispatch(
           setCredentials({
             accessToken: newAccessToken,
-            role: decoded.role,
+            role: roleFromServer,
           }),
         );
 
