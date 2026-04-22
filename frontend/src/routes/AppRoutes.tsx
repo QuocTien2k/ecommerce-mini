@@ -1,3 +1,4 @@
+import AdminLayout from "@/layouts/AdminLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
 import ForgotPassword from "@pages/auth/ForgotPassword";
@@ -8,10 +9,25 @@ import ForbiddenPage from "@pages/error/ForbiddenPage";
 import NotFoundPage from "@pages/error/NotFoundPage";
 import Home from "@pages/home/Home";
 import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import RoleRoute from "./RoleRoute";
+import { Role } from "@/types/role";
+import AdminDashboard from "@pages/admin/AdminDashboard";
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Admin Layout */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<RoleRoute allowedRoles={[Role.ADMIN]} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+
+            {/* thêm các route admin khác */}
+          </Route>
+        </Route>
+      </Route>
+
       {/* Layout Website */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />

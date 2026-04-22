@@ -1,8 +1,9 @@
+import type { Role } from "@/types/role";
 import { useAppSelector } from "@app/hooks";
 import { Navigate, Outlet } from "react-router-dom";
 
 interface Props {
-  allowedRoles: string[];
+  allowedRoles: Role[];
 }
 
 export default function RoleRoute({ allowedRoles }: Props) {
