@@ -1,9 +1,35 @@
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
 export default function NotFoundPage() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">404</h1>
-        <p className="text-muted-foreground">Page not found</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="max-w-4xl text-center space-y-4">
+        {/* Image */}
+        <div className="flex justify-center">
+          <img
+            src="public/400.gif"
+            alt="404 illustration"
+            className="w-full max-w-[600px] h-auto object-contain"
+          />
+        </div>
+
+        {/* Text */}
+        <div className="space-y-2">
+          <h1 className="text-5xl font-bold tracking-tight">404</h1>
+          <p className="text-lg text-muted-foreground">
+            Trang bạn đang tìm không tồn tại hoặc đã bị di chuyển.
+          </p>
+        </div>
+
+        {/* Action */}
+        <div>
+          <Link to="/">
+            <Button size="lg" className="w-full sm:w-auto cursor-pointer">
+              Quay về trang chủ
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
