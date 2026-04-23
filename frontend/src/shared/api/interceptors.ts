@@ -24,7 +24,19 @@ export function setupInterceptors() {
 
   // RESPONSE INTERCEPTOR
   api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      const res = response.data;
+
+      // ApiResponse
+      if (res && typeof res === "object" && "status" in res) {
+        if (!res.status) {
+          return Promise.reject(res); // đẩy error xuống catch
+        }
+        return res.data; // unwrap
+      }
+
+      return response;
+    },
     async (error) => {
       const originalRequest = error.config;
 
@@ -48,9 +60,19 @@ export function setupInterceptors() {
 
       isRefreshing = true;
 
+      const noRefreshRoutes = ["/auth/login", "/auth/refresh", "/auth/me"];
+
+      const isNoRefresh = noRefreshRoutes.some((url) =>
+        originalRequest.url?.includes(url),
+      );
+
+      if (isNoRefresh) {
+        return Promise.reject(error);
+      }
+
       try {
         const res = await refreshClient.post("/auth/refresh");
-        const newAccessToken = res.data.accessToken;
+        const newAccessToken = res.data.data.accessToken;
 
         const meRes = await api.get("/auth/me", {
           headers: {

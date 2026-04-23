@@ -21,13 +21,13 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ accessToken: string; role: string }>,
+      action: PayloadAction<{ accessToken: string; role: string | null }>,
     ) => {
       const { accessToken, role } = action.payload;
 
       state.accessToken = accessToken;
 
-      if (isValidRole(role)) {
+      if (role && isValidRole(role)) {
         state.role = role;
         state.isAuthenticated = true;
       } else {

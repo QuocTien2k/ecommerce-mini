@@ -1,10 +1,11 @@
 import { api } from "@shared/api/axios";
+import type { LoginResponseDto } from "./types";
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post("/auth/login", { email, password }),
+    api.post<LoginResponseDto>("/auth/login", { email, password }),
 
-  refresh: () => api.post("/auth/refresh"),
+  refresh: () => api.post<LoginResponseDto>("/auth/refresh"),
 
   logout: () => api.post("/auth/logout"),
 
