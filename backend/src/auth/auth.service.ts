@@ -98,7 +98,7 @@ export class AuthService {
     };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '120s',
     });
 
     const refreshToken = crypto.randomBytes(64).toString('hex');
@@ -173,7 +173,7 @@ export class AuthService {
     };
 
     const newAccessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '120s',
     });
 
     //rotate refresh token

@@ -7,12 +7,14 @@ export interface AuthState {
   accessToken: string | null;
   role: Role | null;
   isAuthenticated: boolean;
+  isAuthInitialized: boolean;
 }
 
 const initialState: AuthState = {
   accessToken: null,
   role: null,
   isAuthenticated: false,
+  isAuthInitialized: false,
 };
 
 const authSlice = createSlice({
@@ -26,15 +28,23 @@ const authSlice = createSlice({
       const { accessToken, role } = action.payload;
 
       state.accessToken = accessToken;
+      state.isAuthenticated = true;
 
+      // if (role && isValidRole(role)) {
+      //   state.role = role;
+      //   state.isAuthenticated = true;
+      // } else {
+      //   // fallback an toàn
+      //   state.role = null;
+      //   state.isAuthenticated = false;
+      // }
       if (role && isValidRole(role)) {
         state.role = role;
-        state.isAuthenticated = true;
-      } else {
-        // fallback an toàn
-        state.role = null;
-        state.isAuthenticated = false;
       }
+    },
+
+    setAuthInitialized: (state, action: PayloadAction<boolean>) => {
+      state.isAuthInitialized = action.payload;
     },
 
     clearAuth: (state) => {
@@ -45,6 +55,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, clearAuth } = authSlice.actions;
+export const { setCredentials, setAuthInitialized, clearAuth } =
+  authSlice.actions;
 
 export default authSlice.reducer;

@@ -15,7 +15,11 @@ export function setupInterceptors() {
   api.interceptors.request.use((config) => {
     const token = store.getState().auth.accessToken;
 
-    if (token) {
+    const noAuthRoutes = ["/auth/login", "/auth/refresh"];
+
+    const isNoAuth = noAuthRoutes.some((r) => config.url?.includes(r));
+
+    if (token && !isNoAuth) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -40,6 +44,17 @@ export function setupInterceptors() {
     async (error) => {
       const originalRequest = error.config;
 
+      const noRefreshRoutes = ["/auth/login", "/auth/refresh"];
+
+      const isNoRefresh = noRefreshRoutes.some((url) =>
+        originalRequest.url?.includes(url),
+      );
+
+      if (isNoRefresh) {
+        return Promise.reject(error);
+      }
+
+      //xử lý 401 và chưa retry
       if (error.response?.status !== 401 || originalRequest._retry) {
         return Promise.reject(error);
       }
@@ -50,7 +65,7 @@ export function setupInterceptors() {
       if (isRefreshing) {
         return new Promise((resolve) => {
           queue.push((token: string | null) => {
-            if (token) {
+            if (token && originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${token}`;
             }
             resolve(api(originalRequest));
@@ -60,21 +75,13 @@ export function setupInterceptors() {
 
       isRefreshing = true;
 
-      const noRefreshRoutes = ["/auth/login", "/auth/refresh", "/auth/me"];
-
-      const isNoRefresh = noRefreshRoutes.some((url) =>
-        originalRequest.url?.includes(url),
-      );
-
-      if (isNoRefresh) {
-        return Promise.reject(error);
-      }
-
       try {
         const res = await refreshClient.post("/auth/refresh");
-        const newAccessToken = res.data.data.accessToken;
+        const newAccessToken = res.data.accessToken;
 
-        const meRes = await api.get("/auth/me", {
+        console.log("refresh response", res);
+
+        const meRes = await refreshClient.get("/auth/me", {
           headers: {
             Authorization: `Bearer ${newAccessToken}`,
           },

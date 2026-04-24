@@ -1,16 +1,22 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAppSelector } from "@app/hooks";
+import { Role } from "@/types/role";
 
 export default function NotFoundPage() {
+  const role = useAppSelector((state) => state.auth.role);
+
+  const homePath = role === Role.ADMIN ? "/admin" : "/";
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       <div className="max-w-4xl text-center space-y-4">
         {/* Image */}
         <div className="flex justify-center">
           <img
-            src="public/400.gif"
+            src="/400.gif"
             alt="404 illustration"
-            className="w-full max-w-[600px] h-auto object-contain"
+            className="w-full max-w-180 h-auto object-contain"
           />
         </div>
 
@@ -24,7 +30,7 @@ export default function NotFoundPage() {
 
         {/* Action */}
         <div>
-          <Link to="/">
+          <Link to={homePath}>
             <Button size="lg" className="w-full sm:w-auto cursor-pointer">
               Quay về trang chủ
             </Button>
