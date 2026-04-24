@@ -28,19 +28,19 @@ const authSlice = createSlice({
       const { accessToken, role } = action.payload;
 
       state.accessToken = accessToken;
-      state.isAuthenticated = true;
+      // state.isAuthenticated = true;
 
-      // if (role && isValidRole(role)) {
-      //   state.role = role;
-      //   state.isAuthenticated = true;
-      // } else {
-      //   // fallback an toàn
-      //   state.role = null;
-      //   state.isAuthenticated = false;
-      // }
       if (role && isValidRole(role)) {
         state.role = role;
+        state.isAuthenticated = true;
+      } else {
+        // fallback an toàn
+        state.role = null;
+        state.isAuthenticated = false;
       }
+      // if (role && isValidRole(role)) {
+      //   state.role = role;
+      // }
     },
 
     setAuthInitialized: (state, action: PayloadAction<boolean>) => {

@@ -18,11 +18,10 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Admin Layout */}
-      <Route element={<ProtectedRoute />}>
+      <Route path="/admin" element={<ProtectedRoute />}>
         <Route element={<RoleRoute allowedRoles={[Role.ADMIN]} />}>
           <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-
+            <Route index element={<AdminDashboard />} />
             {/* thêm các route admin khác */}
           </Route>
         </Route>

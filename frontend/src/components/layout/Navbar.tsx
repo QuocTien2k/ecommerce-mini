@@ -1,11 +1,16 @@
 import { useAppDispatch } from "@app/hooks";
+import { authApi } from "@features/auth/auth.api";
 import { clearAuth } from "@features/auth/auth.slice";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    dispatch(clearAuth());
+  const handleLogout = async () => {
+    try {
+      await authApi.logout(); // xóa refresh token ở server
+    } finally {
+      dispatch(clearAuth());
+    }
   };
 
   return (
