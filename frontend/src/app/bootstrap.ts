@@ -7,24 +7,34 @@ import {
 } from "@features/auth/auth.slice";
 import { jwtDecode } from "jwt-decode";
 
-export const bootstrapAuth = async () => {
-  const hasRefreshToken = document.cookie.includes("refreshToken");
+const isTokenExpired = (token: string) => {
+  try {
+    const decoded = jwtDecode<{ exp: number }>(token);
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
 
-  if (!hasRefreshToken) {
-    store.dispatch(clearAuth());
+export const bootstrapAuth = async () => {
+  //const hasRefreshToken = document.cookie.includes("refreshToken");
+  const currentAccessToken = store.getState().auth.accessToken;
+
+  //accessToken còn hạn → skip
+  if (currentAccessToken && !isTokenExpired(currentAccessToken)) {
     store.dispatch(setAuthInitialized(true));
     return;
   }
 
   try {
     const res = await refreshClient.post("/auth/refresh");
-    const accessToken = res.data.data.accessToken;
+    const newAccessToken = res.data.data.accessToken;
 
-    const payload = jwtDecode<{ role: string }>(accessToken);
+    const payload = jwtDecode<{ role: string }>(newAccessToken);
 
     store.dispatch(
       setCredentials({
-        accessToken,
+        accessToken: newAccessToken,
         role: payload.role,
       }),
     );
