@@ -5,6 +5,9 @@ import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import type { LoginFormValues } from "@features/auth/login/login.schema";
+import { Role } from "@/types/role";
 
 const Login = () => {
   const {
@@ -20,7 +23,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormValues) => {
     try {
       const res = await authApi.login(data.email, data.password);
       const accessToken = res.accessToken;
@@ -36,13 +39,12 @@ const Login = () => {
         }),
       );
 
-      if (me.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      navigate(me.role === Role.ADMIN ? "/admin" : "/");
     } catch (err: any) {
       console.log("Login error:", err.message);
+      const message = err.response?.data?.message || "Đã xảy ra lỗi";
+
+      toast.error(message);
     }
   };
 
