@@ -9,5 +9,7 @@ export const useLoginForm = () => {
       email: "",
       password: "",
     },
+    mode: "onBlur",
+    reValidateMode: "onChange",
   });
 };
