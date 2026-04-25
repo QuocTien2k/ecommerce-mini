@@ -10,8 +10,12 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields, isSubmitted },
   } = useLoginForm();
+
+  const showEmailError = errors.email && (dirtyFields.email || isSubmitted);
+  const showPasswordError =
+    errors.password && (dirtyFields.password || isSubmitted);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -50,17 +54,19 @@ const Login = () => {
       >
         <h2 className="text-2xl font-semibold text-center">Đăng nhập</h2>
 
+        {/*Email*/}
         <div className="space-y-2">
           <Input placeholder="Email" {...register("email")} className="h-11" />
           <p
             className={`text-sm text-red-500 transition-all duration-200 ${
-              errors.email ? "max-h-10 opacity-100" : "max-h-0 opacity-0"
+              showEmailError ? "max-h-10 opacity-100" : "max-h-0 opacity-0"
             } overflow-hidden`}
           >
-            {errors.email?.message as string}
+            {showEmailError ? errors.email?.message : ""}
           </p>
         </div>
 
+        {/*Password*/}
         <div className="space-y-2">
           <Input
             type="password"
@@ -70,10 +76,10 @@ const Login = () => {
           />
           <p
             className={`text-sm text-red-500 transition-all duration-200 ${
-              errors.password ? "max-h-10 opacity-100" : "max-h-0 opacity-0"
+              showPasswordError ? "max-h-10 opacity-100" : "max-h-0 opacity-0"
             } overflow-hidden`}
           >
-            {errors.password?.message as string}
+            {showPasswordError ? errors.password?.message : ""}
           </p>
         </div>
 
