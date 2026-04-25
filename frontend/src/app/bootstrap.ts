@@ -8,6 +8,14 @@ import {
 import { jwtDecode } from "jwt-decode";
 
 export const bootstrapAuth = async () => {
+  const hasRefreshToken = document.cookie.includes("refreshToken");
+
+  if (!hasRefreshToken) {
+    store.dispatch(clearAuth());
+    store.dispatch(setAuthInitialized(true));
+    return;
+  }
+
   try {
     const res = await refreshClient.post("/auth/refresh");
     const accessToken = res.data.data.accessToken;
