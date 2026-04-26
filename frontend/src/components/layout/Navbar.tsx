@@ -10,6 +10,7 @@ const Navbar = () => {
       await authApi.logout(); // xóa refresh token ở server
     } finally {
       dispatch(clearAuth());
+      localStorage.removeItem("hasAuthHint");
     }
   };
 

@@ -38,6 +38,7 @@ const Login = () => {
           role: me.role,
         }),
       );
+      localStorage.setItem("hasAuthHint", "true");
 
       navigate(me.role === Role.ADMIN ? "/admin" : "/");
     } catch (err: any) {

@@ -8,6 +8,7 @@ export interface AuthState {
   role: Role | null;
   isAuthenticated: boolean;
   isAuthInitialized: boolean;
+  hasAuthHint: boolean;
 }
 
 const initialState: AuthState = {
@@ -15,6 +16,7 @@ const initialState: AuthState = {
   role: null,
   isAuthenticated: false,
   isAuthInitialized: false,
+  hasAuthHint: localStorage.getItem("hasAuthHint") === "true",
 };
 
 const authSlice = createSlice({
@@ -23,12 +25,15 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ accessToken: string; role: string | null }>,
+      action: PayloadAction<{
+        accessToken: string;
+        role: string | null;
+      }>,
     ) => {
       const { accessToken, role } = action.payload;
 
       state.accessToken = accessToken;
-      // state.isAuthenticated = true;
+      state.hasAuthHint = true;
 
       if (role && isValidRole(role)) {
         state.role = role;
@@ -51,6 +56,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.role = null;
       state.isAuthenticated = false;
+      state.hasAuthHint = false;
     },
   },
 });

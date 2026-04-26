@@ -18,10 +18,19 @@ const isTokenExpired = (token: string) => {
 
 export const bootstrapAuth = async () => {
   //const hasRefreshToken = document.cookie.includes("refreshToken");
-  const currentAccessToken = store.getState().auth.accessToken;
+  //const currentAccessToken = store.getState().auth.accessToken;
+  const state = store.getState().auth;
+
+  const { accessToken, hasAuthHint } = state;
 
   //accessToken còn hạn → skip
-  if (currentAccessToken && !isTokenExpired(currentAccessToken)) {
+  if (accessToken && !isTokenExpired(accessToken)) {
+    store.dispatch(setAuthInitialized(true));
+    return;
+  }
+
+  //không có hint => chưa login => skip
+  if (!hasAuthHint) {
     store.dispatch(setAuthInitialized(true));
     return;
   }
