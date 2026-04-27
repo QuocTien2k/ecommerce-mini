@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private readonly mailService: MailService,
+    private configService: ConfigService,
   ) {}
 
   async signup(data: SignupUserDto) {
@@ -42,11 +44,9 @@ export class AuthService {
         },
       });
 
-      await this.mailService.sendMail(
-        user.email,
-        'Đăng ký thành công',
-        `Chào ${user.fullname}, bạn đã đăng ký tài khoản thành công.`,
-      );
+      await this.mailService.sendMail(user.email, 'Đăng ký thành công', {
+        text: `Chào ${user.fullname}, bạn đã đăng ký tài khoản thành công.`,
+      });
 
       return {
         id: user.id,
@@ -257,13 +257,20 @@ export class AuthService {
       },
     });
 
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
 
-    await this.mailService.sendMail(
-      user.email,
-      'Đặt lại mật khẩu',
-      `Click vào link để đặt lại mật khẩu: ${resetLink}`,
-    );
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+    await this.mailService.sendMail(user.email, 'Đặt lại mật khẩu', {
+      text: `Copy link này để đặt lại mật khẩu: ${resetLink}`,
+      html: `
+      <p>Bạn đã yêu cầu đặt lại mật khẩu.</p>
+      <p>
+        <a href="${resetLink}">Click vào đây để đặt lại mật khẩu</a>
+      </p>
+      <p>Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+    `,
+    });
 
     return { message: 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn' };
   }

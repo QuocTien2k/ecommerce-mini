@@ -7,3 +7,9 @@ export interface MeResponseDto {
   email: string;
   role: string;
 }
+
+export interface ResetPasswordDto {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
