@@ -1,13 +1,16 @@
 import { authApi } from "@features/auth/auth.api";
 import { setCredentials } from "@features/auth/auth.slice";
 import { useLoginForm } from "@features/auth/login/useLoginForm";
-import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
+import { useAppDispatch, useAppSelector } from "@app/hooks";
+import { withLoading } from "@lib/with-loading";
+import { selectIsLoading } from "@features/loading/loading.slice";
+import { ensureMinDelay, sleep } from "@lib/sleep";
 
 const Login = () => {
   const {
@@ -20,27 +23,33 @@ const Login = () => {
   const showPasswordError =
     errors.password && (dirtyFields.password || isSubmitted);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const isLoading = useAppSelector(selectIsLoading);
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await authApi.login(data.email, data.password);
-      const accessToken = res.accessToken;
+      await withLoading(dispatch, async () => {
+        const start = Date.now();
+        const res = await authApi.login(data.email, data.password);
+        const accessToken = res.accessToken;
 
-      dispatch(setCredentials({ accessToken, role: null }));
+        dispatch(setCredentials({ accessToken, role: null }));
 
-      const me = await authApi.getMe();
+        const me = await authApi.getMe();
 
-      dispatch(
-        setCredentials({
-          accessToken,
-          role: me.role,
-        }),
-      );
-      localStorage.setItem("hasAuthHint", "true");
+        dispatch(
+          setCredentials({
+            accessToken,
+            role: me.role,
+          }),
+        );
+        localStorage.setItem("hasAuthHint", "true");
 
-      navigate(me.role === Role.ADMIN ? "/admin" : "/");
+        await ensureMinDelay(start, 2000);
+
+        navigate(me.role === Role.ADMIN ? "/admin" : "/");
+      });
     } catch (err: any) {
       console.log("Login error:", err.message);
       const message = err.response?.data?.message || "Đã xảy ra lỗi";
@@ -87,7 +96,7 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button type="submit" className="px-6 py-5">
+          <Button disabled={isLoading} type="submit" className="px-6 py-5">
             Đăng nhập
           </Button>
         </div>
