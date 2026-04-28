@@ -2,6 +2,7 @@ import { useAppDispatch } from "@app/hooks";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
+import { getErrorMessage } from "@lib/error";
 import { ensureMinDelay } from "@lib/sleep";
 import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
@@ -75,10 +76,8 @@ const ResetPassword = () => {
         toast.success(message);
         await ensureMinDelay(start, 1500);
       });
-    } catch (error: any) {
-      const message = error?.response?.data?.message || "Có lỗi xảy ra";
-
-      toast.error(message);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau"));
     }
   };
 

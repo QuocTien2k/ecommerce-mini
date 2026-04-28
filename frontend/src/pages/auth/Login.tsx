@@ -10,6 +10,7 @@ import { Role } from "@/types/role";
 import { useAppDispatch } from "@app/hooks";
 import { withLoading } from "@lib/with-loading";
 import { ensureMinDelay } from "@lib/sleep";
+import { getErrorMessage } from "@lib/error";
 
 const Login = () => {
   const {
@@ -48,11 +49,9 @@ const Login = () => {
 
         navigate(me.role === Role.ADMIN ? "/admin" : "/");
       });
-    } catch (err: any) {
-      console.log("Login error:", err.message);
-      const message = err.response?.data?.message || "Đã xảy ra lỗi";
-
-      toast.error(message);
+    } catch (error) {
+      console.log("Login error:", error);
+      toast.error(getErrorMessage(error, "Đăng nhập thất bại"));
     }
   };
 
