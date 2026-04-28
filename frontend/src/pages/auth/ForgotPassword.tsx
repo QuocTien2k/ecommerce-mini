@@ -1,6 +1,9 @@
+import { useAppDispatch } from "@app/hooks";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
+import { ensureMinDelay } from "@lib/sleep";
+import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -11,6 +14,8 @@ const ForgotPassword = () => {
 
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const dispatch = useAppDispatch();
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -37,11 +42,15 @@ const ForgotPassword = () => {
     setShowEmailError(false);
 
     try {
-      const res = await authApi.forgotPassword(email);
+      await withLoading(dispatch, async () => {
+        const start = Date.now();
+        const res = await authApi.forgotPassword(email);
 
-      const message = res.message || "Gửi yêu cầu thành công";
+        const message = res.message || "Gửi yêu cầu thành công";
 
-      toast.success(message);
+        toast.success(message);
+        await ensureMinDelay(start, 1800);
+      });
     } catch (error: any) {
       const message =
         error?.response?.data?.message || "Có lỗi xảy ra, thử lại sau";

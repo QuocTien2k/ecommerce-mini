@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
-import { useAppDispatch, useAppSelector } from "@app/hooks";
+import { useAppDispatch } from "@app/hooks";
 import { withLoading } from "@lib/with-loading";
-import { selectIsLoading } from "@features/loading/loading.slice";
-import { ensureMinDelay, sleep } from "@lib/sleep";
+import { ensureMinDelay } from "@lib/sleep";
 
 const Login = () => {
   const {
@@ -25,7 +24,6 @@ const Login = () => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const isLoading = useAppSelector(selectIsLoading);
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -46,7 +44,7 @@ const Login = () => {
         );
         localStorage.setItem("hasAuthHint", "true");
 
-        await ensureMinDelay(start, 2000);
+        await ensureMinDelay(start, 1800);
 
         navigate(me.role === Role.ADMIN ? "/admin" : "/");
       });
@@ -96,7 +94,7 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button disabled={isLoading} type="submit" className="px-6 py-5">
+          <Button type="submit" className="px-6 py-5">
             Đăng nhập
           </Button>
         </div>

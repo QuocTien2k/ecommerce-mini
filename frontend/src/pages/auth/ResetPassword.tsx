@@ -1,6 +1,9 @@
+import { useAppDispatch } from "@app/hooks";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
+import { ensureMinDelay } from "@lib/sleep";
+import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -38,6 +41,8 @@ const ResetPassword = () => {
     }
   };
 
+  const dispatch = useAppDispatch();
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -57,15 +62,19 @@ const ResetPassword = () => {
     }
 
     try {
-      const res = await authApi.resetPassword({
-        token,
-        newPassword,
-        confirmPassword,
+      await withLoading(dispatch, async () => {
+        const start = Date.now();
+        const res = await authApi.resetPassword({
+          token,
+          newPassword,
+          confirmPassword,
+        });
+
+        const message = res.message || "Đặt lại mật khẩu thành công";
+
+        toast.success(message);
+        await ensureMinDelay(start, 1500);
       });
-
-      const message = res.message || "Đặt lại mật khẩu thành công";
-
-      toast.success(message);
     } catch (error: any) {
       const message = error?.response?.data?.message || "Có lỗi xảy ra";
 
