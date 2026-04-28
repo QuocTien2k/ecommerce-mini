@@ -57,6 +57,7 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
       state.hasAuthHint = false;
+      state.isAuthInitialized = true;
     },
   },
 });

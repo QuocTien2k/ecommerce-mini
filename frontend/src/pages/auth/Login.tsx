@@ -11,6 +11,7 @@ import { useAppDispatch } from "@app/hooks";
 import { withLoading } from "@lib/with-loading";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
 
 const Login = () => {
   const {
@@ -25,29 +26,33 @@ const Login = () => {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { loading, run } = useScopedLoading();
 
   const onSubmit = async (data: LoginFormValues) => {
     //toast
     sonnerToast.dismiss("login-error");
     try {
-      await withLoading(dispatch, async () => {
+      const user = await run(async () => {
         const res = await authApi.login(data.email, data.password);
         const accessToken = res.accessToken;
 
         dispatch(setCredentials({ accessToken, role: null }));
 
-        const me = await authApi.getMe();
+        const profile = await authApi.getMe();
 
         dispatch(
           setCredentials({
             accessToken,
-            role: me.role,
+            role: profile.role,
           }),
         );
+
         localStorage.setItem("hasAuthHint", "true");
 
-        navigate(me.role === Role.ADMIN ? "/admin" : "/");
+        return profile;
       });
+
+      navigate(user.role === Role.ADMIN ? "/admin" : "/");
     } catch (error) {
       console.log("Login error:", error);
       sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
@@ -94,8 +99,8 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button type="submit" className="px-6 py-5">
-            Đăng nhập
+          <Button disabled={loading} type="submit" className="px-6 py-5">
+            {loading ? "Đang đăng nhập" : "Đăng nhập"}
           </Button>
         </div>
 
