@@ -9,8 +9,8 @@ import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
 import { useAppDispatch } from "@app/hooks";
 import { withLoading } from "@lib/with-loading";
-import { ensureMinDelay } from "@lib/sleep";
 import { getErrorMessage } from "@lib/error";
+import { sonnerToast } from "@lib/sonner-toast";
 
 const Login = () => {
   const {
@@ -27,9 +27,10 @@ const Login = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFormValues) => {
+    //toast
+    sonnerToast.dismiss("login-error");
     try {
       await withLoading(dispatch, async () => {
-        const start = Date.now();
         const res = await authApi.login(data.email, data.password);
         const accessToken = res.accessToken;
 
@@ -45,13 +46,13 @@ const Login = () => {
         );
         localStorage.setItem("hasAuthHint", "true");
 
-        await ensureMinDelay(start, 1800);
-
         navigate(me.role === Role.ADMIN ? "/admin" : "/");
       });
     } catch (error) {
       console.log("Login error:", error);
-      toast.error(getErrorMessage(error, "Đăng nhập thất bại"));
+      sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
+        id: "login-error",
+      });
     }
   };
 

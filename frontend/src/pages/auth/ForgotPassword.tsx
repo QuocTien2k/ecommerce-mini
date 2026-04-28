@@ -4,6 +4,7 @@ import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import { getErrorMessage } from "@lib/error";
 import { ensureMinDelay } from "@lib/sleep";
+import { sonnerToast } from "@lib/sonner-toast";
 import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -42,18 +43,22 @@ const ForgotPassword = () => {
 
     setShowEmailError(false);
 
+    //toast
+    sonnerToast.dismiss("forgot-error");
+
     try {
       await withLoading(dispatch, async () => {
-        const start = Date.now();
         const res = await authApi.forgotPassword(email);
 
         const message = res.message || "Gửi yêu cầu thành công";
 
         toast.success(message);
-        await ensureMinDelay(start, 1800);
       });
     } catch (error) {
-      toast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau!"));
+      console.log("Error:", error);
+      sonnerToast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau!"), {
+        id: "forgot-error",
+      });
     }
   };
 

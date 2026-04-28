@@ -4,6 +4,7 @@ import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import { getErrorMessage } from "@lib/error";
 import { ensureMinDelay } from "@lib/sleep";
+import { sonnerToast } from "@lib/sonner-toast";
 import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -62,6 +63,9 @@ const ResetPassword = () => {
       return;
     }
 
+    //toast
+    sonnerToast.dismiss("reset-password-error");
+
     try {
       await withLoading(dispatch, async () => {
         const start = Date.now();
@@ -77,7 +81,9 @@ const ResetPassword = () => {
         await ensureMinDelay(start, 1500);
       });
     } catch (error) {
-      toast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau"));
+      sonnerToast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau"), {
+        id: "reset-password-error",
+      });
     }
   };
 
