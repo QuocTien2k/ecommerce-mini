@@ -4,14 +4,13 @@ import { useLoginForm } from "@features/auth/login/useLoginForm";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
 import { useAppDispatch } from "@app/hooks";
-import { withLoading } from "@lib/with-loading";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { useEffect, useState } from "react";
 
 const Login = () => {
   const {
@@ -28,29 +27,43 @@ const Login = () => {
   const navigate = useNavigate();
   const { loading, run } = useScopedLoading();
 
+  const [uiDisabled, setUiDisabled] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      const t = setTimeout(() => setUiDisabled(true), 80);
+      return () => clearTimeout(t);
+    } else {
+      setUiDisabled(false);
+    }
+  }, [loading]);
+
   const onSubmit = async (data: LoginFormValues) => {
     //toast
     sonnerToast.dismiss("login-error");
     try {
-      const user = await run(async () => {
-        const res = await authApi.login(data.email, data.password);
-        const accessToken = res.accessToken;
+      const user = await run(
+        async () => {
+          const res = await authApi.login(data.email, data.password);
+          const accessToken = res.accessToken;
 
-        dispatch(setCredentials({ accessToken, role: null }));
+          dispatch(setCredentials({ accessToken, role: null }));
 
-        const profile = await authApi.getMe();
+          const profile = await authApi.getMe();
 
-        dispatch(
-          setCredentials({
-            accessToken,
-            role: profile.role,
-          }),
-        );
+          dispatch(
+            setCredentials({
+              accessToken,
+              role: profile.role,
+            }),
+          );
 
-        localStorage.setItem("hasAuthHint", "true");
+          localStorage.setItem("hasAuthHint", "true");
 
-        return profile;
-      });
+          return profile;
+        },
+        { minDuration: 600 },
+      );
 
       navigate(user.role === Role.ADMIN ? "/admin" : "/");
     } catch (error) {
@@ -99,8 +112,19 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button disabled={loading} type="submit" className="px-6 py-5">
-            {loading ? "Đang đăng nhập" : "Đăng nhập"}
+          <Button
+            data-loading={loading}
+            disabled={uiDisabled}
+            type="submit"
+            className="relative px-6 py-5"
+          >
+            <span className={loading ? "opacity-0" : "opacity-100"}>
+              Đăng nhập
+            </span>
+
+            <span className="absolute inset-0 flex items-center justify-center">
+              {loading && "Đang đăng nhập"}
+            </span>
           </Button>
         </div>
 
