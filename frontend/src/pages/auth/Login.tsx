@@ -3,14 +3,13 @@ import { setCredentials } from "@features/auth/auth.slice";
 import { useLoginForm } from "@features/auth/login/useLoginForm";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
 import { useAppDispatch } from "@app/hooks";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
-import { useEffect, useState } from "react";
+import { AsyncButton } from "@components/common/async-button";
 
 const Login = () => {
   const {
@@ -26,17 +25,6 @@ const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, run } = useScopedLoading();
-
-  const [uiDisabled, setUiDisabled] = useState(false);
-
-  useEffect(() => {
-    if (loading) {
-      const t = setTimeout(() => setUiDisabled(true), 80);
-      return () => clearTimeout(t);
-    } else {
-      setUiDisabled(false);
-    }
-  }, [loading]);
 
   const onSubmit = async (data: LoginFormValues) => {
     //toast
@@ -112,20 +100,14 @@ const Login = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button
-            data-loading={loading}
-            disabled={uiDisabled}
+          <AsyncButton
+            loading={loading}
             type="submit"
-            className="relative px-6 py-5"
+            className="px-6 py-5"
+            loadingText="Đang đăng nhập"
           >
-            <span className={loading ? "opacity-0" : "opacity-100"}>
-              Đăng nhập
-            </span>
-
-            <span className="absolute inset-0 flex items-center justify-center">
-              {loading && "Đang đăng nhập"}
-            </span>
-          </Button>
+            Đăng nhập
+          </AsyncButton>
         </div>
 
         <div className="flex justify-between text-sm">
