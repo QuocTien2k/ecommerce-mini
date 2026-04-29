@@ -2,6 +2,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
+import type { ResetPasswordDto } from "@features/auth/types";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import React, { useState } from "react";
@@ -41,6 +42,12 @@ const ResetPassword = () => {
     }
   };
 
+  const payload: ResetPasswordDto = {
+    token: token.trim(),
+    newPassword: newPassword.trim(),
+    confirmPassword: confirmPassword.trim(),
+  };
+
   const { loading, run } = useScopedLoading();
   const navigate = useNavigate();
 
@@ -70,13 +77,7 @@ const ResetPassword = () => {
     sonnerToast.dismiss("reset-password-error");
 
     try {
-      const res = await run(() =>
-        authApi.resetPassword({
-          token,
-          newPassword,
-          confirmPassword,
-        }),
-      );
+      const res = await run(() => authApi.resetPassword(payload));
 
       navigate("/login", {
         state: {
