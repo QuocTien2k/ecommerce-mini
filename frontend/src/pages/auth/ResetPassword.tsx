@@ -1,13 +1,11 @@
-import { useAppDispatch } from "@app/hooks";
-import { Button } from "@components/ui/button";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import { getErrorMessage } from "@lib/error";
-import { ensureMinDelay } from "@lib/sleep";
 import { sonnerToast } from "@lib/sonner-toast";
-import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const ResetPassword = () => {
@@ -43,12 +41,13 @@ const ResetPassword = () => {
     }
   };
 
-  const dispatch = useAppDispatch();
+  const { loading, run } = useScopedLoading();
+  const navigate = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!token) {
+    if (!token?.trim()) {
       toast.error("Token không hợp lệ");
       return;
     }
@@ -56,29 +55,33 @@ const ResetPassword = () => {
     if (!isValidPassword(newPassword)) {
       setShowPasswordError(true);
       return;
+    } else {
+      setShowPasswordError(false);
     }
 
     if (newPassword !== confirmPassword) {
       setShowConfirmError(true);
       return;
+    } else {
+      setShowConfirmError(false);
     }
 
     //toast
     sonnerToast.dismiss("reset-password-error");
 
     try {
-      await withLoading(dispatch, async () => {
-        const start = Date.now();
-        const res = await authApi.resetPassword({
+      const res = await run(() =>
+        authApi.resetPassword({
           token,
           newPassword,
           confirmPassword,
-        });
+        }),
+      );
 
-        const message = res.message || "Đặt lại mật khẩu thành công";
+      toast.success(res.message || "Đặt lại mật khẩu thành công");
 
-        toast.success(message);
-        await ensureMinDelay(start, 1500);
+      navigate("/login", {
+        state: { message: res.message || "Đặt lại mật khẩu thành công" },
       });
     } catch (error) {
       sonnerToast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau"), {
@@ -134,9 +137,14 @@ const ResetPassword = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button type="submit" className="px-6 py-5">
+          <AsyncButton
+            loading={loading}
+            type="submit"
+            className="px-6 py-5"
+            loadingText="Đang xử lý"
+          >
             Xác nhận
-          </Button>
+          </AsyncButton>
         </div>
       </form>
     </div>

@@ -1,11 +1,9 @@
-import { useAppDispatch } from "@app/hooks";
-import { Button } from "@components/ui/button";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import { getErrorMessage } from "@lib/error";
-import { ensureMinDelay } from "@lib/sleep";
 import { sonnerToast } from "@lib/sonner-toast";
-import { withLoading } from "@lib/with-loading";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,7 +15,7 @@ const ForgotPassword = () => {
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const dispatch = useAppDispatch();
+  const { loading, run } = useScopedLoading();
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -47,13 +45,9 @@ const ForgotPassword = () => {
     sonnerToast.dismiss("forgot-error");
 
     try {
-      await withLoading(dispatch, async () => {
-        const res = await authApi.forgotPassword(email);
+      const res = await run(() => authApi.forgotPassword(email));
 
-        const message = res.message || "Gửi yêu cầu thành công";
-
-        toast.success(message);
-      });
+      toast.success(res.message || "Gửi yêu cầu thành công");
     } catch (error) {
       console.log("Error:", error);
       sonnerToast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau!"), {
@@ -89,9 +83,14 @@ const ForgotPassword = () => {
         </div>
 
         <div className="flex justify-center">
-          <Button type="submit" className="px-6 py-5">
+          <AsyncButton
+            loading={loading}
+            type="submit"
+            className="px-6 py-5"
+            loadingText="Đang gửi"
+          >
             Gửi yêu cầu
-          </Button>
+          </AsyncButton>
         </div>
 
         <div className="flex justify-between text-sm">
