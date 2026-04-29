@@ -78,10 +78,11 @@ const ResetPassword = () => {
         }),
       );
 
-      toast.success(res.message || "Đặt lại mật khẩu thành công");
-
       navigate("/login", {
-        state: { message: res.message || "Đặt lại mật khẩu thành công" },
+        state: {
+          message: res.message || "Đặt lại mật khẩu thành công",
+          type: "success",
+        },
       });
     } catch (error) {
       sonnerToast.error(getErrorMessage(error, "Có lỗi xảy ra, thử lại sau"), {

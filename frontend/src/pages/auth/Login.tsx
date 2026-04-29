@@ -1,7 +1,7 @@
 import { authApi } from "@features/auth/auth.api";
 import { setCredentials } from "@features/auth/auth.slice";
 import { useLoginForm } from "@features/auth/login/useLoginForm";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import type { LoginFormValues } from "@features/auth/login/login.schema";
 import { Role } from "@/types/role";
@@ -10,9 +10,7 @@ import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import type { LocationState } from "@/types/location";
+import { useFlashMessage } from "@/hooks/flash-message";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -24,15 +22,7 @@ const Login = () => {
     formState: { errors, dirtyFields, isSubmitted },
   } = useLoginForm();
 
-  const location = useLocation();
-  const state = location.state as LocationState | null;
-  useEffect(() => {
-    if (location.state?.message) {
-      toast.success(location.state.message);
-
-      navigate(location.pathname, { replace: true });
-    }
-  }, [state, navigate, location.pathname]);
+  useFlashMessage();
 
   const showEmailError = errors.email && (dirtyFields.email || isSubmitted);
   const showPasswordError =
