@@ -1,5 +1,10 @@
 import { api } from "@shared/api/axios";
-import type { LoginResponseDto, ResetPasswordDto } from "./types";
+import {
+  type AuthUserResponseDto,
+  type LoginResponseDto,
+  type ResetPasswordDto,
+  type SignupUserDto,
+} from "./types";
 
 export const authApi = {
   login: (email: string, password: string) =>
@@ -16,4 +21,7 @@ export const authApi = {
 
   resetPassword: (data: ResetPasswordDto) =>
     api.post("/auth/reset-password", data),
+
+  signup: (data: SignupUserDto) =>
+    api.post<AuthUserResponseDto>("/auth/signup", data),
 };
