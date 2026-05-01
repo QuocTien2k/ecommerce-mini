@@ -17,9 +17,7 @@ import { LoginDto } from './dtos/login.dto';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
-import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -105,11 +103,5 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async getMe(@CurrentUser('sub') userId: string) {
-    return this.authService.getMe(userId);
   }
 }

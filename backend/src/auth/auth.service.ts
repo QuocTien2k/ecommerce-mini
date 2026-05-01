@@ -316,23 +316,4 @@ export class AuthService {
 
     return { message: 'Đặt lại mật khẩu thành công!' };
   }
-
-  async getMe(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        fullname: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('User không tồn tại');
-    }
-
-    return user;
-  }
 }
