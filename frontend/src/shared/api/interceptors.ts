@@ -81,7 +81,7 @@ export function setupInterceptors() {
 
         console.log("refresh response", res);
 
-        const meRes = await refreshClient.get("/auth/me", {
+        const meRes = await refreshClient.get("/user/me", {
           headers: {
             Authorization: `Bearer ${newAccessToken}`,
           },

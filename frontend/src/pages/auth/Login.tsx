@@ -11,6 +11,7 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { useFlashMessage } from "@/hooks/flash-message";
+import { userApi } from "@features/user/user.api";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -39,7 +40,7 @@ const Login = () => {
 
           dispatch(setCredentials({ accessToken, role: null }));
 
-          const profile = await authApi.getMe();
+          const profile = await userApi.getMe();
 
           dispatch(
             setCredentials({
@@ -49,6 +50,8 @@ const Login = () => {
           );
 
           localStorage.setItem("hasAuthHint", "true");
+
+          console.log(profile.role);
 
           return profile;
         },
