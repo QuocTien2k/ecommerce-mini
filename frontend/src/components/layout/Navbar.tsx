@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "@app/hooks";
 import { AsyncButton } from "@components/common/async-button";
 import { authApi } from "@features/auth/auth.api";
 import { clearAuth } from "@features/auth/auth.slice";
+import { clearUser } from "@features/user/user.slice";
 import { useEffect } from "react";
 
 const Navbar = () => {
@@ -21,6 +22,7 @@ const Navbar = () => {
       });
     } finally {
       dispatch(clearAuth());
+      dispatch(clearUser());
       localStorage.removeItem("hasAuthHint");
     }
   };
