@@ -6,6 +6,8 @@ import {
   setCredentials,
 } from "@features/auth/auth.slice";
 import { jwtDecode } from "jwt-decode";
+import { userApi } from "@features/user/user.api";
+import { setUser } from "@features/user/user.slice";
 
 const isTokenExpired = (token: string) => {
   try {
@@ -47,6 +49,10 @@ export const bootstrapAuth = async () => {
         role: payload.role,
       }),
     );
+
+    //gọi lại để set User
+    const profile = await userApi.getMe();
+    store.dispatch(setUser(profile));
   } catch {
     store.dispatch(clearAuth());
   } finally {
