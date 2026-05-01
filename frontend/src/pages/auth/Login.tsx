@@ -12,6 +12,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { useFlashMessage } from "@/hooks/flash-message";
 import { userApi } from "@features/user/user.api";
+import { setUser } from "@features/user/user.slice";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -42,6 +43,7 @@ const Login = () => {
 
           const profile = await userApi.getMe();
 
+          dispatch(setUser(profile));
           dispatch(
             setCredentials({
               accessToken,
@@ -50,8 +52,6 @@ const Login = () => {
           );
 
           localStorage.setItem("hasAuthHint", "true");
-
-          console.log(profile.role);
 
           return profile;
         },

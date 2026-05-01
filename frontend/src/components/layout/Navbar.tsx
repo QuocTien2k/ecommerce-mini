@@ -1,12 +1,18 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
-import { useAppDispatch } from "@app/hooks";
+import { useAppDispatch, useAppSelector } from "@app/hooks";
 import { AsyncButton } from "@components/common/async-button";
 import { authApi } from "@features/auth/auth.api";
 import { clearAuth } from "@features/auth/auth.slice";
+import { useEffect } from "react";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const { loading, run } = useScopedLoading();
+  const user = useAppSelector((state) => state.user.user);
+
+  useEffect(() => {
+    console.log("User from Redux:", user);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
