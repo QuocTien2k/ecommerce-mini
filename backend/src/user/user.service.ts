@@ -26,18 +26,22 @@ export class UserService {
     });
   }
 
-  //test lấy thông tin
+  private readonly userMeSelect = {
+    id: true,
+    email: true,
+    phone: true,
+    fullname: true,
+    role: true,
+    avatar: true,
+    address: true,
+    createdAt: true,
+  };
+
+  //lấy thông tin
   async getMe(userId: string) {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        fullname: true,
-        role: true,
-        createdAt: true,
-      },
+      select: this.userMeSelect,
     });
   }
 
