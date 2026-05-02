@@ -9,6 +9,8 @@ interface UserState {
     phone: string;
     role: Role;
     createdAt: string;
+    address: string;
+    avatar: string;
   } | null;
 }
 

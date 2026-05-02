@@ -18,14 +18,17 @@ export const AsyncButton = ({
   return (
     <Button
       disabled={disabled || loading}
-      className="inline-flex items-center justify-center gap-2"
+      className="inline-flex items-center justify-center gap-2 whitespace-nowrap"
       {...props}
     >
-      {loading && (
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      {loading ? (
+        <>
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent shrink-0" />
+          <span>{loadingText}</span>
+        </>
+      ) : (
+        children
       )}
-
-      <span>{loading ? loadingText : children}</span>
     </Button>
   );
 };
