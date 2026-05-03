@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   GoneException,
   Injectable,
   UnauthorizedException,
@@ -91,6 +92,12 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
+    if (!user.isActive) {
+      throw new UnauthorizedException(
+        'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ qua email.',
+      );
+    }
+
     const payload = {
       sub: user.id,
       email: user.email,
@@ -164,6 +171,20 @@ export class AuthService {
     }
 
     const user = tokenRecord.user;
+
+    if (!user.isActive) {
+      await this.prisma.refreshToken.updateMany({
+        where: {
+          userId: user.id,
+          isRevoked: false,
+        },
+        data: {
+          isRevoked: true,
+        },
+      });
+
+      throw new ForbiddenException('Tài khoản đã bị khóa');
+    }
 
     //tạo accessToken mới
     const payload = {
