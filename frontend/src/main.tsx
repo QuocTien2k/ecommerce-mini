@@ -7,15 +7,19 @@ import { Provider } from "react-redux";
 import { store } from "./app/store.ts";
 import { setupInterceptors } from "./shared/api/interceptors.ts";
 import { bootstrapAuth } from "@app/bootstrap.ts";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@lib/react-query.ts";
 
 setupInterceptors();
 bootstrapAuth().finally(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </QueryClientProvider>
       </Provider>
     </StrictMode>,
   );

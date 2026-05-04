@@ -1,7 +1,18 @@
 import { api } from "@shared/api/axios";
+import type { GetUsersData } from "../types/adminUser.type";
 
-export const adminApi = {
-  getUsers: () => api.get("/admin/users"),
+export interface GetUsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isActive?: boolean;
+}
 
-  setUserActiveStatus: () => api.patch("/admin/users/:id/lock"),
+export const adminUserApi = {
+  getUsers: (params?: GetUsersParams) =>
+    api.get<GetUsersData>("/admin/users", { params }),
+
+  lockUser: (userId: string) => api.patch(`/admin/users/${userId}/lock`),
+
+  unlockUser: (userId: string) => api.patch(`/admin/users/${userId}/unlock`),
 };
