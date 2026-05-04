@@ -77,9 +77,10 @@ export function setupInterceptors() {
 
       try {
         const res = await refreshClient.post("/auth/refresh");
-        const newAccessToken = res.data.accessToken;
+        const newAccessToken = res.data.data.accessToken;
 
         console.log("refresh response", res);
+        console.log(newAccessToken);
 
         const meRes = await refreshClient.get("/user/me", {
           headers: {
@@ -87,7 +88,7 @@ export function setupInterceptors() {
           },
         });
 
-        const roleFromServer = meRes.data.role;
+        const roleFromServer = meRes.data.data.role;
 
         //redux
         store.dispatch(
