@@ -17,7 +17,7 @@ import {
 } from "@components/ui/dropdown-menu";
 import { authApi } from "@features/auth/auth.api";
 import { clearAuth } from "@features/auth/auth.slice";
-import { clearUser } from "@features/user/user.slice";
+import { clearUser } from "@features/user/store/user.slice";
 import { Power } from "lucide-react";
 import { useState } from "react";
 

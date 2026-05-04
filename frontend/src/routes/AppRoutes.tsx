@@ -13,6 +13,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import { Role } from "@/types/role";
 import AdminDashboard from "@pages/admin/AdminDashboard";
+import AdminUserPage from "@features/user/page/AdminUserPage";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AppRoutes = () => {
         <Route element={<RoleRoute allowedRoles={[Role.ADMIN]} />}>
           <Route element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUserPage />} />
             {/* thêm các route admin khác */}
           </Route>
         </Route>
