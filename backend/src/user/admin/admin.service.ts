@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { AdminUserQuery } from './types/admin-user.type';
 import { Prisma } from '@prisma/client';
@@ -80,5 +84,38 @@ export class AdminService {
     });
 
     return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  async setUserActiveStatus(
+    userId: string,
+    isActive: boolean,
+    currentAdminId: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('không tìm thấy người dùng!');
+    }
+
+    if (userId === currentAdminId && isActive === false) {
+      throw new BadRequestException('Không tự khóa chính mình!');
+    }
+
+    if (user.isActive === isActive) {
+      return plainToInstance(AdminUserDto, user, {
+        excludeExtraneousValues: true,
+      });
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { isActive },
+    });
+
+    return plainToInstance(AdminUserDto, updatedUser, {
+      excludeExtraneousValues: true,
+    });
   }
 }
