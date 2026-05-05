@@ -6,6 +6,8 @@ import { useAdminUsersQuery } from "../hooks/useAdminUsersQuery";
 import { useUserStatusMutation } from "../hooks/useUserStatusMutation";
 import type { AdminUser } from "../types/adminUser.type";
 import { AsyncButton } from "@components/common/async-button";
+import { Title } from "@components/ui/title-module";
+import CopyableText from "@components/common/copyable-text";
 
 const AdminUserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -35,15 +37,10 @@ const AdminUserPage = () => {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">User Management</h2>
-          <p className="text-sm text-muted-foreground">
-            Search by ID, phone, fullname
-          </p>
-        </div>
+        <Title title="Quản lý người dùng" />
 
         <span className="text-sm text-muted-foreground">
-          Total: {meta?.total ?? 0}
+          Tổng số lượng user: {meta?.total ?? 0}
         </span>
       </div>
 
@@ -57,12 +54,12 @@ const AdminUserPage = () => {
           <thead className="bg-muted/50">
             <tr className="text-left">
               <th className="px-4 py-3 font-medium">ID</th>
-              <th className="px-4 py-3 font-medium">Full Name</th>
+              <th className="px-4 py-3 font-medium">Họ và tên</th>
               <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Phone</th>
-              <th className="px-4 py-3 font-medium">Role</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Action</th>
+              <th className="px-4 py-3 font-medium">Số điện thoại</th>
+              <th className="px-4 py-3 font-medium">vai trò</th>
+              <th className="px-4 py-3 font-medium">Trạng thái</th>
+              <th className="px-4 py-3 text-right font-medium">Hành động</th>
             </tr>
           </thead>
 
@@ -72,7 +69,9 @@ const AdminUserPage = () => {
                 key={user.id}
                 className="border-t hover:bg-muted/30 transition-colors"
               >
-                <td className="px-4 py-3 font-mono text-xs">{user.id}</td>
+                <td className="px-4 py-3">
+                  <CopyableText value={user.id} />
+                </td>
 
                 <td className="px-4 py-3 font-medium">{user.fullname}</td>
 
