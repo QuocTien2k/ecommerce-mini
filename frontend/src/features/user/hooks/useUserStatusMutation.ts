@@ -14,9 +14,9 @@ export const useUserStatusMutation = () => {
       isActive: boolean;
     }) => {
       if (isActive) {
-        return adminUserApi.unlockUser(userId);
+        return adminUserApi.lockUser(userId);
       }
-      return adminUserApi.lockUser(userId);
+      return adminUserApi.unlockUser(userId);
     },
 
     onSuccess: () => {
