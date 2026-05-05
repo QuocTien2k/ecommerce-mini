@@ -2,14 +2,14 @@ import { useAppSelector } from "@app/hooks";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const { isAuthInitialized, accessToken } = useAppSelector(
+  const { isAuthInitialized, accessToken, role, isRefreshing } = useAppSelector(
     (state) => state.auth,
   );
-  if (!isAuthInitialized) {
+  if (!isAuthInitialized || isRefreshing) {
     return null;
   }
 
-  if (!accessToken) {
+  if (!accessToken || !role) {
     return <Navigate to="/login" replace />;
   }
 

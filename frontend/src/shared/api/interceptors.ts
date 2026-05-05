@@ -1,14 +1,19 @@
 import { store } from "@/app/store";
 import { api, refreshClient } from "./axios";
-import { clearAuth, setCredentials } from "@/features/auth/auth.slice";
+import {
+  clearAuth,
+  setCredentials,
+  setRefreshing,
+} from "@/features/auth/auth.slice";
 
-let isRefreshing = false;
-let queue: Array<(token: string | null) => void> = [];
+// let isRefreshing = false;
+// let queue: Array<(token: string | null) => void> = [];
+let refreshPromise: Promise<string | null> | null = null;
 
-const processQueue = (token: string | null) => {
-  queue.forEach((cb) => cb(token));
-  queue = [];
-};
+// const processQueue = (token: string | null) => {
+//   queue.forEach((cb) => cb(token));
+//   queue = [];
+// };
 
 export function setupInterceptors() {
   // REQUEST INTERCEPTOR
@@ -61,60 +66,47 @@ export function setupInterceptors() {
 
       originalRequest._retry = true;
 
-      // nếu đang refresh thì queue request lại
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          queue.push((token: string | null) => {
-            if (token && originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
-            resolve(api(originalRequest));
-          });
-        });
-      }
-
-      isRefreshing = true;
-
       try {
-        const res = await refreshClient.post("/auth/refresh");
-        const newAccessToken = res.data.data.accessToken;
+        store.dispatch(setRefreshing(true));
+        // nếu chưa có refreshPromise => tạo mới
+        if (!refreshPromise) {
+          refreshPromise = refreshClient
+            .post("/auth/refresh")
+            .then((res) => {
+              const token = res.data.data.accessToken;
 
-        console.log("refresh response", res);
-        console.log(newAccessToken);
+              store.dispatch(
+                setCredentials({
+                  accessToken: token,
+                  role: store.getState().auth.role, // KHÔNG xử lý role ở đây
+                }),
+              );
 
-        const meRes = await refreshClient.get("/user/me", {
-          headers: {
-            Authorization: `Bearer ${newAccessToken}`,
-          },
-        });
+              return token;
+            })
+            .catch((err) => {
+              store.dispatch(clearAuth());
+              return null;
+            })
+            .finally(() => {
+              store.dispatch(setRefreshing(false));
+              refreshPromise = null;
+            });
+        }
 
-        const roleFromServer = meRes.data.data.role;
+        const newToken = await refreshPromise;
 
-        //redux
-        store.dispatch(
-          setCredentials({
-            accessToken: newAccessToken,
-            role: roleFromServer,
-          }),
-        );
+        if (!newToken) {
+          return Promise.reject(error);
+        }
 
-        processQueue(newAccessToken);
-
-        // retry request gốc
-        if (!originalRequest.headers) originalRequest.headers = {};
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // attach token mới và retry request
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
         return api(originalRequest);
-      } catch (err: any) {
-        // refresh fail → logout
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          store.dispatch(clearAuth());
-        }
-        processQueue(null);
-
+      } catch (err) {
         return Promise.reject(err);
-      } finally {
-        isRefreshing = false;
       }
     },
   );

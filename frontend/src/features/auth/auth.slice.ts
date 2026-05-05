@@ -9,6 +9,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   isAuthInitialized: boolean;
   hasAuthHint: boolean;
+  isRefreshing: boolean;
 }
 
 const initialState: AuthState = {
@@ -17,6 +18,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isAuthInitialized: false,
   hasAuthHint: localStorage.getItem("hasAuthHint") === "true",
+  isRefreshing: false,
 };
 
 const authSlice = createSlice({
@@ -52,6 +54,10 @@ const authSlice = createSlice({
       state.isAuthInitialized = action.payload;
     },
 
+    setRefreshing: (state, action: PayloadAction<boolean>) => {
+      state.isRefreshing = action.payload;
+    },
+
     clearAuth: (state) => {
       state.accessToken = null;
       state.role = null;
@@ -62,7 +68,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, setAuthInitialized, clearAuth } =
+export const { setCredentials, setAuthInitialized, clearAuth, setRefreshing } =
   authSlice.actions;
 
 export default authSlice.reducer;

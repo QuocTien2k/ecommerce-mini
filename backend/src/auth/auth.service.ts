@@ -105,7 +105,7 @@ export class AuthService {
     };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '2m',
     });
 
     const refreshToken = crypto.randomBytes(64).toString('hex');
@@ -194,7 +194,7 @@ export class AuthService {
     };
 
     const newAccessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '2m',
     });
 
     //rotate refresh token
@@ -211,8 +211,9 @@ export class AuthService {
     // transaction để đảm bảo atomic
     await this.prisma.$transaction([
       // xóa token cũ
-      this.prisma.refreshToken.delete({
+      this.prisma.refreshToken.update({
         where: { id: tokenRecord.id },
+        data: { isRevoked: true },
       }),
 
       // tạo token mới

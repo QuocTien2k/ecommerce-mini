@@ -6,8 +6,8 @@ import {
   setCredentials,
 } from "@features/auth/auth.slice";
 import { jwtDecode } from "jwt-decode";
-import { userApi } from "@features/user/api/user.api";
-import { setUser } from "@features/user/store/user.slice";
+// import { userApi } from "@features/user/api/user.api";
+// import { setUser } from "@features/user/store/user.slice";
 
 const isTokenExpired = (token: string) => {
   try {
@@ -27,6 +27,15 @@ export const bootstrapAuth = async () => {
 
   //accessToken còn hạn → skip
   if (accessToken && !isTokenExpired(accessToken)) {
+    const payload = jwtDecode<{ role: string }>(accessToken);
+
+    store.dispatch(
+      setCredentials({
+        accessToken,
+        role: payload.role,
+      }),
+    );
+
     store.dispatch(setAuthInitialized(true));
     return;
   }
@@ -51,8 +60,8 @@ export const bootstrapAuth = async () => {
     );
 
     //gọi lại để set User
-    const profile = await userApi.getMe();
-    store.dispatch(setUser(profile));
+    // const profile = await userApi.getMe();
+    // store.dispatch(setUser(profile));
   } catch {
     store.dispatch(clearAuth());
   } finally {
