@@ -8,6 +8,7 @@ export const useAdminUsersQuery = (params?: GetUsersParams) => {
   return useQuery({
     queryKey: [ADMIN_USERS_QUERY_KEY, params],
     queryFn: async (): Promise<GetUsersData> => {
+      await new Promise((r) => setTimeout(r, 1000));
       const res = await adminUserApi.getUsers(params);
       return res;
     },

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Lock, Unlock } from "lucide-react";
 import { useAdminUsersQuery } from "../hooks/useAdminUsersQuery";
 import { useUserStatusMutation } from "../hooks/useUserStatusMutation";
@@ -12,6 +11,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
+import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 
 const AdminUserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -56,140 +56,137 @@ const AdminUserPage = () => {
     admin: "bg-purple-100 text-purple-800 border-purple-300",
     user: "bg-neutral-100 text-neutral-700 border-neutral-200",
   };
-
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-75 w-full rounded-xl" />
-      </div>
-    );
-  }
+  console.log({ isLoading, isFetching });
 
   return (
-    <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Title title="Quản lý người dùng" />
+    <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
+      <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <Title title="Quản lý người dùng" />
 
-        <span className="text-sm text-muted-foreground">
-          Tổng số lượng user: {meta?.total ?? 0}
-        </span>
-      </div>
+          <span className="text-sm text-muted-foreground">
+            Tổng số lượng user: {meta?.total ?? 0}
+          </span>
+        </div>
 
-      <div
-        className={cn("border rounded-xl overflow-hidden transition-opacity", {
-          "opacity-60": isFetching,
-        })}
-      ></div>
+        <div
+          className={cn(
+            "border rounded-xl overflow-hidden transition-opacity",
+            {
+              "opacity-60": isFetching,
+            },
+          )}
+        ></div>
 
-      {/* Custom Table */}
-      <div className="border rounded-xl overflow-hidden ">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr className="text-left hover:bg-muted/40 transition-colors">
-              <th className="px-4 py-3 font-medium">ID</th>
-              <th className="px-4 py-3 font-medium">Họ và tên</th>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Số điện thoại</th>
-              <th className="px-4 py-3 font-medium">Vai trò</th>
-              <th className="px-4 py-3 font-medium">Trạng thái</th>
-              <th className="px-4 py-3 text-center font-medium w-35">
-                Hành động
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className="border-t hover:bg-muted/30 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  <CopyableText value={user.id} />
-                </td>
-
-                <td className="px-4 py-3 font-medium">{user.fullname}</td>
-
-                <td className="px-4 py-3">{user.email}</td>
-
-                <td className="px-4 py-3">{user.phone || "-"}</td>
-
-                <td className="px-4 py-3">
-                  <Badge
-                    className={`capitalize border ${roleStyles[user.role.toLowerCase()] ?? "bg-gray-100 text-gray-700"}`}
-                  >
-                    {user.role.toLowerCase()}
-                  </Badge>
-                </td>
-
-                <td className="px-4 py-3">
-                  <Badge variant={user.isActive ? "default" : "destructive"}>
-                    {user.isActive ? "Active" : "Locked"}
-                  </Badge>
-                </td>
-
-                <td className="px-4 py-3 text-right w-35">
-                  <AsyncButton
-                    size="sm"
-                    className="w-full max-w-27.5 ml-auto"
-                    disabled={pendingId !== null}
-                    loading={loading && pendingId === user.id}
-                    variant={user.isActive ? "destructive" : "default"}
-                    //loadingText={user.isActive ? "Đang khóa..." : "Đang mở..."}
-                    onClick={() => handleToggleStatus(user.id, user.isActive)}
-                  >
-                    {user.isActive ? (
-                      <Lock className="w-4 h-4" />
-                    ) : (
-                      <Unlock className="w-4 h-4" />
-                    )}
-                  </AsyncButton>
-                </td>
+        {/* Custom Table */}
+        <div className="border rounded-xl overflow-hidden ">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr className="text-left hover:bg-muted/40 transition-colors">
+                <th className="px-4 py-3 font-medium">ID</th>
+                <th className="px-4 py-3 font-medium">Họ và tên</th>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Số điện thoại</th>
+                <th className="px-4 py-3 font-medium">Vai trò</th>
+                <th className="px-4 py-3 font-medium">Trạng thái</th>
+                <th className="px-4 py-3 text-center font-medium w-35">
+                  Hành động
+                </th>
               </tr>
-            ))}
+            </thead>
 
-            {users.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center py-10">
-                  <span className="text-sm text-muted-foreground">
-                    No users found
-                  </span>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            <tbody>
+              {users.map((user) => (
+                <tr
+                  key={user.id}
+                  className="border-t hover:bg-muted/30 transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <CopyableText value={user.id} />
+                  </td>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">
-          Page {page} / {totalPages}
-        </span>
+                  <td className="px-4 py-3 font-medium">{user.fullname}</td>
 
-        <div className="flex gap-2">
-          <AsyncButton
-            size="sm"
-            variant="outline"
-            disabled={page === 1}
-            onClick={() => setPage((prev) => prev - 1)}
-          >
-            Prev
-          </AsyncButton>
+                  <td className="px-4 py-3">{user.email}</td>
 
-          <AsyncButton
-            size="sm"
-            variant="outline"
-            disabled={page >= totalPages}
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            Next
-          </AsyncButton>
+                  <td className="px-4 py-3">{user.phone || "-"}</td>
+
+                  <td className="px-4 py-3">
+                    <Badge
+                      className={`capitalize border ${roleStyles[user.role.toLowerCase()] ?? "bg-gray-100 text-gray-700"}`}
+                    >
+                      {user.role.toLowerCase()}
+                    </Badge>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <Badge variant={user.isActive ? "default" : "destructive"}>
+                      {user.isActive ? "Active" : "Locked"}
+                    </Badge>
+                  </td>
+
+                  <td className="px-4 py-3 text-right w-35">
+                    <AsyncButton
+                      size="sm"
+                      className="w-full max-w-27.5 ml-auto"
+                      disabled={pendingId !== null}
+                      loading={loading && pendingId === user.id}
+                      variant={user.isActive ? "destructive" : "default"}
+                      //loadingText={user.isActive ? "Đang khóa..." : "Đang mở..."}
+                      onClick={() => handleToggleStatus(user.id, user.isActive)}
+                    >
+                      {user.isActive ? (
+                        <Lock className="w-4 h-4" />
+                      ) : (
+                        <Unlock className="w-4 h-4" />
+                      )}
+                    </AsyncButton>
+                  </td>
+                </tr>
+              ))}
+
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="text-center py-10">
+                    <span className="text-sm text-muted-foreground">
+                      No users found
+                    </span>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            Page {page} / {totalPages}
+          </span>
+
+          <div className="flex gap-2">
+            <AsyncButton
+              size="sm"
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              Prev
+            </AsyncButton>
+
+            <AsyncButton
+              size="sm"
+              variant="outline"
+              disabled={page >= totalPages}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              Next
+            </AsyncButton>
+          </div>
         </div>
       </div>
-    </div>
+    </QueryStateWrapper>
   );
 };
 
