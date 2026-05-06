@@ -18,10 +18,15 @@ import {
 import { authApi } from "@features/auth/auth.api";
 import { clearAuth } from "@features/auth/auth.slice";
 import { clearUser } from "@features/user/store/user.slice";
-import { Power } from "lucide-react";
+import { ChevronLeft, ChevronRight, Power } from "lucide-react";
 import { useState } from "react";
 
-const Navbar = () => {
+type NavbarProps = {
+  collapsed: boolean;
+  onToggle: () => void;
+};
+
+const Navbar: React.FC<NavbarProps> = ({ collapsed, onToggle }) => {
   const [openProfile, setOpenProfile] = useState(false);
   const dispatch = useAppDispatch();
   const { loading, run } = useScopedLoading();
@@ -40,8 +45,32 @@ const Navbar = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b flex items-center justify-between px-6">
-      <h1 className="text-lg font-medium">Admin Panel</h1>
+    <header className="h-16 bg-white border-b flex items-center justify-between px-6 relative">
+      <div className="flex items-center gap-4 relative">
+        {/* Nút Toggle - Absolute, nhô ra ngoài */}
+        <button
+          onClick={onToggle}
+          className={`
+        absolute -left-7.5 top-1/2 -translate-y-1/2
+        h-9 w-9 flex items-center justify-center cursor-pointer
+        bg-linear-to-b from-neutral-900 via-neutral-950 to-black
+        border border-white/5 rounded-r-2xl border-r-0 shadow-none hover:shadow-inner hover:border-white/10
+    hover:bg-neutral-900 active:scale-95
+    transition-all duration-300 z-20
+        
+      `}
+          aria-label={collapsed ? "Mở sidebar" : "Thu gọn sidebar"}
+        >
+          {collapsed ? (
+            <ChevronRight size={22} className="text-white/90" />
+          ) : (
+            <ChevronLeft size={22} className="text-white/90" />
+          )}
+        </button>
+
+        {/* Tiêu đề - đẩy sang phải một chút để tránh chồng nút */}
+        <h1 className="text-lg font-medium text-gray-800 ml-8">Admin Panel</h1>
+      </div>
 
       <div className="flex items-center gap-4">
         <DropdownMenu>
