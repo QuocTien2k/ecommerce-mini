@@ -10,6 +10,8 @@ import { Title } from "@components/ui/title-module";
 import CopyableText from "@components/common/copyable-text";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
+import { getErrorMessage } from "@lib/error";
+import { sonnerToast } from "@lib/sonner-toast";
 
 const AdminUserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -25,6 +27,7 @@ const AdminUserPage = () => {
 
   const handleToggleStatus = async (userId: string, isActive: boolean) => {
     if (pendingId) return; // optional guard
+    sonnerToast.dismiss("status-error");
 
     setPendingId(userId);
 
@@ -35,8 +38,11 @@ const AdminUserPage = () => {
         },
         { minDuration: 500 },
       );
-    } catch (err) {
-      console.error("Toggle status error:", err);
+    } catch (error) {
+      console.error("Toggle status error:", error);
+      sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
+        id: "status-error",
+      });
     } finally {
       setPendingId(null);
     }
@@ -45,6 +51,11 @@ const AdminUserPage = () => {
   const users: AdminUser[] = data?.data ?? [];
   const meta = data?.meta;
   const totalPages = meta?.totalPages ?? 1;
+
+  const roleStyles: Record<string, string> = {
+    admin: "bg-purple-100 text-purple-800 border-purple-300",
+    user: "bg-neutral-100 text-neutral-700 border-neutral-200",
+  };
 
   if (isLoading) {
     return (
@@ -56,7 +67,7 @@ const AdminUserPage = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Title title="Quản lý người dùng" />
@@ -73,15 +84,15 @@ const AdminUserPage = () => {
       ></div>
 
       {/* Custom Table */}
-      <div className="border rounded-xl overflow-hidden">
+      <div className="border rounded-xl overflow-hidden ">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
-            <tr className="text-left">
+            <tr className="text-left hover:bg-muted/40 transition-colors">
               <th className="px-4 py-3 font-medium">ID</th>
               <th className="px-4 py-3 font-medium">Họ và tên</th>
               <th className="px-4 py-3 font-medium">Email</th>
               <th className="px-4 py-3 font-medium">Số điện thoại</th>
-              <th className="px-4 py-3 font-medium">vai trò</th>
+              <th className="px-4 py-3 font-medium">Vai trò</th>
               <th className="px-4 py-3 font-medium">Trạng thái</th>
               <th className="px-4 py-3 text-center font-medium w-35">
                 Hành động
@@ -106,7 +117,9 @@ const AdminUserPage = () => {
                 <td className="px-4 py-3">{user.phone || "-"}</td>
 
                 <td className="px-4 py-3">
-                  <Badge variant="secondary" className="capitalize">
+                  <Badge
+                    className={`capitalize border ${roleStyles[user.role.toLowerCase()] ?? "bg-gray-100 text-gray-700"}`}
+                  >
                     {user.role.toLowerCase()}
                   </Badge>
                 </td>
