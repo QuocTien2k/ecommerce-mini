@@ -1,11 +1,5 @@
 import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ChevronRight,
-  ChevronLeft,
-} from "lucide-react";
+import { LayoutDashboard, Users, Package } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type NavItem = {
@@ -13,11 +7,6 @@ type NavItem = {
   label: string;
   icon: LucideIcon;
   end?: boolean;
-};
-
-type SidebarProps = {
-  collapsed: boolean;
-  onToggle: () => void;
 };
 
 const navItems: NavItem[] = [
