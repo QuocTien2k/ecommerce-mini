@@ -11,5 +11,6 @@ export const useAdminUsersQuery = (params?: GetUsersParams) => {
       const res = await adminUserApi.getUsers(params);
       return res;
     },
+    placeholderData: (prev) => prev,
   });
 };

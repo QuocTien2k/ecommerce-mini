@@ -8,17 +8,39 @@ import type { AdminUser } from "../types/adminUser.type";
 import { AsyncButton } from "@components/common/async-button";
 import { Title } from "@components/ui/title-module";
 import CopyableText from "@components/common/copyable-text";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { cn } from "@lib/utils";
 
 const AdminUserPage = () => {
   const [page, setPage] = useState<number>(1);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const { loading, run } = useScopedLoading();
 
   const { data, isLoading, isFetching } = useAdminUsersQuery({
     page,
     limit: 6,
   });
 
-  const { mutate: setStatus, isPending } = useUserStatusMutation();
+  const { mutateAsync } = useUserStatusMutation();
+
+  const handleToggleStatus = async (userId: string, isActive: boolean) => {
+    if (pendingId) return; // optional guard
+
+    setPendingId(userId);
+
+    try {
+      await run(
+        async () => {
+          await mutateAsync({ userId, isActive });
+        },
+        { minDuration: 500 },
+      );
+    } catch (err) {
+      console.error("Toggle status error:", err);
+    } finally {
+      setPendingId(null);
+    }
+  };
 
   const users: AdminUser[] = data?.data ?? [];
   const meta = data?.meta;
@@ -44,9 +66,11 @@ const AdminUserPage = () => {
         </span>
       </div>
 
-      {isFetching && (
-        <p className="text-xs text-muted-foreground">Updating...</p>
-      )}
+      <div
+        className={cn("border rounded-xl overflow-hidden transition-opacity", {
+          "opacity-60": isFetching,
+        })}
+      ></div>
 
       {/* Custom Table */}
       <div className="border rounded-xl overflow-hidden">
@@ -59,7 +83,9 @@ const AdminUserPage = () => {
               <th className="px-4 py-3 font-medium">Số điện thoại</th>
               <th className="px-4 py-3 font-medium">vai trò</th>
               <th className="px-4 py-3 font-medium">Trạng thái</th>
-              <th className="px-4 py-3 text-right font-medium">Hành động</th>
+              <th className="px-4 py-3 text-center font-medium w-35">
+                Hành động
+              </th>
             </tr>
           </thead>
 
@@ -91,24 +117,15 @@ const AdminUserPage = () => {
                   </Badge>
                 </td>
 
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-right w-35">
                   <AsyncButton
                     size="sm"
-                    loading={isPending && pendingId === user.id}
+                    className="w-full max-w-27.5 ml-auto"
+                    disabled={pendingId !== null}
+                    loading={loading && pendingId === user.id}
                     variant={user.isActive ? "destructive" : "default"}
-                    onClick={() => {
-                      setPendingId(user.id);
-
-                      setStatus(
-                        {
-                          userId: user.id,
-                          isActive: user.isActive,
-                        },
-                        {
-                          onSettled: () => setPendingId(null),
-                        },
-                      );
-                    }}
+                    //loadingText={user.isActive ? "Đang khóa..." : "Đang mở..."}
+                    onClick={() => handleToggleStatus(user.id, user.isActive)}
                   >
                     {user.isActive ? (
                       <Lock className="w-4 h-4" />
