@@ -22,7 +22,7 @@ export function QueryStateWrapper({ isLoading, isFetching, children }: Props) {
     <div className="relative">
       {children}
 
-      {isFetching && <SpinnerOverlay text="Đang cập nhật..." />}
+      {isFetching && <SpinnerOverlay />}
     </div>
   );
 }
