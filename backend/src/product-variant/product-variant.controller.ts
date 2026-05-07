@@ -4,7 +4,6 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -17,6 +16,7 @@ import { CreateProductVariantDto } from './dtos/create-product-variant.dto';
 import { ProductVariantService } from './product-variant.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { UpdateProductVariantDto } from './dtos/update-product-variant.dto';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('product-variant')
 export class ProductVariantController {
@@ -26,32 +26,24 @@ export class ProductVariantController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(FilesInterceptor('files'))
+  @ResponseMessage('Tạo biến thể thành công!')
   async create(
     @Body() dto: CreateProductVariantDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const data = await this.productVariantService.create(dto, files);
-
-    return {
-      message: 'Tạo biến thể sản phẩm thành công',
-      data,
-    };
+    return await this.productVariantService.create(dto, files);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @UseInterceptors(FilesInterceptor('files'))
+  @ResponseMessage('Cập nhật biến thể thành công!')
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProductVariantDto,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    const data = await this.productVariantService.update(id, dto, files);
-
-    return {
-      message: 'Cập nhập biến thể thành công',
-      data,
-    };
+    return await this.productVariantService.update(id, dto, files);
   }
 }

@@ -2,6 +2,7 @@ import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@auth/guards/roles.guard';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 import {
   Body,
   Controller,
@@ -43,46 +44,38 @@ export class ProductControllerAdmin {
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Tạo sản phẩm thành công!')
   async create(
     @Body() dto: CreateProductDto,
     @CurrentUser('sub') userId: string,
   ) {
-    return {
-      message: 'Tạo sản phẩm thành công',
-      data: await this.productService.create(dto, userId),
-    };
+    return await this.productService.create(dto, userId);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Cập nhật sản phẩm thành công!')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateProductDto,
   ) {
-    return {
-      message: 'Cập nhật sản phẩm thành công',
-      data: await this.productService.update(id, dto),
-    };
+    return await this.productService.update(id, dto);
   }
 
   @Patch(':id/deactivate')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Tạm ẩn sản phẩm thành công!')
   async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
-    return {
-      message: 'Tạm ẩn sản phẩm thành công',
-      data: await this.productService.softDelete(id),
-    };
+    return await this.productService.softDelete(id);
   }
 
   @Patch(':id/activate')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Khôi phục sản phẩm thành công!')
   async restore(@Param('id', new ParseUUIDPipe()) id: string) {
-    return {
-      message: 'Khôi phục sản phẩm thành công',
-      data: await this.productService.restore(id),
-    };
+    return await this.productService.restore(id);
   }
 }

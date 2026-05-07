@@ -20,6 +20,7 @@ import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
 import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('voucher')
 export class VoucherController {
@@ -28,16 +29,12 @@ export class VoucherController {
   @Get('user')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
+  @ResponseMessage('Lấy danh sách voucher thành công!')
   async getMyVouchers(
     @CurrentUser('sub') userId: string,
     @Query() query: GetMyVouchersDto,
   ) {
-    const data = await this.voucherService.getMyVouchers(userId, query);
-
-    return {
-      message: 'Lấy danh sách voucher thành công!',
-      data,
-    };
+    return await this.voucherService.getMyVouchers(userId, query);
   }
 
   @Get('admin')
@@ -55,53 +52,38 @@ export class VoucherController {
   @Post('')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Tạo voucher thành công!')
   async createVoucher(@Body() dto: CreateVoucherDto) {
-    const data = await this.voucherService.createVoucher(dto);
-
-    return {
-      message: 'Tạo voucher thành công',
-      data,
-    };
+    return await this.voucherService.createVoucher(dto);
   }
 
   @Post(':id/assign')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Gửi voucher thành công!')
   async assignVoucher(
     @Body() dto: AssignVoucherDto,
     @Param('id', new ParseUUIDPipe()) voucherId: string,
   ) {
-    const data = await this.voucherService.assignVoucherToUsers(voucherId, dto);
-    return {
-      message: 'Gửi voucher thành công!',
-      data,
-    };
+    return await this.voucherService.assignVoucherToUsers(voucherId, dto);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Cập nhật voucher thành công!')
   async updateVoucher(
     @Param('id', new ParseUUIDPipe()) voucherId: string,
     @Body() dto: UpdateVoucherDto,
   ) {
-    const data = await this.voucherService.updateVoucher(voucherId, dto);
-
-    return {
-      message: 'Cập nhật voucher thành công!',
-      data,
-    };
+    return await this.voucherService.updateVoucher(voucherId, dto);
   }
 
   @Patch('soft/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Xóa voucher thành công!')
   async softDelete(@Param('id', new ParseUUIDPipe()) voucherId: string) {
-    const data = await this.voucherService.softDeleteVoucher(voucherId);
-
-    return {
-      message: 'Đã xóa voucher thành công!',
-      data,
-    };
+    return await this.voucherService.softDeleteVoucher(voucherId);
   }
 }

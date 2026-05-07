@@ -22,8 +22,8 @@ export class AdminController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @ResponseMessage('Lấy danh sách người dùng thành công')
   @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy danh sách người dùng thành công')
   async getUsers(@Query() query: AdminUserQuery) {
     return this.adminService.getUsers(query);
   }
@@ -31,6 +31,7 @@ export class AdminController {
   @Patch(':id/lock')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Khóa người dùng thành công')
   async lockUser(
     @Param('id', new ParseUUIDPipe()) userId: string,
     @CurrentUser('sub') currentUserId: string,
@@ -41,6 +42,7 @@ export class AdminController {
   @Patch(':id/unlock')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Mở khóa người dùng thành công')
   async unLockUser(
     @Param('id', new ParseUUIDPipe()) userId: string,
     @CurrentUser('sub') currentUserId: string,

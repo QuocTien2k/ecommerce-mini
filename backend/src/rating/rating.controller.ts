@@ -17,68 +17,49 @@ import { Role } from '@prisma/client';
 import { RatingService } from '@rating/rating.service';
 import { CreateRatingDto } from '@rating/dtos/create-rating.dto';
 import { UpdateRatingDto } from '@rating/dtos/update-rating.sto';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('rating')
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
 
   @Get(':productId/me')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async getMyRating(
     @CurrentUser('sub') userId: string,
     @Param('productId', new ParseUUIDPipe()) productId: string,
   ) {
-    const data = await this.ratingService.getMyRating(userId, productId);
-
-    return {
-      message: 'Lấy đánh giá của bạn thành công!',
-      data,
-    };
+    return await this.ratingService.getMyRating(userId, productId);
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Đánh giá sản phẩm thành công!')
   async createRating(
     @CurrentUser('sub') userId: string,
     @Body() dto: CreateRatingDto,
   ) {
-    const data = await this.ratingService.create(userId, dto);
-    return {
-      message: 'Đánh giá sản phẩm thành công!',
-      data,
-    };
+    return await this.ratingService.create(userId, dto);
   }
 
   @Patch(':productId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Cập nhật đánh giá thành công!')
   async update(
     @CurrentUser('sub') userId: string,
     @Param('productId', new ParseUUIDPipe()) productId: string,
     @Body() dto: UpdateRatingDto,
   ) {
-    const data = await this.ratingService.update(userId, productId, dto);
-
-    return {
-      message: 'Cập nhật đánh giá thành công!',
-      data,
-    };
+    return await this.ratingService.update(userId, productId, dto);
   }
 
   @Delete(':productId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Xóa đánh giá thành công!')
   async delete(
     @CurrentUser('sub') userId: string,
     @Param('productId', new ParseUUIDPipe()) productId: string,
   ) {
-    const data = await this.ratingService.delete(userId, productId);
-
-    return {
-      message: 'Xóa đánh giá thành công!',
-      data,
-    };
+    return await this.ratingService.delete(userId, productId);
   }
 }

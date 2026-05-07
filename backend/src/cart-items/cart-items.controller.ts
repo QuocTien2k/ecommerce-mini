@@ -17,6 +17,7 @@ import { Role } from '@prisma/client';
 import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { UpdateCartItemDto } from './dtos/update-cart.dto';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('cart-items')
 export class CartItemsController {
@@ -24,14 +25,14 @@ export class CartItemsController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   async getMyCart(@CurrentUser('sub') userId: string) {
     return await this.cartItemsService.getMyCart(userId);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   async addToCart(
     @Body() dto: AddToCartDto,
     @CurrentUser('sub') userId: string,
@@ -41,7 +42,7 @@ export class CartItemsController {
 
   @Patch(':cartItemId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   async updateCart(
     @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
     @Body() dto: UpdateCartItemDto,
@@ -52,16 +53,12 @@ export class CartItemsController {
 
   @Delete(':cartItemId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
+  @ResponseMessage('Xóa sản phẩm thành công!')
   async deleteCartItem(
     @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
     @CurrentUser('sub') userId: string,
   ) {
-    const data = await this.cartItemsService.deleteCartItem(userId, cartItemId);
-
-    return {
-      message: 'Xóa sản phẩm thành công',
-      data,
-    };
+    return await this.cartItemsService.deleteCartItem(userId, cartItemId);
   }
 }

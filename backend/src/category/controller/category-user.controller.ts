@@ -8,11 +8,6 @@ export class CategoryControllerUser {
   //  PUBLIC
   @Get()
   async getPublicCategories() {
-    const data = await this.categoryService.getPublicCategoryTree();
-
-    return {
-      message: 'Lấy danh mục thành công',
-      data,
-    };
+    return await this.categoryService.getPublicCategoryTree();
   }
 }

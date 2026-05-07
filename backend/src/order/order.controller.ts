@@ -21,6 +21,7 @@ import { UpdateOrderStatusDto } from './dtos/update-order.dto';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 import { OrderMapper } from './mapper/order.mapper';
 import { Request } from 'express';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('order')
 export class OrderController {
@@ -28,7 +29,8 @@ export class OrderController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
+  @ResponseMessage('Tạo đơn hàng thành công!')
   async createOrder(
     @Body() dto: CreateOrderDto,
     @CurrentUser('sub') userId: string,
@@ -42,17 +44,15 @@ export class OrderController {
     const result = await this.ordersService.createOrder(userId, dto, ipAddr);
 
     return {
-      message: 'Tạo đơn hàng thành công',
-      data: {
-        order: OrderMapper.toDetail(result.order),
-        payment: result.payment,
-      },
+      order: OrderMapper.toDetail(result.order),
+      payment: result.payment,
     };
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Cập nhật trạng thái đơn hàng thành công!')
   async updateStatus(
     @Param('id', new ParseUUIDPipe()) orderId: string,
     @Body() dto: UpdateOrderStatusDto,
@@ -62,25 +62,18 @@ export class OrderController {
       dto.status,
     );
 
-    return {
-      message: 'Cập nhật trạng thái đơn hàng thành công',
-      data: updated,
-    };
+    return updated;
   }
 
   @Patch(':id/cancel')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Hủy đơn hàng thành công!')
   async cancelOrder(
     @Param('id', new ParseUUIDPipe()) orderId: string,
     @CurrentUser('sub') userId: string,
   ) {
-    const data = await this.ordersService.cancelOrder(userId, orderId);
-
-    return {
-      message: 'Hủy đơn hàng thành công',
-      data,
-    };
+    return await this.ordersService.cancelOrder(userId, orderId);
   }
 
   @Get()

@@ -11,9 +11,6 @@ import {
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
-import { RolesGuard } from '@auth/guards/roles.guard';
-import { Roles } from '@auth/decorators/roles.decorator';
-import { Role } from '@prisma/client';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { CreateVnpayPaymentDto } from './dtos/create-payment.dto';
 import { Request } from 'express';
@@ -23,8 +20,7 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('vnpay')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async createPayment(
     @CurrentUser('sub') userId: string,
     @Body() body: CreateVnpayPaymentDto,
@@ -41,9 +37,7 @@ export class PaymentController {
       ipAddr,
     );
 
-    return {
-      data,
-    };
+    return data;
   }
 
   @Get('vnpay/ipn')
@@ -60,8 +54,7 @@ export class PaymentController {
   }
 
   @Get('status/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   async getPaymentStatus(
     @Param('id', new ParseUUIDPipe()) orderId: string,
     @CurrentUser('sub') userId: string,

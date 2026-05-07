@@ -8,10 +8,7 @@ export class ProductControllerUser {
 
   @Get()
   async findAll(@Query() query: GetProductsQueryDto) {
-    return {
-      message: 'Lấy danh sách sản phẩm thành công',
-      data: await this.productService.findAllForUser(query),
-    };
+    return await this.productService.findAllForUser(query);
   }
 
   @Get(':slug')
