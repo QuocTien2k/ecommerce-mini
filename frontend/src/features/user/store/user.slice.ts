@@ -1,17 +1,8 @@
-import type { Role } from "@/types/role";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { AdminUser } from "../types/adminUser.type";
 
 interface UserState {
-  user: {
-    id: string;
-    email: string;
-    fullname: string;
-    phone: string;
-    role: Role;
-    createdAt: string;
-    address: string;
-    avatar: string;
-  } | null;
+  user: AdminUser | null;
 }
 
 const initialState: UserState = {

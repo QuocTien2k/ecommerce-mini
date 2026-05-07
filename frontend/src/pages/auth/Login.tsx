@@ -37,17 +37,19 @@ const Login = () => {
       const user = await run(
         async () => {
           const res = await authApi.login(data.email, data.password);
-          const accessToken = res.accessToken;
+          //console.log("Res: ", res.data.accessToken);
+          const accessToken = res.data.accessToken;
 
           dispatch(setCredentials({ accessToken, role: null }));
 
           const profile = await userApi.getMe();
+          //console.log("profile: ", profile.data.role);
 
-          dispatch(setUser(profile));
+          dispatch(setUser(profile.data));
           dispatch(
             setCredentials({
               accessToken,
-              role: profile.role,
+              role: profile.data.role,
             }),
           );
 
@@ -58,7 +60,7 @@ const Login = () => {
         { minDuration: 600 },
       );
 
-      navigate(user.role === Role.ADMIN ? "/admin" : "/");
+      navigate(user.data.role === Role.ADMIN ? "/admin" : "/");
     } catch (error) {
       console.log("Login error:", error);
       sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {

@@ -1,5 +1,7 @@
 import { api } from "@shared/api/axios";
+import type { ApiResult } from "@shared/types/api-result";
+import type { AdminUser } from "../types/adminUser.type";
 
 export const userApi = {
-  getMe: () => api.get("/user/me"),
+  getMe: (): ApiResult<AdminUser> => api.get("/user/me"),
 };

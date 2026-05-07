@@ -41,7 +41,7 @@ export function setupInterceptors() {
         if (!res.status) {
           return Promise.reject(res); // đẩy error xuống catch
         }
-        return res.data; // unwrap
+        return res;
       }
 
       return response;

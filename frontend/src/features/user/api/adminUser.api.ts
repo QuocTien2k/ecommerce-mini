@@ -1,5 +1,6 @@
 import { api } from "@shared/api/axios";
 import type { GetUsersData } from "../types/adminUser.type";
+import type { ApiResult } from "@shared/types/api-result";
 
 export interface GetUsersParams {
   page?: number;
@@ -9,10 +10,12 @@ export interface GetUsersParams {
 }
 
 export const adminUserApi = {
-  getUsers: (params?: GetUsersParams) =>
-    api.get<GetUsersData>("/admin/users", { params }),
+  getUsers: (params?: GetUsersParams): ApiResult<GetUsersData> =>
+    api.get("/admin/users", { params }),
 
-  lockUser: (userId: string) => api.patch(`/admin/users/${userId}/lock`),
+  lockUser: (userId: string): ApiResult<null> =>
+    api.patch(`/admin/users/${userId}/lock`),
 
-  unlockUser: (userId: string) => api.patch(`/admin/users/${userId}/unlock`),
+  unlockUser: (userId: string): ApiResult<null> =>
+    api.patch(`/admin/users/${userId}/unlock`),
 };

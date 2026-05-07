@@ -33,12 +33,11 @@ const AdminUserPage = () => {
     setPendingId(userId);
 
     try {
-      await run(
-        async () => {
-          await mutateAsync({ userId, isActive });
-        },
-        { minDuration: 500 },
-      );
+      const result = await run(() => mutateAsync({ userId, isActive }), {
+        minDuration: 500,
+      });
+
+      sonnerToast.success(result.message);
     } catch (error) {
       console.error("Toggle status error:", error);
       sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
@@ -49,8 +48,8 @@ const AdminUserPage = () => {
     }
   };
 
-  const users: AdminUser[] = data?.data ?? [];
-  const meta = data?.meta;
+  const users: AdminUser[] = data?.data?.data ?? [];
+  const meta = data?.data.meta;
   const totalPages = meta?.totalPages ?? 1;
 
   const roleStyles: Record<string, string> = {
