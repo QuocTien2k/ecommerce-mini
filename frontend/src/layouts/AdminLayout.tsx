@@ -20,8 +20,10 @@ const AdminLayout = () => {
         />
 
         {/* Content */}
-        <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
+        <main className="relative flex-1 p-6 overflow-auto">
+          <div className="relative min-h-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

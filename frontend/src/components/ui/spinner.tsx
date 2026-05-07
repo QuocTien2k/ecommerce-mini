@@ -7,24 +7,68 @@ type SpinnerProps = {
 };
 
 const sizeMap = {
-  sm: "w-5 h-5 border-2",
-  md: "w-8 h-8 border-2",
-  lg: "w-12 h-12 border-[3px]",
+  sm: {
+    ring: "w-12 h-12 border-[3px]",
+    text: "text-[10px]",
+  },
+  md: {
+    ring: "w-20 h-20 border-4",
+    text: "text-xs",
+  },
+  lg: {
+    ring: "w-28 h-28 border-[5px]",
+    text: "text-sm",
+  },
 };
 
 export const Spinner = ({ size = "md", label, className }: SpinnerProps) => {
-  return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <div
-        role="status"
-        aria-label={label || "Loading"}
-        className={cn(
-          "animate-spin rounded-full border-gray-300 border-t-gray-700",
-          sizeMap[size],
-        )}
-      />
+  const currentSize = sizeMap[size];
 
-      {label && <span className="text-xs text-gray-600">{label}</span>}
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3",
+        className,
+      )}
+    >
+      <div className="relative flex items-center justify-center perspective-[800px]">
+        <div
+          className={cn(
+            "absolute rounded-full border-transparent border-b-pink-400 animate-ring-1",
+            currentSize.ring,
+          )}
+        />
+
+        <div
+          className={cn(
+            "absolute rounded-full border-transparent border-b-rose-500 animate-ring-2",
+            currentSize.ring,
+          )}
+        />
+
+        <div
+          className={cn(
+            "absolute rounded-full border-transparent border-b-cyan-400 animate-ring-3",
+            currentSize.ring,
+          )}
+        />
+
+        <div
+          className={cn(
+            "absolute rounded-full border-transparent border-b-amber-400 animate-ring-4",
+            currentSize.ring,
+          )}
+        />
+
+        <div
+          className={cn(
+            "font-medium text-muted-foreground tracking-wide",
+            currentSize.text,
+          )}
+        >
+          {label || "Loading"}
+        </div>
+      </div>
     </div>
   );
 };
