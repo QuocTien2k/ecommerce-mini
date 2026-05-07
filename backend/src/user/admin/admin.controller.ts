@@ -14,6 +14,7 @@ import { Roles } from '@auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { AdminUserQuery } from './types/admin-user.type';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('admin/users')
 export class AdminController {
@@ -21,6 +22,7 @@ export class AdminController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ResponseMessage('Lấy danh sách người dùng thành công')
   @Roles(Role.ADMIN)
   async getUsers(@Query() query: AdminUserQuery) {
     return this.adminService.getUsers(query);

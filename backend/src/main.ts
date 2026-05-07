@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -57,7 +57,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Response interceptor
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
   app.use(cookieParser());
 
   app.enableCors({
