@@ -12,6 +12,7 @@ import { cn } from "@lib/utils";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
+import AppPagination from "@components/common/pagination";
 
 const AdminUserPage = () => {
   const [page, setPage] = useState<number>(1);
@@ -56,7 +57,7 @@ const AdminUserPage = () => {
     admin: "bg-purple-100 text-purple-800 border-purple-300",
     user: "bg-neutral-100 text-neutral-700 border-neutral-200",
   };
-  console.log({ isLoading, isFetching });
+  //console.log({ isLoading, isFetching });
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -150,7 +151,7 @@ const AdminUserPage = () => {
                 <tr>
                   <td colSpan={7} className="text-center py-10">
                     <span className="text-sm text-muted-foreground">
-                      No users found
+                      Không tìm thấy người dùng
                     </span>
                   </td>
                 </tr>
@@ -160,31 +161,11 @@ const AdminUserPage = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            Page {page} / {totalPages}
-          </span>
-
-          <div className="flex gap-2">
-            <AsyncButton
-              size="sm"
-              variant="outline"
-              disabled={page === 1}
-              onClick={() => setPage((prev) => prev - 1)}
-            >
-              Prev
-            </AsyncButton>
-
-            <AsyncButton
-              size="sm"
-              variant="outline"
-              disabled={page >= totalPages}
-              onClick={() => setPage((prev) => prev + 1)}
-            >
-              Next
-            </AsyncButton>
-          </div>
-        </div>
+        <AppPagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </QueryStateWrapper>
   );
