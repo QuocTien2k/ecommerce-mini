@@ -27,11 +27,9 @@ export class ProductControllerAdmin {
   @Get('list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy danh sách sản phẩm thành công')
   async findAllForAdmin(@Query() query: GetProductsQueryDto) {
-    return {
-      message: 'Lấy danh sách sản phẩm thành công',
-      data: await this.productService.findAllForAdmin(query),
-    };
+    return await this.productService.findAllForAdmin(query);
   }
 
   @Get(':id')
