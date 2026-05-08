@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+
 import type { GetUsersParams } from "../types/adminUser.type";
 import type { Role } from "@/types/role";
+
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const useAdminUsersFilter = () => {
@@ -54,21 +56,26 @@ export const useAdminUsersFilter = () => {
     setIsActive("");
   };
 
+  const filters = {
+    keyword,
+    id,
+    role,
+    isActive,
+  };
+
+  const filterActions = {
+    setKeyword,
+    setId,
+    setRole,
+    setIsActive,
+  };
+
   return {
     page,
     setPage,
 
-    keyword,
-    setKeyword,
-
-    id,
-    setId,
-
-    role,
-    setRole,
-
-    isActive,
-    setIsActive,
+    filters,
+    filterActions,
 
     queryParams,
 

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Unlock } from "lucide-react";
-import { useAdminUsersQuery } from "../hooks/useAdminUsersQuery";
-import { useUserStatusMutation } from "../hooks/useUserStatusMutation";
-import type { AdminUser } from "../types/adminUser.type";
+import { useAdminUsersQuery } from "./hooks/useAdminUsersQuery";
+import { useUserStatusMutation } from "./hooks/useUserStatusMutation";
+import type { AdminUser } from "./types/adminUser.type";
 import { AsyncButton } from "@components/common/async-button";
 import { Title } from "@components/ui/title-module";
 import CopyableText from "@components/common/copyable-text";
@@ -13,32 +13,15 @@ import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import AppPagination from "@components/common/pagination";
-import { useAdminUsersFilter } from "../hooks/useAdminUsersFilter";
+import { useAdminUsersFilter } from "./hooks/useAdminUsersFilter";
+import AdminUsersFilter from "./components/AdminUsersFilter";
 
 const AdminUserPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const { loading, run } = useScopedLoading();
 
-  const {
-    page,
-    setPage,
-
-    keyword,
-    setKeyword,
-
-    id,
-    setId,
-
-    role,
-    setRole,
-
-    isActive,
-    setIsActive,
-
-    queryParams,
-
-    resetFilters,
-  } = useAdminUsersFilter();
+  const { page, setPage, filters, filterActions, queryParams, resetFilters } =
+    useAdminUsersFilter();
 
   const { data, isLoading, isFetching } = useAdminUsersQuery(queryParams);
 
@@ -74,7 +57,6 @@ const AdminUserPage = () => {
     admin: "bg-purple-100 text-purple-800 border-purple-300",
     user: "bg-neutral-100 text-neutral-700 border-neutral-200",
   };
-  //console.log({ isLoading, isFetching });
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -98,50 +80,11 @@ const AdminUserPage = () => {
         ></div>
 
         {/* Filters */}
-        <div className="grid grid-cols-4 gap-4">
-          <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Tìm email hoặc số điện thoại..."
-            className="border rounded-md px-3 py-2"
-          />
-
-          <input
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            placeholder="Tìm theo ID..."
-            className="border rounded-md px-3 py-2"
-          />
-
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as any)}
-            className="border rounded-md px-3 py-2"
-          >
-            <option value="">Tất cả role</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="USER">USER</option>
-          </select>
-
-          <select
-            value={isActive}
-            onChange={(e) => setIsActive(e.target.value as any)}
-            className="border rounded-md px-3 py-2"
-          >
-            <option value="">Tất cả trạng thái</option>
-            <option value="true">Active</option>
-            <option value="false">Locked</option>
-          </select>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            onClick={resetFilters}
-            className="border px-4 py-2 rounded-md"
-          >
-            Reset bộ lọc
-          </button>
-        </div>
+        <AdminUsersFilter
+          filters={filters}
+          actions={filterActions}
+          onReset={resetFilters}
+        />
 
         {/* Custom Table */}
         <div className="border rounded-xl overflow-hidden ">

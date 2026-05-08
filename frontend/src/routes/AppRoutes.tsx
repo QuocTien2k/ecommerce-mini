@@ -13,7 +13,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import { Role } from "@/types/role";
 import AdminDashboard from "@pages/admin/AdminDashboard";
-import AdminUserPage from "@features/user/page/AdminUserPage";
+import AdminUserPage from "@features/user/AdminUserPage";
 
 const AppRoutes = () => {
   return (
