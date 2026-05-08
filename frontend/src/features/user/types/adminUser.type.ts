@@ -13,20 +13,3 @@ export interface AdminUser {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface GetUsersData {
-  data: AdminUser[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}

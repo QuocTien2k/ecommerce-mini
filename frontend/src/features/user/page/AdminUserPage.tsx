@@ -40,7 +40,7 @@ const AdminUserPage = () => {
       sonnerToast.success(result.message);
     } catch (error) {
       console.error("Toggle status error:", error);
-      sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
+      sonnerToast.error(getErrorMessage(error, "Thay đổi thất bại"), {
         id: "status-error",
       });
     } finally {
