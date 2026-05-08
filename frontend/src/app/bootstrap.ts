@@ -6,6 +6,8 @@ import {
   setCredentials,
 } from "@features/auth/auth.slice";
 import { jwtDecode } from "jwt-decode";
+import { userApi } from "@features/user/api/user.api";
+import { clearUser, setUser } from "@features/user/store/user.slice";
 // import { userApi } from "@features/user/api/user.api";
 // import { setUser } from "@features/user/store/user.slice";
 
@@ -23,6 +25,12 @@ export const bootstrapAuth = async () => {
   //const currentAccessToken = store.getState().auth.accessToken;
   const state = store.getState().auth;
 
+  const hydrateUser = async () => {
+    const profile = await userApi.getMe();
+
+    store.dispatch(setUser(profile.data));
+  };
+
   const { accessToken, hasAuthHint } = state;
 
   //accessToken còn hạn → skip
@@ -36,13 +44,13 @@ export const bootstrapAuth = async () => {
       }),
     );
 
-    store.dispatch(setAuthInitialized(true));
+    await hydrateUser();
+
     return;
   }
 
   //không có hint => chưa login => skip
   if (!hasAuthHint) {
-    store.dispatch(setAuthInitialized(true));
     return;
   }
 
@@ -59,11 +67,10 @@ export const bootstrapAuth = async () => {
       }),
     );
 
-    //gọi lại để set User
-    // const profile = await userApi.getMe();
-    // store.dispatch(setUser(profile));
+    await hydrateUser();
   } catch {
     store.dispatch(clearAuth());
+    store.dispatch(clearUser());
   } finally {
     store.dispatch(setAuthInitialized(true));
   }
