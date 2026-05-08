@@ -13,16 +13,34 @@ import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import AppPagination from "@components/common/pagination";
+import { useAdminUsersFilter } from "../hooks/useAdminUsersFilter";
 
 const AdminUserPage = () => {
-  const [page, setPage] = useState<number>(1);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const { loading, run } = useScopedLoading();
 
-  const { data, isLoading, isFetching } = useAdminUsersQuery({
+  const {
     page,
-    limit: 6,
-  });
+    setPage,
+
+    keyword,
+    setKeyword,
+
+    id,
+    setId,
+
+    role,
+    setRole,
+
+    isActive,
+    setIsActive,
+
+    queryParams,
+
+    resetFilters,
+  } = useAdminUsersFilter();
+
+  const { data, isLoading, isFetching } = useAdminUsersQuery(queryParams);
 
   const { mutateAsync } = useUserStatusMutation();
 
@@ -78,6 +96,52 @@ const AdminUserPage = () => {
             },
           )}
         ></div>
+
+        {/* Filters */}
+        <div className="grid grid-cols-4 gap-4">
+          <input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Tìm email hoặc số điện thoại..."
+            className="border rounded-md px-3 py-2"
+          />
+
+          <input
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="Tìm theo ID..."
+            className="border rounded-md px-3 py-2"
+          />
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as any)}
+            className="border rounded-md px-3 py-2"
+          >
+            <option value="">Tất cả role</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="USER">USER</option>
+          </select>
+
+          <select
+            value={isActive}
+            onChange={(e) => setIsActive(e.target.value as any)}
+            className="border rounded-md px-3 py-2"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="true">Active</option>
+            <option value="false">Locked</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={resetFilters}
+            className="border px-4 py-2 rounded-md"
+          >
+            Reset bộ lọc
+          </button>
+        </div>
 
         {/* Custom Table */}
         <div className="border rounded-xl overflow-hidden ">

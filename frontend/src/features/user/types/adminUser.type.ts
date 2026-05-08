@@ -13,3 +13,15 @@ export interface AdminUser {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface GetUsersParams {
+  page?: number;
+  limit?: number;
+
+  id?: string;
+  keyword?: string;
+
+  role?: Role;
+
+  isActive?: boolean;
+}
