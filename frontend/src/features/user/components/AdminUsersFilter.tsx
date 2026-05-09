@@ -1,4 +1,13 @@
 import type { Role } from "@/types/role";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@components/ui/select";
 
 type Props = {
   filters: {
@@ -20,51 +29,67 @@ type Props = {
 
 const AdminUsersFilter = ({ filters, actions, onReset }: Props) => {
   return (
-    <>
-      <div className="grid grid-cols-4 gap-4">
-        <input
+    <div className="flex flex-wrap items-end gap-3">
+      <div className="min-w-40 flex-1">
+        <Input
           value={filters.keyword}
           onChange={(e) => actions.setKeyword(e.target.value)}
-          placeholder="Tìm email hoặc số điện thoại..."
-          className="border rounded-md px-3 py-2"
+          placeholder="Email hoặc số điện thoại..."
         />
+      </div>
 
-        <input
+      <div className="w-80">
+        <Input
           value={filters.id}
           onChange={(e) => actions.setId(e.target.value)}
           placeholder="Tìm theo ID..."
-          className="border rounded-md px-3 py-2"
         />
+      </div>
 
-        <select
-          value={filters.role}
-          onChange={(e) => actions.setRole(e.target.value as Role | "")}
-          className="border rounded-md px-3 py-2"
-        >
-          <option value="">Tất cả role</option>
-          <option value="ADMIN">ADMIN</option>
-          <option value="USER">USER</option>
-        </select>
-
-        <select
-          value={filters.isActive}
-          onChange={(e) =>
-            actions.setIsActive(e.target.value as "" | "true" | "false")
+      <div className="w-60">
+        <Select
+          value={filters.role || "ALL"}
+          onValueChange={(value) =>
+            actions.setRole(value === "ALL" ? "" : (value as Role))
           }
-          className="border rounded-md px-3 py-2"
         >
-          <option value="">Tất cả trạng thái</option>
-          <option value="true">Active</option>
-          <option value="false">Locked</option>
-        </select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Tất cả role" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả role</SelectItem>
+            <SelectItem value="ADMIN">ADMIN</SelectItem>
+            <SelectItem value="USER">USER</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={onReset} className="border px-4 py-2 rounded-md">
-          Reset bộ lọc
-        </button>
+      <div className="w-60">
+        <Select
+          value={filters.isActive || "ALL"}
+          onValueChange={(value) =>
+            actions.setIsActive(
+              value === "ALL" ? "" : (value as "" | "true" | "false"),
+            )
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Tất cả trạng thái" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+            <SelectItem value="true">Active</SelectItem>
+            <SelectItem value="false">Locked</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-    </>
+
+      <Button variant="warning" onClick={onReset} className="shrink-0 px-5">
+        Reset
+      </Button>
+    </div>
   );
 };
 

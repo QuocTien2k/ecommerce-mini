@@ -51,6 +51,7 @@ export const bootstrapAuth = async () => {
 
   //không có hint => chưa login => skip
   if (!hasAuthHint) {
+    store.dispatch(setAuthInitialized(true));
     return;
   }
 
