@@ -1,4 +1,6 @@
 import { useState } from "react";
+
+import { useDebounce } from "@/hooks/useDebounce";
 import { useProvinces } from "@/hooks/address/useProvinces";
 
 interface Props {
@@ -9,8 +11,10 @@ interface Props {
 export const ProvinceSelect = ({ value, onChange }: Props) => {
   const [search, setSearch] = useState("");
 
+  const debouncedSearch = useDebounce(search, 500);
+
   const { data, isLoading } = useProvinces({
-    search,
+    search: debouncedSearch,
   });
 
   return (

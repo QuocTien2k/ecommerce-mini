@@ -14,5 +14,6 @@ export const useProvinces = ({ search }: UseProvincesProps = {}) => {
         search,
         limit: 20,
       }),
+    staleTime: 1000 * 60 * 60 * 24,
   });
 };
