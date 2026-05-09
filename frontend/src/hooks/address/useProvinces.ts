@@ -1,19 +1,12 @@
+import { fetchProvinces } from "@/services/address.service";
+import { mapOptions } from "@/utils/address.mapper";
 import { useQuery } from "@tanstack/react-query";
-import { getProvinces } from "@/services/address.service";
-import { QUERY_KEYS } from "@/constants/queryKeys";
 
-interface UseProvincesProps {
-  search?: string;
-}
-
-export const useProvinces = ({ search }: UseProvincesProps = {}) => {
+export function useProvince() {
   return useQuery({
-    queryKey: [QUERY_KEYS.PROVINCES, search],
-    queryFn: () =>
-      getProvinces({
-        search,
-        limit: 20,
-      }),
-    staleTime: 1000 * 60 * 60 * 24,
+    queryKey: ["provinces"],
+    queryFn: fetchProvinces,
+    select: mapOptions,
+    staleTime: 1000 * 60 * 60, // 1h cache
   });
-};
+}

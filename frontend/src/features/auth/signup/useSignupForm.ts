@@ -13,8 +13,8 @@ export const useSignupForm = () => {
       confirmPassword: "",
       address: {
         detail: "",
-        ward: "",
-        province: "",
+        wardCode: "",
+        provinceCode: "",
       },
     },
     mode: "onSubmit",

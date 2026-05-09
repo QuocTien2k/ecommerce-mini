@@ -27,9 +27,11 @@ export const signupSchema = z
         .min(1, "Địa chỉ chi tiết không được rỗng")
         .regex(/\S/, "Địa chỉ chi tiết không được rỗng"),
 
-      ward: z.string().min(1, "Vui lòng chọn phường/xã"),
+      // provinceCode thay vì province (semantic rõ hơn)
+      provinceCode: z.string().min(1, "Vui lòng chọn tỉnh/thành"),
 
-      province: z.string().min(1, "Vui lòng chọn tỉnh/thành"),
+      // wardCode thay vì ward
+      wardCode: z.string().min(1, "Vui lòng chọn phường/xã"),
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {

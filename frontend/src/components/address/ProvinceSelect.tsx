@@ -1,41 +1,27 @@
-import { useState } from "react";
+import { useProvince } from "@/hooks/address/useProvinces";
 
-import { useDebounce } from "@/hooks/useDebounce";
-import { useProvinces } from "@/hooks/address/useProvinces";
-
-interface Props {
+type Props = {
   value?: string;
   onChange: (value: string) => void;
-}
+  disabled?: boolean;
+};
 
-export const ProvinceSelect = ({ value, onChange }: Props) => {
-  const [search, setSearch] = useState("");
-
-  const debouncedSearch = useDebounce(search, 500);
-
-  const { data, isLoading } = useProvinces({
-    search: debouncedSearch,
-  });
+export function ProvinceSelect({ value, onChange, disabled }: Props) {
+  const { data, isLoading } = useProvince();
 
   return (
-    <div>
-      <input
-        placeholder="Search province..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+    <select
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={disabled || isLoading}
+    >
+      <option value="">Chọn tỉnh / thành</option>
 
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Select province</option>
-
-        {data?.map((province) => (
-          <option key={province.id} value={province.name}>
-            {province.name}
-          </option>
-        ))}
-      </select>
-
-      {isLoading && <p>Loading...</p>}
-    </div>
+      {data?.map((p) => (
+        <option key={p.value} value={p.value}>
+          {p.label}
+        </option>
+      ))}
+    </select>
   );
-};
+}

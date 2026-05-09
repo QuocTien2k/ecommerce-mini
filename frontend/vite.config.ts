@@ -19,4 +19,13 @@ export default defineConfig({
       "@features": path.resolve(__dirname, "./src/features"),
     },
   },
+  server: {
+    proxy: {
+      "/address-kit": {
+        target: "https://production.cas.so",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

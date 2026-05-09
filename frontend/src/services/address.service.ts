@@ -1,42 +1,19 @@
-import type {
-  Province,
-  ProvinceApiResponse,
-  Ward,
-  WardApiResponse,
-} from "@/types/address";
-import { api } from "@shared/api/axios";
+const BASE_URL = "/address-kit/2025-07-01/";
 
-interface GetProvinceParams {
-  page?: number;
-  limit?: number;
-  search?: string;
+export async function fetchProvinces() {
+  const res = await fetch(`${BASE_URL}/provinces`);
+
+  if (!res.ok) throw new Error("Failed to fetch provinces");
+
+  const json = await res.json();
+  return json.provinces;
 }
 
-export const getProvinces = async (
-  params?: GetProvinceParams,
-): Promise<Province[]> => {
-  const response = await api.get<ProvinceApiResponse>("/vietnamprovince", {
-    params: {
-      page: params?.page,
-      limit: params?.limit,
-      search: params?.search,
-    },
-  });
+export async function fetchCommunes(provinceCode: string) {
+  const res = await fetch(`${BASE_URL}/provinces/${provinceCode}/communes`);
 
-  return response.data.data.map((item) => ({
-    id: item.id,
-    name: item.name,
-  }));
-};
+  if (!res.ok) throw new Error("Failed to fetch communes");
 
-export const getWardsByProvince = async (province: string): Promise<Ward[]> => {
-  const response = await api.get<WardApiResponse>("/vietnamprovince", {
-    params: {
-      province,
-    },
-  });
-
-  return response.data.data.map((item) => ({
-    name: item.name,
-  }));
-};
+  const json = await res.json();
+  return json.communes;
+}

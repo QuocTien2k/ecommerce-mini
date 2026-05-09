@@ -1,4 +1,5 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { buildAddress } from "@/utils/address.mapper";
 import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
@@ -7,7 +8,9 @@ import { useSignupForm } from "@features/auth/signup/useSignupForm";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { Link, useNavigate } from "react-router-dom";
-import ProvinceList from "./test.jsx";
+import { Controller } from "react-hook-form";
+import { CommuneSelect } from "@components/address/CommuneSelect";
+import { ProvinceSelect } from "@components/address/ProvinceSelect";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,6 +19,9 @@ const Signup = () => {
   const {
     register,
     handleSubmit,
+    control,
+    watch,
+    setValue,
     formState: { errors, dirtyFields, isSubmitted },
   } = useSignupForm();
 
@@ -28,7 +34,12 @@ const Signup = () => {
     try {
       await run(
         async () => {
-          const { confirmPassword, ...payload } = values;
+          const { confirmPassword, address, ...rest } = values;
+
+          const payload = {
+            ...rest,
+            address: buildAddress(address),
+          };
 
           await authApi.signup(payload);
 
@@ -151,21 +162,79 @@ const Signup = () => {
         </div>
 
         {/* Address */}
-        <div className="space-y-2">
-          <Input
-            placeholder="Địa chỉ"
-            {...register("address")}
-            className="h-11"
-          />
-          <p
-            className={`text-sm text-red-500 transition-all duration-200 ${
-              getErrorVisibility("address")
-                ? "max-h-10 opacity-100"
-                : "max-h-0 opacity-0"
-            } overflow-hidden`}
-          >
-            {getErrorVisibility("address") ? errors.address?.message : ""}
-          </p>
+        <div className="space-y-4">
+          {/* Province */}
+          <div className="space-y-2">
+            <Controller
+              control={control}
+              name="address.provinceCode"
+              render={({ field }) => (
+                <ProvinceSelect
+                  value={field.value}
+                  onChange={(val) => {
+                    field.onChange(val);
+
+                    // reset ward khi đổi province
+                    setValue("address.wardCode", "");
+                  }}
+                />
+              )}
+            />
+
+            <p
+              className={`text-sm text-red-500 transition-all duration-200 ${
+                getErrorVisibility("address") && errors.address?.provinceCode
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              } overflow-hidden`}
+            >
+              {errors.address?.provinceCode?.message}
+            </p>
+          </div>
+
+          {/* Commune */}
+          <div className="space-y-2">
+            <Controller
+              control={control}
+              name="address.wardCode"
+              render={({ field }) => (
+                <CommuneSelect
+                  provinceCode={watch("address.provinceCode")}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+
+            <p
+              className={`text-sm text-red-500 transition-all duration-200 ${
+                getErrorVisibility("address") && errors.address?.wardCode
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              } overflow-hidden`}
+            >
+              {errors.address?.wardCode?.message}
+            </p>
+          </div>
+
+          {/* Detail address */}
+          <div className="space-y-2">
+            <Input
+              placeholder="Địa chỉ chi tiết"
+              {...register("address.detail")}
+              className="h-11"
+            />
+
+            <p
+              className={`text-sm text-red-500 transition-all duration-200 ${
+                getErrorVisibility("address") && errors.address?.detail
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              } overflow-hidden`}
+            >
+              {errors.address?.detail?.message}
+            </p>
+          </div>
         </div>
 
         <div className="flex justify-center">
@@ -183,10 +252,6 @@ const Signup = () => {
           <Link to="/login" className="text-muted-foreground hover:underline">
             Đã có tài khoản?
           </Link>
-        </div>
-
-        <div className="mt-4">
-          <ProvinceList />
         </div>
       </form>
     </div>
