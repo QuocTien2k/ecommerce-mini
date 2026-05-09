@@ -11,7 +11,11 @@ export const useSignupForm = () => {
       fullname: "",
       password: "",
       confirmPassword: "",
-      address: "",
+      address: {
+        detail: "",
+        ward: "",
+        province: "",
+      },
     },
     mode: "onSubmit",
     reValidateMode: "onChange",

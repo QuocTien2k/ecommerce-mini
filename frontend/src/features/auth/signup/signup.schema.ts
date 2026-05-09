@@ -21,11 +21,16 @@ export const signupSchema = z
 
     confirmPassword: z.string(),
 
-    address: z
-      .string()
-      .min(1, "Địa chỉ không được rỗng")
-      .max(255, "Địa chỉ tối đa 255 ký tự")
-      .regex(/\S/, "Địa chỉ không được rỗng"),
+    address: z.object({
+      detail: z
+        .string()
+        .min(1, "Địa chỉ chi tiết không được rỗng")
+        .regex(/\S/, "Địa chỉ chi tiết không được rỗng"),
+
+      ward: z.string().min(1, "Vui lòng chọn phường/xã"),
+
+      province: z.string().min(1, "Vui lòng chọn tỉnh/thành"),
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Mật khẩu không khớp",
