@@ -7,6 +7,7 @@ import { useSignupForm } from "@features/auth/signup/useSignupForm";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { Link, useNavigate } from "react-router-dom";
+import ProvinceList from "./test.jsx";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -182,6 +183,10 @@ const Signup = () => {
           <Link to="/login" className="text-muted-foreground hover:underline">
             Đã có tài khoản?
           </Link>
+        </div>
+
+        <div className="mt-4">
+          <ProvinceList />
         </div>
       </form>
     </div>
