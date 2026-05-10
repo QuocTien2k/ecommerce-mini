@@ -5,12 +5,12 @@ export function mapOptions(list: any[]) {
   }));
 }
 
-export function buildAddress(address: {
+export function buildAddress(params: {
   detail: string;
   wardName?: string;
   provinceName?: string;
 }) {
-  return [address.detail, address.wardName, address.provinceName]
+  return [params.detail, params.wardName, params.provinceName]
     .filter(Boolean)
     .join(", ");
 }

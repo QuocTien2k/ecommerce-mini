@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Controller } from "react-hook-form";
 import { CommuneSelect } from "@components/address/CommuneSelect";
 import { ProvinceSelect } from "@components/address/ProvinceSelect";
+import { useAddressResolver } from "@/hooks/address/useAddressResolver";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -25,6 +26,13 @@ const Signup = () => {
     formState: { errors, dirtyFields, isSubmitted },
   } = useSignupForm();
 
+  const address = watch("address");
+
+  const { provinceName, wardName } = useAddressResolver({
+    provinceCode: address.provinceCode,
+    wardCode: address.wardCode,
+  });
+
   const getErrorVisibility = (field: keyof SignupFormValues) =>
     errors[field] && (dirtyFields[field] || isSubmitted);
 
@@ -38,8 +46,20 @@ const Signup = () => {
 
           const payload = {
             ...rest,
-            address: buildAddress(address),
+            address: buildAddress({
+              detail: address.detail,
+              provinceName,
+              wardName,
+            }),
           };
+
+          // DEBUG LOG
+          // console.log("SIGNUP PAYLOAD:", {
+          //   raw: values,
+          //   transformed: payload,
+          //   addressInput: address,
+          //   addressOutput: payload.address,
+          // });
 
           await authApi.signup(payload);
 
