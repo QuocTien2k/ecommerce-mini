@@ -1,4 +1,5 @@
 import { useCommunes } from "@/hooks/address/useCommunes";
+import AddressCombobox from "./AddressCombobox";
 
 type Props = {
   provinceCode?: string;
@@ -13,21 +14,18 @@ export function CommuneSelect({
   onChange,
   disabled,
 }: Props) {
-  const { data, isLoading } = useCommunes(provinceCode);
+  const { data = [], isLoading } = useCommunes(provinceCode);
 
   return (
-    <select
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value)}
+    <AddressCombobox
+      options={data}
+      value={value}
+      onChange={onChange}
       disabled={!provinceCode || disabled || isLoading}
-    >
-      <option value="">Chọn phường / xã</option>
-
-      {data?.map((c) => (
-        <option key={c.value} value={c.value}>
-          {c.label}
-        </option>
-      ))}
-    </select>
+      placeholder={
+        provinceCode ? "Chọn phường / xã" : "Vui lòng chọn tỉnh / thành trước"
+      }
+      searchPlaceholder="Tìm phường / xã..."
+    />
   );
 }

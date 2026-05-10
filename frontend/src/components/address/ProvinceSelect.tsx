@@ -1,4 +1,5 @@
 import { useProvince } from "@/hooks/address/useProvinces";
+import AddressCombobox from "./AddressCombobox";
 
 type Props = {
   value?: string;
@@ -7,21 +8,16 @@ type Props = {
 };
 
 export function ProvinceSelect({ value, onChange, disabled }: Props) {
-  const { data, isLoading } = useProvince();
+  const { data = [], isLoading } = useProvince();
 
   return (
-    <select
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value)}
+    <AddressCombobox
+      options={data}
+      value={value}
+      onChange={onChange}
       disabled={disabled || isLoading}
-    >
-      <option value="">Chọn tỉnh / thành</option>
-
-      {data?.map((p) => (
-        <option key={p.value} value={p.value}>
-          {p.label}
-        </option>
-      ))}
-    </select>
+      placeholder="Chọn tỉnh / thành"
+      searchPlaceholder="Tìm tỉnh / thành..."
+    />
   );
 }
