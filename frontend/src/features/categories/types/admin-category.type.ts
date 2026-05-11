@@ -2,7 +2,7 @@ export interface AdminCategoryQueryParams {
   search?: string;
   isActive?: boolean;
   parentId?: string | "null";
-
+  isDeleted?: boolean;
   page?: number;
   limit?: number;
 }
@@ -12,7 +12,7 @@ export interface AdminCategoryItem {
   name: string;
   slug: string;
   isActive: boolean;
-
+  deletedAt: boolean;
   parentId: string | null;
 
   createdAt: string;

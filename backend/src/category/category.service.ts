@@ -353,11 +353,11 @@ export class CategoryService {
 
   //list for admin
   async getAdminCategories(query: AdminCategoryQueryDto) {
-    const { search, isActive, parentId } = query;
+    const { search, isActive, parentId, isDeleted } = query;
 
     const { page, limit, skip } = getPagination(query);
 
-    const where: Prisma.CategoryWhereInput = { deletedAt: null };
+    const where: Prisma.CategoryWhereInput = {};
 
     //search
     if (search?.trim()) {
@@ -376,6 +376,10 @@ export class CategoryService {
       where.parentId = null;
     } else if (parentId) {
       where.parentId = parentId;
+    }
+
+    if (typeof isDeleted === 'boolean') {
+      where.deletedAt = isDeleted ? { not: null } : null;
     }
 
     const [data, total] = await Promise.all([

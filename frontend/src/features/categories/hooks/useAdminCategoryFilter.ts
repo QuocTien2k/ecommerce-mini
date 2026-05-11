@@ -15,11 +15,13 @@ export const useAdminCategoryFilter = () => {
   /* "": không filter, null: category cha, uuid: category con của parent */
   const [parentId, setParentId] = useState("");
 
+  const [isDeleted, setIsDeleted] = useState<"" | "true" | "false">("");
+
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, isActive, parentId]);
+  }, [debouncedSearch, isActive, parentId, isDeleted]);
 
   const queryParams = useMemo<AdminCategoryQueryParams>(() => {
     const params: AdminCategoryQueryParams = {
@@ -42,8 +44,13 @@ export const useAdminCategoryFilter = () => {
       params.parentId = parentId;
     }
 
+    //deleted
+    if (isDeleted !== "") {
+      params.isDeleted = isDeleted === "true";
+    }
+
     return params;
-  }, [page, debouncedSearch, isActive, parentId]);
+  }, [page, debouncedSearch, isActive, parentId, isDeleted]);
 
   const resetFilters = () => {
     setPage(1);
@@ -53,18 +60,22 @@ export const useAdminCategoryFilter = () => {
     setIsActive("");
 
     setParentId("");
+
+    setIsDeleted("");
   };
 
   const filters = {
     search,
     isActive,
     parentId,
+    isDeleted,
   };
 
   const filterActions = {
     setSearch,
     setIsActive,
     setParentId,
+    setIsDeleted,
   };
 
   return {

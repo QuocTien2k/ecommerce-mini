@@ -16,6 +16,11 @@ export class AdminCategoryQueryDto {
   parentId?: string | 'null';
 
   @IsOptional()
+  @Type(() => Boolean)
+  @IsBoolean()
+  isDeleted?: boolean;
+
+  @IsOptional()
   @Type(() => Number)
   @Min(1)
   page: number = 1;
