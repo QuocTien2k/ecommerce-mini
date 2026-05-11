@@ -1,6 +1,8 @@
-import React from "react";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
 
 const AdminCategoryPage = () => {
+  const { loading, run } = useScopedLoading();
+
   return <div>AdminCategoryPage</div>;
 };
 
