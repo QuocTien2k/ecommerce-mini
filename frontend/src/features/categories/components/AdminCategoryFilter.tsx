@@ -14,13 +14,15 @@ import type { FlatCategoryItem } from "../types/admin-category.type";
 type Props = {
   filters: {
     search: string;
-    isActive: "" | "true" | "false";
+    //isActive: "" | "true" | "false";
+    isDeleted: "" | "true" | "false";
     parentId: string;
   };
 
   actions: {
     setSearch: (value: string) => void;
-    setIsActive: (value: "" | "true" | "false") => void;
+    //setIsActive: (value: "" | "true" | "false") => void;
+    setIsDeleted: (value: "" | "true" | "false") => void;
     setParentId: (value: string) => void;
   };
 
@@ -73,7 +75,7 @@ const AdminCategoryFilter = ({
       </div>
 
       {/* Status */}
-      <div className="w-60">
+      {/* <div className="w-60">
         <Select
           value={filters.isActive || "ALL"}
           onValueChange={(value) =>
@@ -92,6 +94,30 @@ const AdminCategoryFilter = ({
             <SelectItem value="true">Hoạt động</SelectItem>
 
             <SelectItem value="false">Tạm khóa</SelectItem>
+          </SelectContent>
+        </Select>
+      </div> */}
+
+      {/* Deleted/Restore Status */}
+      <div className="w-60">
+        <Select
+          value={filters.isDeleted || "ALL"}
+          onValueChange={(value) =>
+            actions.setIsDeleted(
+              value === "ALL" ? "" : (value as "" | "true" | "false"),
+            )
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Tất cả trạng thái" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
+
+            <SelectItem value="true">Đã xóa</SelectItem>
+
+            <SelectItem value="false">Đang hoạt động</SelectItem>
           </SelectContent>
         </Select>
       </div>

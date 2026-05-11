@@ -16,6 +16,12 @@ import CopyableText from "@components/common/copyable-text";
 import { AsyncButton } from "@components/common/async-button";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Badge } from "@components/ui/badge";
+import {
+  useRestoreCategoryMutation,
+  useSoftDeleteCategoryMutation,
+} from "./hooks/useCategoryStatusMutation";
+import { sonnerToast } from "@lib/sonner-toast";
+import { getErrorMessage } from "@lib/error";
 
 const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -28,6 +34,10 @@ const AdminCategoryPage = () => {
 
   const { data: flatData } = useAdminFlatCategoriesQuery();
 
+  const { mutateAsync: softDeleteCategory } = useSoftDeleteCategoryMutation();
+
+  const { mutateAsync: restoreCategory } = useRestoreCategoryMutation();
+
   const categories: AdminCategoryItem[] = data?.data?.data ?? [];
 
   const meta = data?.data?.meta;
@@ -35,6 +45,42 @@ const AdminCategoryPage = () => {
   const totalPages = meta?.totalPages ?? 1;
 
   const flatCategories: FlatCategoryItem[] = flatData?.data ?? [];
+
+  const handleToggleDelete = async (categoryId: string, isDeleted: boolean) => {
+    if (pendingId) return;
+
+    sonnerToast.dismiss("category-status-error");
+
+    setPendingId(categoryId);
+
+    try {
+      const result = await run(
+        async () => {
+          if (isDeleted) {
+            return restoreCategory(categoryId);
+          }
+
+          return softDeleteCategory(categoryId);
+        },
+        {
+          minDuration: 500,
+        },
+      );
+
+      sonnerToast.success(result.message);
+    } catch (error) {
+      console.error("Toggle category delete error:", error);
+
+      sonnerToast.error(
+        getErrorMessage(error, "Thay đổi trạng thái thất bại"),
+        {
+          id: "category-status-error",
+        },
+      );
+    } finally {
+      setPendingId(null);
+    }
+  };
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -76,7 +122,7 @@ const AdminCategoryPage = () => {
 
                 <th className="px-4 py-3 font-medium">Parent ID</th>
 
-                <th className="px-4 py-3 font-medium">Trạng thái</th>
+                {/* <th className="px-4 py-3 font-medium">Trạng thái</th> */}
 
                 <th className="px-4 py-3 font-medium">Dữ liệu</th>
 
@@ -118,13 +164,13 @@ const AdminCategoryPage = () => {
                     </td>
 
                     {/* Active */}
-                    <td className="px-4 py-3">
+                    {/* <td className="px-4 py-3">
                       <Badge
                         variant={category.isActive ? "default" : "secondary"}
                       >
                         {category.isActive ? "Active" : "Inactive"}
                       </Badge>
-                    </td>
+                    </td> */}
 
                     {/* Deleted */}
                     <td className="px-4 py-3">
@@ -138,14 +184,12 @@ const AdminCategoryPage = () => {
                       <AsyncButton
                         size="sm"
                         className="w-full max-w-28 ml-auto"
-                        disabled={pendingId !== null}
+                        disabled={loading || isFetching}
                         loading={loading && pendingId === category.id}
                         variant={isDeleted ? "default" : "destructive"}
-                        // onClick={() =>
-                        //   isDeleted
-                        //     ? handleRestore(category.id)
-                        //     : handleSoftDelete(category.id)
-                        // }
+                        onClick={() =>
+                          handleToggleDelete(category.id, isDeleted)
+                        }
                       >
                         {isDeleted ? (
                           <RotateCcw className="w-4 h-4" />

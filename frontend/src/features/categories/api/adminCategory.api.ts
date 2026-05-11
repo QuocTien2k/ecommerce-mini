@@ -14,4 +14,10 @@ export const adminCategory = {
     api.get("/admin/category/list", { params }),
 
   getFlat: (): ApiResult<FlatCategoryItem[]> => api.get("/admin/category/flat"),
+
+  softDelete: (categoryId: string): ApiResult<null> =>
+    api.patch(`/admin/category/soft/${categoryId}`),
+
+  restore: (categoryId: string): ApiResult<null> =>
+    api.patch(`/admin/category/restore/${categoryId}`),
 };

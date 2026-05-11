@@ -1,5 +1,5 @@
 import { IsBoolean, IsOptional, IsString, IsUUID, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class AdminCategoryQueryDto {
   @IsOptional()
@@ -7,7 +7,11 @@ export class AdminCategoryQueryDto {
   search?: string;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  })
   @IsBoolean()
   isActive?: boolean;
 
@@ -16,7 +20,11 @@ export class AdminCategoryQueryDto {
   parentId?: string | 'null';
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  })
   @IsBoolean()
   isDeleted?: boolean;
 

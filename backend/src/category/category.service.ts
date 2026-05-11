@@ -30,6 +30,7 @@ export class CategoryService {
     slug: true,
     parentId: true,
     isActive: true,
+    deletedAt: true,
     createdAt: true,
   };
 
@@ -180,29 +181,39 @@ export class CategoryService {
 
   async getCategoryTreeWithLevel(options?: {
     isActive?: boolean;
+    includeDeleted?: boolean;
     maxLevel?: number;
   }): Promise<CategoryTreeNode[]> {
-    const { isActive, maxLevel } = options || {};
+    const { isActive, includeDeleted, maxLevel } = options || {};
 
     const categories = await this.prisma.category.findMany({
       where: {
         ...(isActive !== undefined && { isActive }),
-        deletedAt: null,
+
+        ...(includeDeleted
+          ? {}
+          : {
+              deletedAt: null,
+            }),
       },
+
       select: {
         id: true,
         name: true,
         slug: true,
         parentId: true,
         isActive: true,
+        deletedAt: true,
       },
+
       orderBy: { createdAt: 'asc' },
     });
 
     const map = new Map<string, CategoryTreeNode>();
+
     const roots: CategoryTreeNode[] = [];
 
-    //build node
+    // build node
     for (const cat of categories) {
       map.set(cat.id, {
         ...cat,
@@ -211,7 +222,7 @@ export class CategoryService {
       });
     }
 
-    //build tree
+    // build tree
     for (const cat of categories) {
       const node = map.get(cat.id)!;
 
@@ -228,6 +239,7 @@ export class CategoryService {
 
         if (maxLevel && level >= maxLevel) {
           node.children = [];
+
           continue;
         }
 
@@ -243,8 +255,10 @@ export class CategoryService {
   }
 
   //UI
-  async getFlatCategoryTree(): Promise<FlatCategoryItem[]> {
-    const tree = await this.getCategoryTreeWithLevel();
+  async getFlatCategoryTree(
+    includeDeleted = false,
+  ): Promise<FlatCategoryItem[]> {
+    const tree = await this.getCategoryTreeWithLevel({ includeDeleted });
     const result: FlatCategoryItem[] = [];
 
     const traverse = (nodes: CategoryTreeNode[]): void => {

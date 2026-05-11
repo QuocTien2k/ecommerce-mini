@@ -23,4 +23,5 @@ export interface FlatCategoryItem {
   name: string;
   level: number;
   isActive: boolean;
+  isDeleted?: boolean;
 }
