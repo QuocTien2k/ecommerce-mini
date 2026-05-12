@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCreateCategoryMutation } from "../hooks/useAdminCreateCategory";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import { X } from "lucide-react";
+import { ImagePlus, X } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
@@ -32,9 +32,34 @@ export const CreateCategoryForm = ({
 }: CreateCategoryFormProps) => {
   const form = useCreateCategoryForm();
   const { loading, run } = useScopedLoading();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   //preview slug
   const categoryName = form.watch("name");
+
+  // watch file
+  const selectedFile = form.watch("file");
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+
+    setPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
+
+  const handleClose = () => {
+    form.reset();
+
+    setPreviewUrl(null);
+
+    onClose();
+  };
 
   const createCategoryMutation = useCreateCategoryMutation();
 
@@ -66,8 +91,7 @@ export const CreateCategoryForm = ({
         },
       );
 
-      form.reset();
-      onClose();
+      handleClose();
 
       sonnerToast.success(result.message);
     } catch (error) {
@@ -88,7 +112,7 @@ export const CreateCategoryForm = ({
         backdrop-blur-sm
         p-4
       "
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="
@@ -104,7 +128,7 @@ export const CreateCategoryForm = ({
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Tạo danh mục</h2>
 
-          <Button variant="destructive" size="icon" onClick={onClose}>
+          <Button variant="destructive" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -169,20 +193,64 @@ export const CreateCategoryForm = ({
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label>Ảnh</Label>
+          <div className="space-y-3">
+            <Label>Ảnh danh mục</Label>
 
-            <Input
+            <input
+              id="category-image"
               type="file"
               accept="image/*"
+              className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
 
-                form.setValue("file", file!, {
+                if (!file) return;
+
+                form.setValue("file", file, {
                   shouldValidate: true,
                 });
               }}
             />
+
+            <div className="flex items-center gap-4">
+              <Label
+                htmlFor="category-image"
+                className="
+        flex size-24 cursor-pointer items-center justify-center
+        overflow-hidden rounded-lg border border-dashed
+        bg-muted transition hover:bg-muted/80
+      "
+              >
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                    <ImagePlus className="size-5" />
+                  </div>
+                )}
+              </Label>
+
+              <div className="space-y-1">
+                <Label
+                  htmlFor="category-image"
+                  className="cursor-pointer text-sm font-medium text-blue-500 hover:underline"
+                >
+                  Chọn ảnh
+                </Label>
+
+                <p className="text-xs text-muted-foreground">PNG, JPG, WEBP</p>
+
+                {selectedFile && (
+                  <p className="max-w-55 truncate text-xs text-muted-foreground">
+                    {selectedFile.name}
+                  </p>
+                )}
+              </div>
+            </div>
 
             {form.formState.errors.file && (
               <p className="text-sm text-red-500">
@@ -197,6 +265,13 @@ export const CreateCategoryForm = ({
               onCheckedChange={(checked) =>
                 form.setValue("isActive", Boolean(checked))
               }
+              className="
+    border-emerald-500
+    data-[state=checked]:bg-emerald-500
+    data-[state=checked]:border-emerald-500
+    data-[state=checked]:text-white
+    cursor-pointer
+  "
             />
 
             <Label>Hiển thị danh mục</Label>
