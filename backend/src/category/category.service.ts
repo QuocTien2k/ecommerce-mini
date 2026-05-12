@@ -267,7 +267,7 @@ export class CategoryService {
     return roots;
   }
 
-  private getCategoryLevel(category: any): number {
+  private getCategoryLevelFromTree(category: any): number {
     if (!category.parent) return 1;
 
     if (!category.parent.parent) return 2;
@@ -438,7 +438,7 @@ export class CategoryService {
 
       image: category.image,
 
-      level: this.getCategoryLevel(category),
+      level: this.getCategoryLevelFromTree(category),
 
       parentId: category.parentId,
 
