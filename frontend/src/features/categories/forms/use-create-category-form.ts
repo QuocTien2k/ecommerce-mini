@@ -12,10 +12,10 @@ export const useCreateCategoryForm = () => {
 
     defaultValues: {
       name: "",
-      slug: "",
       description: "",
       parentId: undefined,
       isActive: true,
+      file: undefined,
     },
   });
 };
