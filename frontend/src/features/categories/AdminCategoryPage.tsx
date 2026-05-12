@@ -22,9 +22,12 @@ import {
 } from "./hooks/useCategoryStatusMutation";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
+import { Button } from "@components/ui/button";
+import { CreateCategoryForm } from "./components/AdminCreateCategory";
 
 const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [openCreate, setOpenCreate] = useState(false);
   const { loading, run } = useScopedLoading();
 
   const { page, setPage, filters, filterActions, queryParams, resetFilters } =
@@ -92,6 +95,7 @@ const AdminCategoryPage = () => {
           <span className="text-sm text-muted-foreground">
             Tổng số danh mục: {meta?.total ?? 0}
           </span>
+          <Button onClick={() => setOpenCreate(true)}>Tạo danh mục</Button>
         </div>
 
         {/* Filters */}
@@ -223,6 +227,11 @@ const AdminCategoryPage = () => {
           onPageChange={setPage}
         />
       </div>
+
+      <CreateCategoryForm
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+      />
     </QueryStateWrapper>
   );
 };
