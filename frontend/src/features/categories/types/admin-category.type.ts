@@ -25,3 +25,12 @@ export interface FlatCategoryItem {
   isActive: boolean;
   isDeleted?: boolean;
 }
+
+//Action
+export interface CreateCategoryDto {
+  name: string;
+  slug?: string;
+  description?: string;
+  parentId?: string;
+  isActive?: boolean;
+}
