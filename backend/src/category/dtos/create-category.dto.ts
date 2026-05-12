@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsOptional,
@@ -26,6 +27,7 @@ export class CreateCategoryDto {
   parentId?: string;
 
   @IsOptional()
+  @Transform(({ value }) => value === 'true')
   @IsBoolean()
   isActive?: boolean;
 }
