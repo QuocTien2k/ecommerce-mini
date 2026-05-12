@@ -179,7 +179,7 @@ export const CreateCategoryForm = ({
               </SelectTrigger>
 
               <SelectContent
-                className="mt- max-h-72 p-2 text-black/50"
+                className="max-h-72 p-2 text-black/50"
                 position="popper"
               >
                 {flatCategoriesQuery.data?.data?.map((category) => (

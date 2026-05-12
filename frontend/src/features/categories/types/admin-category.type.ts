@@ -11,9 +11,19 @@ export interface AdminCategoryItem {
   id: string;
   name: string;
   slug: string;
+
+  image: string | null;
+
+  parentId: string | null;
+
+  parent: {
+    id: string;
+    name: string;
+    parentId: string | null;
+  } | null;
+
   isActive: boolean;
   deletedAt: string | null;
-  parentId: string | null;
   createdAt: string;
 }
 

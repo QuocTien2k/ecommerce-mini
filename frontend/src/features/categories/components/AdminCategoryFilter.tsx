@@ -60,10 +60,8 @@ const AdminCategoryFilter = ({
             <SelectValue placeholder="Tất cả danh mục" />
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectItem value="ALL">Tất cả danh mục</SelectItem>
-
-            <SelectItem value="null">Danh mục cha</SelectItem>
 
             {flatCategories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
@@ -112,7 +110,7 @@ const AdminCategoryFilter = ({
             <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent position="popper">
             <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
 
             <SelectItem value="true">Đã xóa</SelectItem>

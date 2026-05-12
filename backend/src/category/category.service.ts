@@ -28,7 +28,20 @@ export class CategoryService {
     id: true,
     name: true,
     slug: true,
+    image: true,
     parentId: true,
+    parent: {
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+        parent: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    },
     isActive: true,
     deletedAt: true,
     createdAt: true,
@@ -254,6 +267,14 @@ export class CategoryService {
     return roots;
   }
 
+  private getCategoryLevel(category: any): number {
+    if (!category.parent) return 1;
+
+    if (!category.parent.parent) return 2;
+
+    return 3;
+  }
+
   //UI
   async getFlatCategoryTree(
     includeDeleted = false,
@@ -396,7 +417,7 @@ export class CategoryService {
       where.deletedAt = isDeleted ? { not: null } : null;
     }
 
-    const [data, total] = await Promise.all([
+    const [categories, total] = await Promise.all([
       this.prisma.category.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -404,8 +425,31 @@ export class CategoryService {
         take: limit,
         select: this.adminCategorySelect,
       }),
+
       this.prisma.category.count({ where }),
     ]);
+
+    const data = categories.map((category) => ({
+      id: category.id,
+
+      name: category.name,
+
+      slug: category.slug,
+
+      image: category.image,
+
+      level: this.getCategoryLevel(category),
+
+      parentId: category.parentId,
+
+      parentName: category.parent?.name ?? null,
+
+      isActive: category.isActive,
+
+      deletedAt: category.deletedAt,
+
+      createdAt: category.createdAt,
+    }));
 
     return buildPaginatedResponse(data, total, page, limit);
   }

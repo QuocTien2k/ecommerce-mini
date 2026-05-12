@@ -24,6 +24,7 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
 import { CreateCategoryForm } from "./components/AdminCreateCategory";
+import { format } from "date-fns";
 
 const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -107,6 +108,7 @@ const AdminCategoryPage = () => {
         />
 
         {/* Table */}
+        {/* Table */}
         <div
           className={cn(
             "border rounded-xl overflow-hidden transition-opacity",
@@ -118,17 +120,17 @@ const AdminCategoryPage = () => {
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr className="text-left hover:bg-muted/40 transition-colors">
-                <th className="px-4 py-3 font-medium">ID</th>
+                <th className="px-4 py-3 font-medium">Ảnh</th>
 
                 <th className="px-4 py-3 font-medium">Tên danh mục</th>
 
                 <th className="px-4 py-3 font-medium">Slug</th>
 
-                <th className="px-4 py-3 font-medium">Parent ID</th>
+                <th className="px-4 py-3 font-medium">Danh mục cha</th>
 
-                {/* <th className="px-4 py-3 font-medium">Trạng thái</th> */}
+                <th className="px-4 py-3 font-medium">Trạng thái</th>
 
-                <th className="px-4 py-3 font-medium">Dữ liệu</th>
+                <th className="px-4 py-3 font-medium">Ngày tạo</th>
 
                 <th className="px-4 py-3 text-center font-medium w-40">
                   Hành động
@@ -145,47 +147,55 @@ const AdminCategoryPage = () => {
                     key={category.id}
                     className="border-t hover:bg-muted/30 transition-colors"
                   >
-                    {/* ID */}
+                    {/* IMAGE */}
                     <td className="px-4 py-3">
-                      <p>{category.id}</p>
-                    </td>
-
-                    {/* Name */}
-                    <td className="px-4 py-3 font-medium">
-                      <CopyableText value={category.name} />
-                    </td>
-
-                    {/* Slug */}
-                    <td className="px-4 py-3">
-                      <Badge variant="outline">{category.slug}</Badge>
-                    </td>
-
-                    {/* Parent */}
-                    <td className="px-4 py-3">
-                      {category.parentId ? (
-                        <CopyableText value={category.parentId} />
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-10 h-10 rounded-md object-cover"
+                        />
                       ) : (
                         "-"
                       )}
                     </td>
 
-                    {/* Active */}
-                    {/* <td className="px-4 py-3">
-                      <Badge
-                        variant={category.isActive ? "default" : "secondary"}
-                      >
-                        {category.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </td> */}
+                    {/* NAME */}
+                    <td className="px-4 py-3 font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate max-w-55">
+                          {category.name}
+                        </span>
+                      </div>
+                    </td>
 
-                    {/* Deleted */}
+                    {/* SLUG */}
+                    <td className="px-4 py-3">
+                      <Badge variant="outline">{category.slug}</Badge>
+                    </td>
+
+                    {/* PARENT NAME */}
+                    <td className="px-4 py-3">
+                      {category.parent?.name ? (
+                        <CopyableText value={category.parent.name} />
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+
+                    {/* STATUS */}
                     <td className="px-4 py-3">
                       <Badge variant={isDeleted ? "destructive" : "outline"}>
                         {isDeleted ? "Deleted" : "Normal"}
                       </Badge>
                     </td>
 
-                    {/* Actions */}
+                    {/* CREATED AT */}
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      {format(new Date(category.createdAt), "dd/MM/yyyy")}
+                    </td>
+
+                    {/* ACTIONS */}
                     <td className="px-4 py-3 text-right w-40">
                       <AsyncButton
                         size="sm"
@@ -208,7 +218,7 @@ const AdminCategoryPage = () => {
                 );
               })}
 
-              {/* Empty */}
+              {/* EMPTY */}
               {categories.length === 0 && (
                 <tr>
                   <td colSpan={7} className="text-center py-10">
