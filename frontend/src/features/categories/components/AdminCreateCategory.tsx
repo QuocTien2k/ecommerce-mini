@@ -178,19 +178,18 @@ export const CreateCategoryForm = ({
                 <SelectValue placeholder="Chọn danh mục cha" />
               </SelectTrigger>
 
-              <SelectContent>
+              <SelectContent
+                className="mt- max-h-72 p-2 text-black/50"
+                position="popper"
+              >
                 {flatCategoriesQuery.data?.data?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
+                    {"".repeat(category.level - 1)}
                     {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {form.formState.errors.parentId && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.parentId.message}
-              </p>
-            )}
           </div>
 
           <div className="space-y-3">

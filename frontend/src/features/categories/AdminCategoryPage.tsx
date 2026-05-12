@@ -147,11 +147,13 @@ const AdminCategoryPage = () => {
                   >
                     {/* ID */}
                     <td className="px-4 py-3">
-                      <CopyableText value={category.id} />
+                      <p>{category.id}</p>
                     </td>
 
                     {/* Name */}
-                    <td className="px-4 py-3 font-medium">{category.name}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <CopyableText value={category.name} />
+                    </td>
 
                     {/* Slug */}
                     <td className="px-4 py-3">

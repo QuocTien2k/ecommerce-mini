@@ -12,9 +12,8 @@ export interface AdminCategoryItem {
   name: string;
   slug: string;
   isActive: boolean;
-  deletedAt: boolean;
+  deletedAt: string | null;
   parentId: string | null;
-
   createdAt: string;
 }
 
