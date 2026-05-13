@@ -58,6 +58,10 @@ export const CreateCategoryForm = ({
 
     setPreviewUrl(null);
 
+    const input = document.getElementById("category-image") as HTMLInputElement;
+
+    if (input) input.value = "";
+
     onClose();
   };
 
@@ -173,7 +177,12 @@ export const CreateCategoryForm = ({
           <div className="space-y-2">
             <Label>Danh mục cha</Label>
 
-            <Select onValueChange={(value) => form.setValue("parentId", value)}>
+            <Select
+              value={form.watch("parentId") ?? ""}
+              onValueChange={(value) =>
+                form.setValue("parentId", value || undefined)
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Chọn danh mục cha" />
               </SelectTrigger>
