@@ -13,14 +13,9 @@ export interface AdminCategoryItem {
   slug: string;
 
   image: string | null;
-
+  description: string | null;
   parentId: string | null;
-
-  parent: {
-    id: string;
-    name: string;
-    parentId: string | null;
-  } | null;
+  parentName: string | null;
 
   isActive: boolean;
   deletedAt: string | null;

@@ -33,7 +33,7 @@ export const adminCategory = {
     file?: File,
   ): ApiResult<AdminCategoryItem> => {
     return api.patch(
-      `/admin/category/update/${id}`,
+      `/admin/category/${id}`,
       buildFormData(data, file ? { file } : undefined),
     );
   },

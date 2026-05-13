@@ -29,6 +29,7 @@ export class CategoryService {
     name: true,
     slug: true,
     image: true,
+    description: true,
     parentId: true,
     parent: {
       select: {
@@ -439,6 +440,10 @@ export class CategoryService {
       image: category.image,
 
       level: this.getCategoryLevelFromTree(category),
+
+      //level: this.getCategoryLevel(category.id),
+
+      description: category.description,
 
       parentId: category.parentId,
 

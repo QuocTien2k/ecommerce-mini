@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import {
   updateCategorySchema,
   type UpdateCategoryFormValues,
-} from "../schemas/update-category.schema";
-import { useForm } from "react-hook-form";
+} from "../schemas/category.schema";
 
 export const useUpdateCategoryForm = (
   initialData?: Partial<UpdateCategoryFormValues>,

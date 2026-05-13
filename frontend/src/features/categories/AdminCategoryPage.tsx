@@ -25,10 +25,14 @@ import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
 import { CreateCategoryForm } from "./components/AdminCreateCategory";
 import { format } from "date-fns";
+import { UpdateCategoryForm } from "./components/AdminUpdateCategory";
 
 const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedCategory, setSelectedCategory] =
+    useState<AdminCategoryItem | null>(null);
   const { loading, run } = useScopedLoading();
 
   const { page, setPage, filters, filterActions, queryParams, resetFilters } =
@@ -86,6 +90,11 @@ const AdminCategoryPage = () => {
     }
   };
 
+  console.log(
+    "Category parentName: ",
+    categories.map((category) => category.parentName),
+  );
+
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
@@ -107,7 +116,6 @@ const AdminCategoryPage = () => {
           onReset={resetFilters}
         />
 
-        {/* Table */}
         {/* Table */}
         <div
           className={cn(
@@ -176,8 +184,8 @@ const AdminCategoryPage = () => {
 
                     {/* PARENT NAME */}
                     <td className="px-4 py-3">
-                      {category.parent?.name ? (
-                        <CopyableText value={category.parent.name} />
+                      {category.parentName ? (
+                        <CopyableText value={category.parentName} />
                       ) : (
                         "-"
                       )}
@@ -213,6 +221,19 @@ const AdminCategoryPage = () => {
                           <Trash2 className="w-4 h-4" />
                         )}
                       </AsyncButton>
+
+                      <AsyncButton
+                        size="sm"
+                        className="w-full max-w-28 ml-auto"
+                        disabled={loading || isFetching}
+                        loading={loading && pendingId === category.id}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setOpenUpdate(true);
+                        }}
+                      >
+                        Cập nhật
+                      </AsyncButton>
                     </td>
                   </tr>
                 );
@@ -243,6 +264,12 @@ const AdminCategoryPage = () => {
       <CreateCategoryForm
         open={openCreate}
         onClose={() => setOpenCreate(false)}
+      />
+
+      <UpdateCategoryForm
+        open={openUpdate}
+        onClose={() => setOpenUpdate(false)}
+        category={selectedCategory}
       />
     </QueryStateWrapper>
   );

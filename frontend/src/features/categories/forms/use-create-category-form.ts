@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createCategorySchema,
   type CreateCategoryFormValues,
-} from "../schemas/create-category.schema";
+} from "../schemas/category.schema";
 
 export const useCreateCategoryForm = () => {
   return useForm<CreateCategoryFormValues>({
