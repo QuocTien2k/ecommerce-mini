@@ -27,6 +27,17 @@ export const adminCategory = {
     );
   },
 
+  update: (
+    id: string,
+    data: Partial<CreateCategoryDto>,
+    file?: File,
+  ): ApiResult<AdminCategoryItem> => {
+    return api.patch(
+      `/admin/category/update/${id}`,
+      buildFormData(data, file ? { file } : undefined),
+    );
+  },
+
   softDelete: (categoryId: string): ApiResult<null> =>
     api.patch(`/admin/category/soft/${categoryId}`),
 

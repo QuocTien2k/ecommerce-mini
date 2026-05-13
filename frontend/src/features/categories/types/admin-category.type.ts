@@ -43,3 +43,11 @@ export interface CreateCategoryDto {
   parentId?: string;
   isActive?: boolean;
 }
+
+export type UpdateCategoryDto = Partial<CreateCategoryDto>;
+
+export type UpdateCategoryPayload = {
+  id: string;
+  data: UpdateCategoryDto;
+  file?: File;
+};
