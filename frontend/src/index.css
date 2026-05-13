@@ -125,7 +125,8 @@
   --sidebar-ring: oklch(0.556 0 0);
   --muted: oklch(0.25 0 0);
   --muted-foreground: oklch(0.7 0 0);
-  --warning: oklch(0.83 0.19 76.06) --warning-foreground: oklch(0.25 0.02 82);
+  --warning: oklch(0.83 0.19 76.06);
+  --warning-foreground: oklch(0.25 0.02 82);
 }
 
 @layer base {

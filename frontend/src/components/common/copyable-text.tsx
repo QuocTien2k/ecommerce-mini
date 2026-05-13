@@ -1,6 +1,7 @@
-import { copyToClipboard } from "@/utils/copy";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { copyToClipboard } from "@/utils/copy";
 
 type Props = {
   value: string;
@@ -12,23 +13,35 @@ const CopyableText = ({ value, className }: Props) => {
 
   const handleCopy = async () => {
     const success = await copyToClipboard(value);
+
     if (!success) return;
 
     setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1200);
   };
 
   return (
     <button
+      type="button"
       onClick={handleCopy}
-      className={`flex items-center gap-1 font-mono text-xs hover:bg-muted/50 hover:text-foreground transition cursor-pointer ${className}`}
+      title="Copy"
+      aria-label={`Copy ${value}`}
+      className={cn(
+        "group inline-flex max-w-full items-center gap-1 rounded-md transition-colors cursor-pointer",
+        "font-mono text-xs text-muted-foreground",
+        "hover:bg-muted/50 hover:text-foreground",
+        className,
+      )}
     >
-      <span>{value}</span>
+      <span className="truncate">{value}</span>
 
       {copied ? (
-        <Check className="w-3 h-3 text-green-600" />
+        <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
       ) : (
-        <Copy className="w-3 h-3 opacity-40 group-hover:opacity-80 transition" />
+        <Copy className="w-3.5 h-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-70" />
       )}
     </button>
   );

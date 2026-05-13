@@ -177,24 +177,39 @@ const AdminCategoryPage = () => {
                       </div>
                     </td>
 
-                    {/* SLUG */}
+                    {/* slug */}
                     <td className="px-4 py-3">
-                      <Badge variant="outline">{category.slug}</Badge>
+                      <Badge
+                        variant="secondary"
+                        className="font-mono text-[11px] tracking-wide"
+                      >
+                        /{category.slug}
+                      </Badge>
                     </td>
 
-                    {/* PARENT NAME */}
+                    {/* parent name */}
                     <td className="px-4 py-3">
                       {category.parentName ? (
-                        <CopyableText value={category.parentName} />
+                        <CopyableText
+                          value={category.parentName}
+                          className="
+        px-2 py-1
+        font-sans text-sm font-semibold
+        text-primary
+        hover:text-primary
+      "
+                        />
                       ) : (
-                        "-"
+                        <span className="text-xs text-muted-foreground">
+                          Không có
+                        </span>
                       )}
                     </td>
 
                     {/* STATUS */}
                     <td className="px-4 py-3">
-                      <Badge variant={isDeleted ? "destructive" : "outline"}>
-                        {isDeleted ? "Deleted" : "Normal"}
+                      <Badge variant={isDeleted ? "destructive" : "secondary"}>
+                        {isDeleted ? "Đã ẩn" : "Đang hoạt động"}
                       </Badge>
                     </td>
 
@@ -204,36 +219,37 @@ const AdminCategoryPage = () => {
                     </td>
 
                     {/* ACTIONS */}
-                    <td className="px-4 py-3 text-right w-40">
-                      <AsyncButton
-                        size="sm"
-                        className="w-full max-w-28 ml-auto"
-                        disabled={loading || isFetching}
-                        loading={loading && pendingId === category.id}
-                        variant={isDeleted ? "default" : "destructive"}
-                        onClick={() =>
-                          handleToggleDelete(category.id, isDeleted)
-                        }
-                      >
-                        {isDeleted ? (
-                          <RotateCcw className="w-4 h-4" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </AsyncButton>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <AsyncButton
+                          size="sm"
+                          variant="edit"
+                          disabled={loading || isFetching}
+                          loading={loading && pendingId === category.id}
+                          onClick={() => {
+                            setSelectedCategory(category);
+                            setOpenUpdate(true);
+                          }}
+                        >
+                          Cập nhật
+                        </AsyncButton>
 
-                      <AsyncButton
-                        size="sm"
-                        className="w-full max-w-28 ml-auto"
-                        disabled={loading || isFetching}
-                        loading={loading && pendingId === category.id}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setOpenUpdate(true);
-                        }}
-                      >
-                        Cập nhật
-                      </AsyncButton>
+                        <AsyncButton
+                          size="icon"
+                          disabled={loading || isFetching}
+                          loading={loading && pendingId === category.id}
+                          variant={isDeleted ? "secondary" : "destructive"}
+                          onClick={() =>
+                            handleToggleDelete(category.id, isDeleted)
+                          }
+                        >
+                          {isDeleted ? (
+                            <RotateCcw className="w-4 h-4" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </AsyncButton>
+                      </div>
                     </td>
                   </tr>
                 );
