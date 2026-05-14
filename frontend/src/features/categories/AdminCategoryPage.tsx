@@ -27,6 +27,8 @@ import { CreateCategoryForm } from "./components/AdminCreateCategory";
 import { format } from "date-fns";
 import { UpdateCategoryForm } from "./components/AdminUpdateCategory";
 
+type PendingAction = "update" | "delete" | "restore" | null;
+
 const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openCreate, setOpenCreate] = useState(false);
@@ -34,6 +36,7 @@ const AdminCategoryPage = () => {
   const [selectedCategory, setSelectedCategory] =
     useState<AdminCategoryItem | null>(null);
   const { loading, run } = useScopedLoading();
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
   const { page, setPage, filters, filterActions, queryParams, resetFilters } =
     useAdminCategoryFilter();
@@ -60,6 +63,7 @@ const AdminCategoryPage = () => {
     sonnerToast.dismiss("category-status-error");
 
     setPendingId(categoryId);
+    setPendingAction(isDeleted ? "restore" : "delete");
 
     try {
       const result = await run(
@@ -87,6 +91,7 @@ const AdminCategoryPage = () => {
       );
     } finally {
       setPendingId(null);
+      setPendingAction(null);
     }
   };
 
@@ -220,7 +225,11 @@ const AdminCategoryPage = () => {
                           size="sm"
                           variant="edit"
                           disabled={loading || isFetching}
-                          loading={loading && pendingId === category.id}
+                          loading={
+                            loading &&
+                            pendingId === category.id &&
+                            pendingAction === "update"
+                          }
                           onClick={() => {
                             setSelectedCategory(category);
                             setOpenUpdate(true);
@@ -231,8 +240,14 @@ const AdminCategoryPage = () => {
 
                         <AsyncButton
                           size="icon"
+                          showLoadingText={false}
                           disabled={loading || isFetching}
-                          loading={loading && pendingId === category.id}
+                          loading={
+                            loading &&
+                            pendingId === category.id &&
+                            (pendingAction === "delete" ||
+                              pendingAction === "restore")
+                          }
                           variant={isDeleted ? "secondary" : "destructive"}
                           onClick={() =>
                             handleToggleDelete(category.id, isDeleted)
