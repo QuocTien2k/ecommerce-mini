@@ -90,11 +90,6 @@ const AdminCategoryPage = () => {
     }
   };
 
-  console.log(
-    "Category parentName: ",
-    categories.map((category) => category.parentName),
-  );
-
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
