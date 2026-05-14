@@ -15,6 +15,7 @@ import { Role } from "@/types/role";
 import AdminDashboard from "@pages/admin/AdminDashboard";
 import AdminUserPage from "@features/user/AdminUserPage";
 import AdminCategoryPage from "@features/categories/AdminCategoryPage";
+import AdminProductPage from "@features/products/AdminProductPage";
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const AppRoutes = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUserPage />} />
             <Route path="categories" element={<AdminCategoryPage />} />
+            <Route path="products" element={<AdminProductPage />} />
             {/* thêm các route admin khác */}
           </Route>
         </Route>
