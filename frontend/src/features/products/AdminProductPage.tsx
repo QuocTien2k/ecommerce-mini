@@ -1,5 +1,271 @@
+import { useState } from "react";
+import { useAdminProductFilter } from "./hooks/useAdminProductFilter";
+import { useAdminProductsQuery } from "./hooks/useAdminProductQuery";
+import type { AdminProductListItem } from "./types/admin-product.type";
+import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
+import { Title } from "@components/ui/title-module";
+import { Button } from "@components/ui/button";
+import AdminProductFilter from "./components/AdminProductFilter";
+import type { FlatCategoryItem } from "@features/categories/types/admin-category.type";
+import AppPagination from "@components/common/pagination";
+import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
+import { cn } from "@lib/utils";
+import { Badge } from "@components/ui/badge";
+import CopyableText from "@components/common/copyable-text";
+import { format } from "date-fns";
+import { AsyncButton } from "@components/common/async-button";
+import { RotateCcw, Trash2 } from "lucide-react";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { sonnerToast } from "@lib/sonner-toast";
+
+type PendingAction = "update" | "delete" | "restore" | null;
+
 const AdminProductPage = () => {
-  return <div>AdminProductPage</div>;
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const { page, setPage, filters, filterActions, queryParams, resetFilters } =
+    useAdminProductFilter();
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedProduct, setSelectedProduct] =
+    useState<AdminProductListItem | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const { loading, run } = useScopedLoading();
+
+  const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
+  const { data: flatData } = useAdminFlatCategoriesQuery();
+
+  const products: AdminProductListItem[] = data?.data?.data ?? [];
+  const flatCategories: FlatCategoryItem[] = flatData?.data ?? [];
+
+  const meta = data?.data?.meta;
+
+  const totalPages = meta?.totalPages ?? 1;
+
+  const handleToggleStatus = async (productId: string, isDeleted: boolean) => {
+    if (pendingId) return;
+
+    sonnerToast.dismiss("category-status-error");
+
+    setPendingId(productId);
+    setPendingAction(isDeleted ? "restore" : "delete");
+  };
+
+  return (
+    <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
+      <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <Title title="Quản lý sản phẩm" />
+
+          <span className="text-sm text-muted-foreground">
+            Tổng số sản phẩm: {meta?.total ?? 0}
+          </span>
+          {/* <Button onClick={() => setOpenCreate(true)}>Tạo danh mục</Button> */}
+        </div>
+
+        {/* Filters */}
+        <AdminProductFilter
+          filters={filters}
+          actions={filterActions}
+          flatCategories={flatCategories}
+          onReset={resetFilters}
+        />
+
+        {/* Table */}
+        <div
+          className={cn(
+            "border rounded-xl overflow-hidden transition-opacity",
+            {
+              "opacity-60": isFetching,
+            },
+          )}
+        >
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr className="text-left hover:bg-muted/40 transition-colors">
+                <th className="px-4 py-3 font-medium">Tên sản phẩm</th>
+
+                <th className="px-4 py-3 font-medium">Danh mục</th>
+
+                <th className="px-4 py-3 font-medium">Giá</th>
+
+                <th className="px-4 py-3 font-medium">Giảm giá</th>
+
+                <th className="px-4 py-3 font-medium">Đánh giá</th>
+
+                <th className="px-4 py-3 font-medium">Trạng thái</th>
+
+                <th className="px-4 py-3 font-medium">Ngày tạo</th>
+
+                <th className="px-4 py-3 text-center font-medium w-40">
+                  Hành động
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {products.map((product) => {
+                const category = flatCategories.find(
+                  (item) => item.id === product.categoryId,
+                );
+
+                return (
+                  <tr
+                    key={product.id}
+                    className="border-t hover:bg-muted/30 transition-colors"
+                  >
+                    {/* NAME */}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium truncate max-w-60">
+                          {product.name}
+                        </span>
+
+                        <Badge
+                          variant="secondary"
+                          className="w-fit font-mono text-[11px] tracking-wide"
+                        >
+                          /{product.slug}
+                        </Badge>
+                      </div>
+                    </td>
+
+                    {/* CATEGORY */}
+                    <td className="px-4 py-3">
+                      {category ? (
+                        <CopyableText
+                          value={category.name}
+                          className="
+                  px-2 py-1
+                  font-sans text-sm font-semibold
+                  text-primary
+                  hover:text-primary
+                "
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Không có
+                        </span>
+                      )}
+                    </td>
+
+                    {/* PRICE */}
+                    <td className="px-4 py-3 font-medium">
+                      {Number(product.price).toLocaleString("vi-VN")}đ
+                    </td>
+
+                    {/* DISCOUNT */}
+                    <td className="px-4 py-3">
+                      {product.discountPct ? (
+                        <Badge variant="destructive">
+                          -{product.discountPct}%
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Không có
+                        </span>
+                      )}
+                    </td>
+
+                    {/* RATING */}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium">
+                          {product.ratingAvg ?? 0}/5
+                        </span>
+
+                        <span className="text-xs text-muted-foreground">
+                          {product.ratingCount} đánh giá
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* STATUS */}
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={product.isActive ? "secondary" : "destructive"}
+                      >
+                        {product.isActive ? "Đang hoạt động" : "Tạm khóa"}
+                      </Badge>
+                    </td>
+
+                    {/* CREATED AT */}
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
+                      {format(new Date(product.createdAt), "dd/MM/yyyy")}
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <AsyncButton
+                          size="sm"
+                          variant="edit"
+                          disabled={loading || isFetching}
+                          loading={
+                            loading &&
+                            pendingId === product.id &&
+                            pendingAction === "update"
+                          }
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setOpenUpdate(true);
+                          }}
+                        >
+                          Cập nhật
+                        </AsyncButton>
+
+                        <AsyncButton
+                          size="icon"
+                          showLoadingText={false}
+                          disabled={loading || isFetching}
+                          loading={
+                            loading &&
+                            pendingId === product.id &&
+                            (pendingAction === "delete" ||
+                              pendingAction === "restore")
+                          }
+                          variant={
+                            product.isActive ? "destructive" : "secondary"
+                          }
+                          onClick={() =>
+                            handleToggleStatus(product.id, product.isActive)
+                          }
+                        >
+                          {product.isActive ? (
+                            <Trash2 className="w-4 h-4" />
+                          ) : (
+                            <RotateCcw className="w-4 h-4" />
+                          )}
+                        </AsyncButton>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {/* EMPTY */}
+              {products.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="text-center py-10">
+                    <span className="text-sm text-muted-foreground">
+                      Không tìm thấy sản phẩm
+                    </span>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <AppPagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      </div>
+    </QueryStateWrapper>
+  );
 };
 
 export default AdminProductPage;
