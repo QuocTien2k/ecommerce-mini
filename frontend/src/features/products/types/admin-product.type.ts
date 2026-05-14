@@ -85,3 +85,44 @@ export type AdminProductDetail = {
 
   variants: AdminProductVariant[];
 };
+
+/*Action*/
+export type AdminCreateProductPayload = {
+  name: string;
+
+  slug?: string;
+
+  description?: string;
+
+  price: number;
+
+  discountPct?: number;
+
+  isActive?: boolean;
+
+  categoryId: string;
+};
+
+export type AdminCreateProductResponse = {
+  id: string;
+
+  name: string;
+  slug: string;
+  description: string | null;
+
+  price: string;
+  discountPrice: string | null;
+  discountPct: number | null;
+
+  ratingAvg: number | null;
+  ratingCount: number;
+
+  isActive: boolean;
+
+  categoryId: string;
+
+  creatorId: string;
+
+  createdAt: string;
+  updatedAt: string;
+};
