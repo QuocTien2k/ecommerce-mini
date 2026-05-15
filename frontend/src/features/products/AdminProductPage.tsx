@@ -14,10 +14,11 @@ import { Badge } from "@components/ui/badge";
 import CopyableText from "@components/common/copyable-text";
 import { format } from "date-fns";
 import { AsyncButton } from "@components/common/async-button";
-import { RotateCcw, Trash2 } from "lucide-react";
+import { Eye, RotateCcw, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { CreateProductForm } from "./components/AdminCreateProduct";
+import { Link } from "react-router-dom";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -101,6 +102,7 @@ const AdminProductPage = () => {
                 <th className="px-4 py-3 text-center font-medium w-40">
                   Hành động
                 </th>
+                <th className="px-4 py-3 font-medium">Chi tiết</th>
               </tr>
             </thead>
 
@@ -239,6 +241,24 @@ const AdminProductPage = () => {
                           )}
                         </AsyncButton>
                       </div>
+                    </td>
+
+                    {/* DETAIL*/}
+                    <td className="px-4 py-3">
+                      <Link
+                        to={`/admin/products/${product.id}`}
+                        className="
+      inline-flex items-center justify-center
+      w-9 h-9
+      rounded-lg
+      hover:bg-gray-100
+      text-gray-600 hover:text-blue-600
+      transition
+    "
+                        title="Chi tiết sản phẩm"
+                      >
+                        <Eye size={18} />
+                      </Link>
                     </td>
                   </tr>
                 );

@@ -1,3 +1,24 @@
+export type AdminProductVariant = {
+  id: string;
+
+  color: string;
+
+  attributes: {
+    size?: string;
+  };
+
+  attributesHash: string;
+
+  images: string[];
+
+  imagePublicIds: string[];
+
+  stock: number;
+
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdminCreateVariantPayload = {
   productId: string;
 

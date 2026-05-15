@@ -1,3 +1,5 @@
+import type { AdminProductVariant } from "./admin-variant.type";
+
 export type AdminProductListQueryParams = {
   page?: number;
   limit?: number;
@@ -29,23 +31,6 @@ export type AdminProductListItem = {
   isActive: boolean;
 
   categoryId: string;
-
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type AdminProductVariant = {
-  id: string;
-
-  color: string | null;
-
-  attributes: Record<string, string>;
-  attributesHash: string;
-
-  images: string[];
-  imagePublicIds: string[];
-
-  stock: number;
 
   createdAt: string;
   updatedAt: string;

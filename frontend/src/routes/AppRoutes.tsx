@@ -16,6 +16,7 @@ import AdminDashboard from "@pages/admin/AdminDashboard";
 import AdminUserPage from "@features/user/AdminUserPage";
 import AdminCategoryPage from "@features/categories/AdminCategoryPage";
 import AdminProductPage from "@features/products/AdminProductPage";
+import AdminProductDetail from "@features/products/AdminProductDetail";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +29,8 @@ const AppRoutes = () => {
             <Route path="users" element={<AdminUserPage />} />
             <Route path="categories" element={<AdminCategoryPage />} />
             <Route path="products" element={<AdminProductPage />} />
+            <Route path="products/:id" element={<AdminProductDetail />} />
+
             {/* thêm các route admin khác */}
           </Route>
         </Route>
