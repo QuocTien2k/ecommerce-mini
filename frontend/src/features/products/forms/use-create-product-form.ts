@@ -2,11 +2,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createProductSchema,
+  type CreateProductFormOutput,
   type CreateProductFormValues,
 } from "../schemas/product.schema";
 
 export const useCreateProductForm = () => {
-  return useForm<CreateProductFormValues>({
+  return useForm<CreateProductFormValues, unknown, CreateProductFormOutput>({
     resolver: zodResolver(createProductSchema),
 
     defaultValues: {

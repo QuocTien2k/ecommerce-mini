@@ -18,7 +18,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { UpdateProductVariantDto } from './dtos/update-product-variant.dto';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
-@Controller('product-variant')
+@Controller('admin/product-variant')
 export class ProductVariantController {
   constructor(private readonly productVariantService: ProductVariantService) {}
 

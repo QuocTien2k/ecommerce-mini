@@ -17,6 +17,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
+import { CreateProductForm } from "./components/AdminCreateProduct";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -60,7 +61,7 @@ const AdminProductPage = () => {
           <span className="text-sm text-muted-foreground">
             Tổng số sản phẩm: {meta?.total ?? 0}
           </span>
-          {/* <Button onClick={() => setOpenCreate(true)}>Tạo danh mục</Button> */}
+          <Button onClick={() => setOpenCreate(true)}>Tạo sản phẩm</Button>
         </div>
 
         {/* Filters */}
@@ -264,6 +265,12 @@ const AdminProductPage = () => {
           onPageChange={setPage}
         />
       </div>
+
+      {/* Create */}
+      <CreateProductForm
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+      />
     </QueryStateWrapper>
   );
 };
