@@ -1,12 +1,11 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
-import { useEffect, useRef, useState } from "react";
-import { useCreateProductForm } from "../forms/use-create-product-form";
+
 import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
 import { useAdminCreateProduct } from "../hooks/useAdminCreateProduct";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
-import { ImagePlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
@@ -20,6 +19,8 @@ import {
 } from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
+import type { CreateProductFormOutput } from "../schemas/product.schema";
+import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -30,7 +31,7 @@ export const CreateProductForm = ({
   open,
   onClose,
 }: CreateProductFormProps) => {
-  const form = useCreateProductForm();
+  const form = useAdminCreateProductForm();
 
   const { loading, run } = useScopedLoading();
 
@@ -38,53 +39,25 @@ export const CreateProductForm = ({
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   // preview slug
   const productName = form.watch("name");
 
-  // watch files
-  const selectedFiles = form.watch("files");
-
-  // preview first image
-  useEffect(() => {
-    if (!selectedFiles?.length) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFiles[0]);
-
-    setPreviewUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [selectedFiles]);
-
   const handleClose = () => {
     form.reset();
-
-    setPreviewUrl(null);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    form.clearErrors();
 
     onClose();
   };
 
-  const onSubmit = form.handleSubmit(async (values) => {
-    if (loading) return;
+  const onSubmit = form.handleSubmit(
+    async (values: CreateProductFormOutput) => {
+      if (loading) return;
 
-    sonnerToast.dismiss("product-create-error");
+      sonnerToast.dismiss("product-create-error");
 
-    try {
-      const result = await run(() =>
-        createProductMutation.mutateAsync({
-          product: {
+      try {
+        const result = await run(() =>
+          createProductMutation.mutateAsync({
             name: values.name,
             slug: values.slug || undefined,
             description: values.description || undefined,
@@ -92,29 +65,21 @@ export const CreateProductForm = ({
             discountPct: values.discountPct || undefined,
             isActive: values.isActive,
             categoryId: values.categoryId,
-          },
+          }),
+        );
 
-          variant: {
-            color: values.color,
-            stock: values.stock,
-            attributes: values.attributes,
-          },
+        handleClose();
 
-          files: values.files,
-        }),
-      );
+        sonnerToast.success(result.message);
+      } catch (error) {
+        console.error("Create product error:", error);
 
-      handleClose();
-
-      sonnerToast.success(result.product.message);
-    } catch (error) {
-      console.error("Create product error:", error);
-
-      sonnerToast.error(getErrorMessage(error, "Tạo sản phẩm thất bại"), {
-        id: "product-create-error",
-      });
-    }
-  });
+        sonnerToast.error(getErrorMessage(error, "Tạo sản phẩm thất bại"), {
+          id: "product-create-error",
+        });
+      }
+    },
+  );
 
   if (!open) return null;
 
@@ -229,47 +194,6 @@ export const CreateProductForm = ({
               )}
             </div>
 
-            {/* color */}
-            <div className="space-y-2">
-              <Label>Màu sắc</Label>
-
-              <Input
-                placeholder="Ví dụ: Đen, Trắng..."
-                {...form.register("color")}
-              />
-
-              {form.formState.errors.color && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.color.message}
-                </p>
-              )}
-            </div>
-
-            {/* size */}
-            <div className="space-y-2">
-              <Label>Size</Label>
-
-              <Select
-                value={form.watch("attributes.size") || ""}
-                onValueChange={(value) =>
-                  form.setValue("attributes.size", value, {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn size" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="S">S</SelectItem>
-                  <SelectItem value="M">M</SelectItem>
-                  <SelectItem value="L">L</SelectItem>
-                  <SelectItem value="XL">XL</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* price */}
             <div className="space-y-2">
               <Label>Giá sản phẩm</Label>
@@ -306,102 +230,6 @@ export const CreateProductForm = ({
                 </p>
               )}
             </div>
-
-            {/* stock */}
-            <div className="space-y-2">
-              <Label>Tồn kho</Label>
-
-              <Input
-                type="number"
-                min={0}
-                placeholder="0"
-                {...form.register("stock")}
-              />
-
-              {form.formState.errors.stock && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.stock.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* images */}
-          <div className="space-y-3">
-            <Label>Ảnh sản phẩm</Label>
-
-            <input
-              ref={fileInputRef}
-              id="product-image"
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-
-                form.setValue("files", files, {
-                  shouldValidate: true,
-                });
-              }}
-            />
-
-            <div className="flex items-center gap-4">
-              <Label
-                htmlFor="product-image"
-                className="
-                flex size-28 cursor-pointer items-center justify-center
-                overflow-hidden rounded-lg border border-dashed
-                bg-muted transition hover:bg-muted/80
-              "
-              >
-                {previewUrl ? (
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                    <ImagePlus className="size-6" />
-                  </div>
-                )}
-              </Label>
-
-              <div className="space-y-1">
-                <Label
-                  htmlFor="product-image"
-                  className="
-                  cursor-pointer text-sm font-medium
-                  text-blue-500 hover:underline
-                "
-                >
-                  Chọn ảnh sản phẩm
-                </Label>
-
-                <p className="text-xs text-muted-foreground">
-                  PNG, JPG, WEBP - tối đa 5MB
-                </p>
-
-                {!!selectedFiles.length && (
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      Đã chọn {selectedFiles.length} ảnh
-                    </p>
-
-                    <p className="max-w-60 truncate text-xs text-muted-foreground">
-                      {selectedFiles[0].name}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {form.formState.errors.files && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.files.message}
-              </p>
-            )}
           </div>
 
           {/* active */}

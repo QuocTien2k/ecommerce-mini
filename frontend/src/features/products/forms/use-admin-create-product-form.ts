@@ -6,7 +6,7 @@ import {
   type CreateProductFormValues,
 } from "../schemas/product.schema";
 
-export const useCreateProductForm = () => {
+export const useAdminCreateProductForm = () => {
   return useForm<CreateProductFormValues, unknown, CreateProductFormOutput>({
     resolver: zodResolver(createProductSchema),
 
@@ -15,13 +15,9 @@ export const useCreateProductForm = () => {
       slug: "",
       description: "",
       price: 0,
-      discountPct: 0,
+      discountPct: undefined,
       isActive: true,
       categoryId: "",
-      color: "",
-      stock: 0,
-      attributes: {},
-      files: [],
     },
 
     mode: "onSubmit",
