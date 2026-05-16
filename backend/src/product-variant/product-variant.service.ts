@@ -65,7 +65,7 @@ export class ProductVariantService {
         acc[key] = attributes[key];
         return acc;
       },
-      {} as Record<string, any>,
+      {} as Record<string, string | number>,
     );
 
     return JSON.stringify(normalizedObject);
@@ -102,6 +102,11 @@ export class ProductVariantService {
     const images = uploads.map((item) => item.secure_url);
     const imagePublicIds = uploads.map((item) => item.public_id);
 
+    const attributes =
+      dto.attributes && Object.keys(dto.attributes).length > 0
+        ? dto.attributes
+        : Prisma.JsonNull;
+
     try {
       //Create variant
       return await this.prisma.productVariant.create({
@@ -109,7 +114,7 @@ export class ProductVariantService {
           productId: dto.productId,
           color: dto.color,
 
-          attributes: dto.attributes ?? null,
+          attributes,
           attributesHash: normalizedAttributes,
 
           images,

@@ -11,7 +11,7 @@ export class CreateProductVariantDto {
   color: string;
 
   @IsOptional()
-  attributes?: any;
+  attributes?: Record<string, string | number>;
 
   @IsOptional()
   @Type(() => Number)
