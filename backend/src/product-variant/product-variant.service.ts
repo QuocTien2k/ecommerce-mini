@@ -26,7 +26,7 @@ export class ProductVariantService {
   }
 
   async findByProductId(productId: string) {
-    return this.prisma.productVariant.findMany({
+    const variants = await this.prisma.productVariant.findMany({
       where: { productId },
       orderBy: { createdAt: 'asc' },
       select: {
@@ -41,6 +41,14 @@ export class ProductVariantService {
         updatedAt: true,
       },
     });
+
+    return variants.map((variant) => ({
+      ...variant,
+      attributes:
+        typeof variant.attributes === 'string'
+          ? JSON.parse(variant.attributes)
+          : variant.attributes,
+    }));
   }
 
   private normalizeAttributes(

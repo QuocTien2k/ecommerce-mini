@@ -3,7 +3,9 @@ export type AdminProductVariant = {
 
   color: string;
 
-  attributes?: string;
+  attributes?: {
+    size?: string;
+  };
 
   attributesHash: string;
 

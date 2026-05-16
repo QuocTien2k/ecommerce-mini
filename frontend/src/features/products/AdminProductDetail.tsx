@@ -119,62 +119,54 @@ const AdminProductDetail = () => {
             </div>
 
             <div className="grid gap-4">
-              {data.variants.map((variant: AdminProductVariant) => {
-                const attributes = variant.attributes
-                  ? JSON.parse(variant.attributes)
-                  : null;
+              {data.variants.map((variant: AdminProductVariant) => (
+                <Card key={variant.id}>
+                  <CardContent className="space-y-5 pt-6">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Màu sắc</p>
 
-                return (
-                  <Card key={variant.id}>
-                    <CardContent className="space-y-5 pt-6">
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Màu sắc
-                          </p>
-
-                          <p className="font-medium">{variant.color}</p>
-                        </div>
-
-                        <div>
-                          <p className="text-sm text-muted-foreground">Size</p>
-
-                          <p className="font-medium">
-                            {attributes?.size ?? "-"}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Số lượng
-                          </p>
-
-                          <p className="font-medium">{variant.stock}</p>
-                        </div>
+                        <p className="font-medium">{variant.color}</p>
                       </div>
 
-                      <div className="space-y-3">
-                        <p className="text-sm font-medium">Hình ảnh</p>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Size</p>
 
-                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
-                          {variant.images.map((img: string) => (
-                            <div
-                              key={img}
-                              className="overflow-hidden rounded-xl border bg-muted"
-                            >
-                              <img
-                                src={img}
-                                alt={variant.color}
-                                className="aspect-3/4 h-full w-full object-cover transition hover:scale-105"
-                              />
-                            </div>
-                          ))}
-                        </div>
+                        <p className="font-medium">
+                          {variant.attributes?.size ?? "-"}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Số lượng
+                        </p>
+
+                        <p className="font-medium">{variant.stock}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium">Hình ảnh</p>
+
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+                        {variant.images.map((img: string) => (
+                          <div
+                            key={img}
+                            className="overflow-hidden rounded-xl border bg-muted"
+                          >
+                            <img
+                              src={img}
+                              alt={variant.color}
+                              className="aspect-3/4 h-full w-full object-cover transition hover:scale-105"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
