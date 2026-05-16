@@ -3,109 +3,181 @@ import { useAdminProductDetail } from "./hooks/useAdminProductDetail";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Package, Percent, Tag, User } from "lucide-react";
 import type { AdminProductVariant } from "./types/admin-variant.type";
+import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
+import { Badge } from "@components/ui/badge";
+import { Separator } from "@components/ui/separator";
 
 const AdminProductDetail = () => {
   const { id } = useParams();
   const { data, isLoading, isFetching } = useAdminProductDetail(id!);
 
+  //console.log(data?.variants.map((variant) => variant.attributes));
+
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       {!data ? (
-        <div>Không tìm thấy sản phẩm</div>
+        <div className="flex h-75 items-center justify-center rounded-xl border">
+          <p className="text-muted-foreground">Không tìm thấy sản phẩm</p>
+        </div>
       ) : (
-        <>
+        <div className="space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <Title title="Chi tiết sản phẩm" />
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <Title title="Chi tiết sản phẩm" />
 
-            <Button asChild>
-              <Link to="/admin/products">
-                <ArrowLeft size={16} /> Quay lại sản phẩm
-              </Link>
-            </Button>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Quản lý thông tin và variants của sản phẩm
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="outline" asChild>
+                <Link to="/admin/products">
+                  <ArrowLeft className="mr-2 size-4" />
+                  Quay lại
+                </Link>
+              </Button>
+
+              <Button>Cập nhật sản phẩm</Button>
+            </div>
           </div>
 
-          <div>
-            <h1>{data.name}</h1>
+          {/* Product Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <Package className="size-5" />
+                {data.name}
+              </CardTitle>
+            </CardHeader>
 
-            <p>{data.description}</p>
+            <CardContent className="space-y-6">
+              <p className="text-muted-foreground leading-relaxed">
+                {data.description}
+              </p>
 
-            <div>
-              <strong>Category:</strong> {data.category.name}
-            </div>
+              <Separator />
 
-            <div>
-              <strong>Price:</strong> {data.price}
-            </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-xl border p-4">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                    <Tag className="size-4" />
+                    Danh mục
+                  </div>
 
-            <div>
-              <strong>Discount:</strong> {data.discountPct ?? 0}%
-            </div>
-
-            <div>
-              <strong>Creator:</strong> {data.creator.fullname}
-            </div>
-
-            <div>
-              <strong>Status:</strong>
-              {data.isActive ? "Active" : "Inactive"}
-            </div>
-
-            <hr />
-
-            <h2>Variants</h2>
-
-            {data.variants.map((variant: AdminProductVariant) => (
-              <div
-                key={variant.id}
-                style={{
-                  border: "1px solid #ccc",
-                  padding: 16,
-                  marginBottom: 16,
-                }}
-              >
-                <div>
-                  <strong>Color:</strong> {variant.color}
+                  <p className="font-medium">{data.category.name}</p>
                 </div>
 
-                <div>
-                  <strong>Size:</strong> {variant.attributes?.size}
+                <div className="rounded-xl border p-4">
+                  <div className="mb-2 text-sm text-muted-foreground">
+                    Giá bán
+                  </div>
+
+                  <p className="text-xl font-bold">
+                    {Number(data.price).toLocaleString("vi-VN")}₫
+                  </p>
                 </div>
 
-                <div>
-                  <strong>Stock:</strong> {variant.stock}
+                <div className="rounded-xl border p-4">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                    <Percent className="size-4" />
+                    Giảm giá
+                  </div>
+
+                  <p className="font-medium">{data.discountPct ?? 0}%</p>
                 </div>
 
-                <div>
-                  <strong>Images:</strong>
-                </div>
+                <div className="rounded-xl border p-4">
+                  <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                    <User className="size-4" />
+                    Người tạo
+                  </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    marginTop: 8,
-                  }}
-                >
-                  {variant.images.map((img: string) => (
-                    <img
-                      key={img}
-                      src={img}
-                      alt=""
-                      width={100}
-                      height={120}
-                      style={{
-                        objectFit: "cover",
-                      }}
-                    />
-                  ))}
+                  <p className="font-medium">{data.creator.fullname}</p>
                 </div>
               </div>
-            ))}
+
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium">Trạng thái:</span>
+
+                <Badge variant={data.isActive ? "default" : "secondary"}>
+                  {data.isActive ? "Active" : "Inactive"}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Variants */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Chi tiết</h2>
+
+              <Badge variant="outline">{data.variants.length} variants</Badge>
+            </div>
+
+            <div className="grid gap-4">
+              {data.variants.map((variant: AdminProductVariant) => {
+                const attributes = variant.attributes
+                  ? JSON.parse(variant.attributes)
+                  : null;
+
+                return (
+                  <Card key={variant.id}>
+                    <CardContent className="space-y-5 pt-6">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Màu sắc
+                          </p>
+
+                          <p className="font-medium">{variant.color}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-muted-foreground">Size</p>
+
+                          <p className="font-medium">
+                            {attributes?.size ?? "-"}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Số lượng
+                          </p>
+
+                          <p className="font-medium">{variant.stock}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-sm font-medium">Hình ảnh</p>
+
+                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+                          {variant.images.map((img: string) => (
+                            <div
+                              key={img}
+                              className="overflow-hidden rounded-xl border bg-muted"
+                            >
+                              <img
+                                src={img}
+                                alt={variant.color}
+                                className="aspect-3/4 h-full w-full object-cover transition hover:scale-105"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </QueryStateWrapper>
   );
