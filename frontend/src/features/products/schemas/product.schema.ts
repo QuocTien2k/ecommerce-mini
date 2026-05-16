@@ -48,13 +48,30 @@ export const createProductSchema = productBaseSchema.extend({
   files: imageFilesSchema,
 });
 
-// update
-export const updateProductSchema = productBaseSchema.extend({
+//update variant
+const variantBaseSchema = z.object({
+  color: z.string().trim().min(1, "Vui lòng nhập màu sản phẩm"),
+
+  stock: z.coerce.number().min(0, "Số lượng tồn kho không hợp lệ"),
+
+  attributes: z
+    .record(z.string(), z.union([z.string(), z.number()]))
+    .optional(),
+});
+export const createVariantSchema = variantBaseSchema.extend({
+  files: imageFilesSchema,
+});
+
+export const updateVariantSchema = variantBaseSchema.extend({
   files: imageFilesSchema.optional(),
+
+  removeImagePublicIds: z.array(z.string()).optional(),
 });
 
 export type CreateProductFormValues = z.input<typeof createProductSchema>;
 
 export type CreateProductFormOutput = z.output<typeof createProductSchema>;
 
-export type UpdateProductFormValues = z.infer<typeof updateProductSchema>;
+export type UpdateVariantFormValues = z.input<typeof updateVariantSchema>;
+
+export type UpdateVariantFormOutput = z.output<typeof updateVariantSchema>;

@@ -29,14 +29,25 @@ export type AdminCreateVariantPayload = {
   stock?: number;
 };
 
-export type AdminCreateVariantResponse = {
+export type AdminUpdateVariantPayload = {
+  color?: string;
+
+  attributes?: Record<string, string | number>;
+
+  stock?: number;
+
+  removeImagePublicIds?: string[];
+};
+
+export type AdminVariantResponse = {
   id: string;
 
   productId: string;
 
   color: string;
 
-  attributes: Record<string, string>;
+  attributes: Record<string, string | number>;
+
   attributesHash: string;
 
   images: string[];
@@ -47,3 +58,7 @@ export type AdminCreateVariantResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type AdminCreateVariantResponse = AdminVariantResponse;
+
+export type AdminUpdateVariantResponse = AdminVariantResponse;
