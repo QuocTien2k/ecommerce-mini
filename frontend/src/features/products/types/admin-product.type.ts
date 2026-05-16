@@ -1,4 +1,4 @@
-import type { AdminProductVariant } from "./admin-variant.type";
+import type { AdminVariantResponse } from "./admin-variant.type";
 
 export type AdminProductListQueryParams = {
   page?: number;
@@ -68,7 +68,7 @@ export type AdminProductDetail = {
     fullname: string;
   };
 
-  variants: AdminProductVariant[];
+  variants: AdminVariantResponse[];
 };
 
 /*Action*/

@@ -1,54 +1,22 @@
-export type AdminProductVariant = {
-  id: string;
+export interface AdminVariantAttributes {
+  [key: string]: string | number;
+}
 
-  color: string;
-
-  attributes?: {
-    size?: string;
-  };
-
-  attributesHash: string;
-
-  images: string[];
-
-  imagePublicIds: string[];
-
-  stock: number;
-
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type AdminCreateVariantPayload = {
+export interface AdminCreateVariantPayload {
   productId: string;
-
   color: string;
-
-  attributes?: Record<string, string>;
-
+  attributes?: AdminVariantAttributes;
   stock?: number;
-};
+}
 
-export type AdminUpdateVariantPayload = {
-  color?: string;
-
-  attributes?: Record<string, string | number>;
-
-  stock?: number;
-
-  removeImagePublicIds?: string[];
-};
-
-export type AdminVariantResponse = {
+export interface AdminVariantResponse {
   id: string;
 
   productId: string;
-
   color: string;
 
-  attributes: Record<string, string | number>;
-
-  attributesHash: string;
+  attributes: AdminVariantAttributes | null;
+  attributesHash: string | null;
 
   images: string[];
   imagePublicIds: string[];
@@ -57,7 +25,7 @@ export type AdminVariantResponse = {
 
   createdAt: string;
   updatedAt: string;
-};
+}
 
 export type AdminCreateVariantResponse = AdminVariantResponse;
 
