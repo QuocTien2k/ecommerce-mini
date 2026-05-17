@@ -3,7 +3,16 @@ import { useAdminProductDetail } from "./hooks/useAdminProductDetail";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
-import { ArrowLeft, Package, Percent, Tag, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Package,
+  Package2,
+  Palette,
+  Percent,
+  Ruler,
+  Tag,
+  User,
+} from "lucide-react";
 import type { AdminVariantResponse } from "./types/admin-variant.type";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import { Badge } from "@components/ui/badge";
@@ -16,6 +25,18 @@ const AdminProductDetail = () => {
   const { id } = useParams();
   const { data, isLoading, isFetching } = useAdminProductDetail(id!);
   const [openCreate, setOpenCreate] = useState(false);
+
+  const getStockColor = (stock: number) => {
+    if (stock < 5) {
+      return "text-red-500";
+    }
+
+    if (stock < 20) {
+      return "text-yellow-500";
+    }
+
+    return "text-green-600";
+  };
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -109,14 +130,25 @@ const AdminProductDetail = () => {
               </CardContent>
             </Card>
 
+            {/* Section Divider */}
+            <div className="relative py-3">
+              <div className="h-2 w-full rounded-full bg-linear-to-r from-transparent via-stone-300 to-transparent" />
+
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="rounded-full border border-stone-300 bg-stone-100 px-5 py-1 text-xs font-bold uppercase tracking-[0.2em] text-stone-700 shadow-sm">
+                  Variants
+                </div>
+              </div>
+            </div>
+
             {/* Variants */}
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h2 className="text-2xl font-semibold">Chi tiết</h2>
 
-                  <Badge variant="outline">
-                    sản phẩm có {data.variants.length} chi tiết
+                  <Badge className="rounded-md border-0 bg-stone-900 px-3 py-1 text-sm font-bold tracking-wide text-stone-100">
+                    {data.variants.length} variants
                   </Badge>
                 </div>
 
@@ -125,64 +157,86 @@ const AdminProductDetail = () => {
                 </Button>
               </div>
 
-              <div className="grid gap-4">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {data.variants.map((variant: AdminVariantResponse) => (
-                  <Card key={variant.id}>
-                    <CardContent className="space-y-5 pt-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Màu sắc
-                            </p>
+                  <Card
+                    key={variant.id}
+                    className="group flex h-full flex-col overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <CardHeader className="space-y-4 pb-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Palette className="h-4 w-4 text-muted-foreground" />
 
-                            <p className="font-medium">{variant.color}</p>
+                            <p className="truncate text-lg font-semibold tracking-tight">
+                              <span className="mr-1 text-sm font-medium text-muted-foreground">
+                                Màu:
+                              </span>
+
+                              <span className="font-bold underline decoration-2 underline-offset-4">
+                                {variant.color}
+                              </span>
+                            </p>
                           </div>
 
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Size
-                            </p>
+                          <div className="flex items-center gap-2">
+                            <Ruler className="h-4 w-4 text-muted-foreground" />
 
-                            <p className="font-medium">
-                              {variant.attributes?.size ?? "-"}
+                            <p className="text-base font-medium">
+                              <span className="mr-1 text-sm font-medium text-muted-foreground">
+                                Size:
+                              </span>
+
+                              <span className="font-semibold">
+                                {variant.attributes?.size ?? "-"}
+                              </span>
                             </p>
                           </div>
 
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Số lượng
-                            </p>
+                          <div className="flex items-center gap-2">
+                            <Package2 className="h-4 w-4 text-muted-foreground" />
 
-                            <p className="font-medium">{variant.stock}</p>
+                            <p
+                              className={`text-base font-semibold ${getStockColor(
+                                variant.stock,
+                              )}`}
+                            >
+                              <span className="mr-1 text-sm font-medium text-muted-foreground">
+                                Tồn kho:
+                              </span>
+
+                              <span className="font-bold">
+                                {variant.stock} sản phẩm
+                              </span>
+                            </p>
                           </div>
                         </div>
 
                         {/* <Button
-                          variant="edit"
-                          onClick={() => handleOpenUpdateVariant(variant)}
-                        >
-                          Cập nhật
-                        </Button> */}
+              size="icon"
+              variant="outline"
+              onClick={() => handleEditVariant(variant)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button> */}
                       </div>
+                    </CardHeader>
 
-                      <div className="space-y-3">
-                        <p className="text-sm font-medium">Hình ảnh</p>
-
-                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
-                          {variant.images.map((img: string) => (
-                            <div
-                              key={img}
-                              className="overflow-hidden rounded-xl border bg-muted"
-                            >
-                              <img
-                                src={img}
-                                alt={variant.color}
-                                className="aspect-3/4 h-full w-full object-cover transition hover:scale-105"
-                              />
-                            </div>
-                          ))}
-                        </div>
+                    <CardContent className="mt-auto">
+                      <div className="grid grid-cols-2 gap-2">
+                        {variant.images.slice(0, 2).map((img: string) => (
+                          <div
+                            key={img}
+                            className="overflow-hidden rounded-xl border bg-muted"
+                          >
+                            <img
+                              src={img}
+                              alt={variant.color}
+                              className="aspect-3/4 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                            />
+                          </div>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
