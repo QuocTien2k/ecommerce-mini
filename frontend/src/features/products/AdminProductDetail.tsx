@@ -4,27 +4,18 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
 import { ArrowLeft, Package, Percent, Tag, User } from "lucide-react";
-import type { AdminProductVariant } from "./types/admin-variant.type";
+import type { AdminVariantResponse } from "./types/admin-variant.type";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import { Badge } from "@components/ui/badge";
 import { Separator } from "@components/ui/separator";
 import { useState } from "react";
+import AdminCreateVariant from "./components/AdminCreateVariant";
 //import { AdminUpdateVariant } from "./components/AdminUpdateVariant";
 
 const AdminProductDetail = () => {
   const { id } = useParams();
   const { data, isLoading, isFetching } = useAdminProductDetail(id!);
-
-  const [openUpdateVariant, setOpenUpdateVariant] = useState(false);
-
-  const [selectedVariant, setSelectedVariant] =
-    useState<AdminProductVariant | null>(null);
-
-  const handleOpenUpdateVariant = (variant: AdminProductVariant) => {
-    setSelectedVariant(variant);
-
-    setOpenUpdateVariant(true);
-  };
+  const [openCreate, setOpenCreate] = useState(false);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -121,13 +112,21 @@ const AdminProductDetail = () => {
             {/* Variants */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold">Chi tiết</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-semibold">Chi tiết</h2>
 
-                <Badge variant="outline">{data.variants.length} variants</Badge>
+                  <Badge variant="outline">
+                    sản phẩm có {data.variants.length} chi tiết
+                  </Badge>
+                </div>
+
+                <Button onClick={() => setOpenCreate(true)}>
+                  Tạo chi tiết sản phẩm
+                </Button>
               </div>
 
               <div className="grid gap-4">
-                {data.variants.map((variant: AdminProductVariant) => (
+                {data.variants.map((variant: AdminVariantResponse) => (
                   <Card key={variant.id}>
                     <CardContent className="space-y-5 pt-6">
                       <div className="flex items-start justify-between gap-4">
@@ -159,12 +158,12 @@ const AdminProductDetail = () => {
                           </div>
                         </div>
 
-                        <Button
+                        {/* <Button
                           variant="edit"
                           onClick={() => handleOpenUpdateVariant(variant)}
                         >
                           Cập nhật
-                        </Button>
+                        </Button> */}
                       </div>
 
                       <div className="space-y-3">
@@ -192,11 +191,11 @@ const AdminProductDetail = () => {
             </div>
           </div>
 
-          {/* <AdminUpdateVariant
-            open={openUpdateVariant}
-            onClose={() => setOpenUpdateVariant(false)}
-            variant={selectedVariant}
-          /> */}
+          <AdminCreateVariant
+            open={openCreate}
+            onClose={() => setOpenCreate(false)}
+            productId={id!}
+          />
         </>
       )}
     </QueryStateWrapper>

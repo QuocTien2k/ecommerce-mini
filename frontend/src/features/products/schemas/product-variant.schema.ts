@@ -8,7 +8,7 @@ export const variantImagesSchema = z
     }),
   )
   .min(1, "Phải upload ít nhất 1 ảnh")
-  .max(4, "Tối đa 4 ảnh");
+  .max(2, "Tối đa 2 ảnh");
 
 // reusable attributes
 export const variantAttributesSchema = z.record(
@@ -18,8 +18,6 @@ export const variantAttributesSchema = z.record(
 
 // base
 const productVariantBaseSchema = z.object({
-  productId: z.string().uuid("Sản phẩm không hợp lệ"),
-
   color: z
     .string()
     .trim()

@@ -37,7 +37,11 @@ export const useAdminCreateVariant = () => {
       return await adminProductVariantApi.create(data, files);
     },
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-product-detail", variables.data.productId],
+      });
+
       queryClient.invalidateQueries({
         queryKey: [ADMIN_PRODUCTS_QUERY_KEY],
       });

@@ -164,217 +164,217 @@
 //           </Button>
 //         </div>
 
-//         <form onSubmit={onUpdate} className="space-y-6">
-//           {/* variant info */}
-//           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-//             {/* color */}
-//             <div className="space-y-2">
-//               <Label>Màu sắc</Label>
+// <form onSubmit={onUpdate} className="space-y-6">
+//   {/* variant info */}
+//   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+//     {/* color */}
+//     <div className="space-y-2">
+//       <Label>Màu sắc</Label>
 
-//               <Input
-//                 placeholder="Ví dụ: Đen, Trắng..."
-//                 {...form.register("color")}
-//               />
+//       <Input
+//         placeholder="Ví dụ: Đen, Trắng..."
+//         {...form.register("color")}
+//       />
 
-//               {form.formState.errors.color && (
-//                 <p className="text-sm text-red-500">
-//                   {form.formState.errors.color.message}
-//                 </p>
+//       {form.formState.errors.color && (
+//         <p className="text-sm text-red-500">
+//           {form.formState.errors.color.message}
+//         </p>
+//       )}
+//     </div>
+
+//     {/* size */}
+//     <div className="space-y-2">
+//       <Label>Size</Label>
+
+//       <Select
+//         value={String(form.watch("attributes.size") || "")}
+//         onValueChange={(value) =>
+//           form.setValue("attributes.size", value, {
+//             shouldValidate: true,
+//           })
+//         }
+//       >
+//         <SelectTrigger>
+//           <SelectValue placeholder="Chọn size" />
+//         </SelectTrigger>
+
+//         <SelectContent>
+//           <SelectItem value="S">S</SelectItem>
+//           <SelectItem value="M">M</SelectItem>
+//           <SelectItem value="L">L</SelectItem>
+//           <SelectItem value="XL">XL</SelectItem>
+//         </SelectContent>
+//       </Select>
+//     </div>
+
+//     {/* stock */}
+//     <div className="space-y-2">
+//       <Label>Tồn kho</Label>
+
+//       <Input
+//         type="number"
+//         min={0}
+//         placeholder="0"
+//         {...form.register("stock")}
+//       />
+
+//       {form.formState.errors.stock && (
+//         <p className="text-sm text-red-500">
+//           {form.formState.errors.stock.message}
+//         </p>
+//       )}
+//     </div>
+//   </div>
+
+//   {/* current images */}
+//   <div className="space-y-3">
+//     <div className="space-y-1">
+//       <Label>Ảnh hiện tại</Label>
+
+//       <p className="text-xs text-muted-foreground">
+//         Chọn ảnh muốn xoá khỏi variant
+//       </p>
+//     </div>
+
+//     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+//       {variant.images.map((image, index) => {
+//         const publicId = variant.imagePublicIds[index];
+
+//         const removedImages = form.watch("removeImagePublicIds") || [];
+
+//         const checked = removedImages.includes(publicId);
+
+//         return (
+//           <div
+//             key={publicId}
+//             className="relative overflow-hidden rounded-xl border"
+//           >
+//             <img
+//               src={image}
+//               alt={variant.color}
+//               className={cn(
+//                 "aspect-3/4 h-full w-full object-cover transition",
+//                 checked && "opacity-40",
 //               )}
-//             </div>
-
-//             {/* size */}
-//             <div className="space-y-2">
-//               <Label>Size</Label>
-
-//               <Select
-//                 value={String(form.watch("attributes.size") || "")}
-//                 onValueChange={(value) =>
-//                   form.setValue("attributes.size", value, {
-//                     shouldValidate: true,
-//                   })
-//                 }
-//               >
-//                 <SelectTrigger>
-//                   <SelectValue placeholder="Chọn size" />
-//                 </SelectTrigger>
-
-//                 <SelectContent>
-//                   <SelectItem value="S">S</SelectItem>
-//                   <SelectItem value="M">M</SelectItem>
-//                   <SelectItem value="L">L</SelectItem>
-//                   <SelectItem value="XL">XL</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-
-//             {/* stock */}
-//             <div className="space-y-2">
-//               <Label>Tồn kho</Label>
-
-//               <Input
-//                 type="number"
-//                 min={0}
-//                 placeholder="0"
-//                 {...form.register("stock")}
-//               />
-
-//               {form.formState.errors.stock && (
-//                 <p className="text-sm text-red-500">
-//                   {form.formState.errors.stock.message}
-//                 </p>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* current images */}
-//           <div className="space-y-3">
-//             <div className="space-y-1">
-//               <Label>Ảnh hiện tại</Label>
-
-//               <p className="text-xs text-muted-foreground">
-//                 Chọn ảnh muốn xoá khỏi variant
-//               </p>
-//             </div>
-
-//             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-//               {variant.images.map((image, index) => {
-//                 const publicId = variant.imagePublicIds[index];
-
-//                 const removedImages = form.watch("removeImagePublicIds") || [];
-
-//                 const checked = removedImages.includes(publicId);
-
-//                 return (
-//                   <div
-//                     key={publicId}
-//                     className="relative overflow-hidden rounded-xl border"
-//                   >
-//                     <img
-//                       src={image}
-//                       alt={variant.color}
-//                       className={cn(
-//                         "aspect-3/4 h-full w-full object-cover transition",
-//                         checked && "opacity-40",
-//                       )}
-//                     />
-
-//                     <div className="absolute right-2 top-2">
-//                       <Checkbox
-//                         checked={checked}
-//                         onCheckedChange={(value) => {
-//                           const current =
-//                             form.getValues("removeImagePublicIds") || [];
-
-//                           if (value) {
-//                             form.setValue("removeImagePublicIds", [
-//                               ...current,
-//                               publicId,
-//                             ]);
-//                           } else {
-//                             form.setValue(
-//                               "removeImagePublicIds",
-//                               current.filter((id) => id !== publicId),
-//                             );
-//                           }
-//                         }}
-//                       />
-//                     </div>
-//                   </div>
-//                 );
-//               })}
-//             </div>
-//           </div>
-
-//           {/* upload new images */}
-//           <div className="space-y-3">
-//             <Label>Thêm ảnh mới</Label>
-
-//             <input
-//               ref={fileInputRef}
-//               id="variant-image"
-//               type="file"
-//               accept="image/*"
-//               multiple
-//               className="hidden"
-//               onChange={(e) => {
-//                 const files = Array.from(e.target.files || []);
-
-//                 form.setValue("files", files, {
-//                   shouldValidate: true,
-//                 });
-//               }}
 //             />
 
-//             <div className="flex items-center gap-4">
-//               <Label
-//                 htmlFor="variant-image"
-//                 className="
-//           flex size-28 cursor-pointer items-center justify-center
-//           overflow-hidden rounded-lg border border-dashed
-//           bg-muted transition hover:bg-muted/80
-//         "
-//               >
-//                 {previewUrl ? (
-//                   <img
-//                     src={previewUrl}
-//                     alt="Preview"
-//                     className="h-full w-full object-cover"
-//                   />
-//                 ) : (
-//                   <div className="flex flex-col items-center gap-1 text-muted-foreground">
-//                     <ImagePlus className="size-6" />
-//                   </div>
-//                 )}
-//               </Label>
+//             <div className="absolute right-2 top-2">
+//               <Checkbox
+//                 checked={checked}
+//                 onCheckedChange={(value) => {
+//                   const current =
+//                     form.getValues("removeImagePublicIds") || [];
 
-//               <div className="space-y-1">
-//                 <Label
-//                   htmlFor="variant-image"
-//                   className="
-//             cursor-pointer text-sm font-medium
-//             text-blue-500 hover:underline
-//           "
-//                 >
-//                   Chọn ảnh mới
-//                 </Label>
-
-//                 <p className="text-xs text-muted-foreground">
-//                   PNG, JPG, WEBP - tối đa 5MB
-//                 </p>
-
-//                 {!!selectedFiles?.length && (
-//                   <div className="space-y-1">
-//                     <p className="text-xs text-muted-foreground">
-//                       Đã chọn {selectedFiles.length} ảnh
-//                     </p>
-
-//                     <p className="max-w-60 truncate text-xs text-muted-foreground">
-//                       {selectedFiles[0].name}
-//                     </p>
-//                   </div>
-//                 )}
-//               </div>
+//                   if (value) {
+//                     form.setValue("removeImagePublicIds", [
+//                       ...current,
+//                       publicId,
+//                     ]);
+//                   } else {
+//                     form.setValue(
+//                       "removeImagePublicIds",
+//                       current.filter((id) => id !== publicId),
+//                     );
+//                   }
+//                 }}
+//               />
 //             </div>
-
-//             {form.formState.errors.files && (
-//               <p className="text-sm text-red-500">
-//                 {form.formState.errors.files.message}
-//               </p>
-//             )}
 //           </div>
+//         );
+//       })}
+//     </div>
+//   </div>
 
-//           {/* actions */}
-//           <div className="flex items-center justify-end gap-3 border-t pt-4">
-//             <Button type="button" variant="outline" onClick={handleClose}>
-//               Hủy
-//             </Button>
+//   {/* upload new images */}
+//   <div className="space-y-3">
+//     <Label>Thêm ảnh mới</Label>
 
-//             <AsyncButton loading={loading} disabled={loading}>
-//               Cập nhật variant
-//             </AsyncButton>
+//     <input
+//       ref={fileInputRef}
+//       id="variant-image"
+//       type="file"
+//       accept="image/*"
+//       multiple
+//       className="hidden"
+//       onChange={(e) => {
+//         const files = Array.from(e.target.files || []);
+
+//         form.setValue("files", files, {
+//           shouldValidate: true,
+//         });
+//       }}
+//     />
+
+//     <div className="flex items-center gap-4">
+//       <Label
+//         htmlFor="variant-image"
+//         className="
+//   flex size-28 cursor-pointer items-center justify-center
+//   overflow-hidden rounded-lg border border-dashed
+//   bg-muted transition hover:bg-muted/80
+// "
+//       >
+//         {previewUrl ? (
+//           <img
+//             src={previewUrl}
+//             alt="Preview"
+//             className="h-full w-full object-cover"
+//           />
+//         ) : (
+//           <div className="flex flex-col items-center gap-1 text-muted-foreground">
+//             <ImagePlus className="size-6" />
 //           </div>
-//         </form>
+//         )}
+//       </Label>
+
+//       <div className="space-y-1">
+//         <Label
+//           htmlFor="variant-image"
+//           className="
+//     cursor-pointer text-sm font-medium
+//     text-blue-500 hover:underline
+//   "
+//         >
+//           Chọn ảnh mới
+//         </Label>
+
+//         <p className="text-xs text-muted-foreground">
+//           PNG, JPG, WEBP - tối đa 5MB
+//         </p>
+
+//         {!!selectedFiles?.length && (
+//           <div className="space-y-1">
+//             <p className="text-xs text-muted-foreground">
+//               Đã chọn {selectedFiles.length} ảnh
+//             </p>
+
+//             <p className="max-w-60 truncate text-xs text-muted-foreground">
+//               {selectedFiles[0].name}
+//             </p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+
+//     {form.formState.errors.files && (
+//       <p className="text-sm text-red-500">
+//         {form.formState.errors.files.message}
+//       </p>
+//     )}
+//   </div>
+
+//   {/* actions */}
+//   <div className="flex items-center justify-end gap-3 border-t pt-4">
+//     <Button type="button" variant="outline" onClick={handleClose}>
+//       Hủy
+//     </Button>
+
+//     <AsyncButton loading={loading} disabled={loading}>
+//       Cập nhật variant
+//     </AsyncButton>
+//   </div>
+// </form>
 //       </div>
 //     </div>
 //   );

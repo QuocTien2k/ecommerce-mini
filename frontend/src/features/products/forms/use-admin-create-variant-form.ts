@@ -16,7 +16,6 @@ export const useAdminCreateVariantForm = () => {
     resolver: zodResolver(createProductVariantSchema),
 
     defaultValues: {
-      productId: "",
       color: "",
       attributes: {},
       stock: 0,
