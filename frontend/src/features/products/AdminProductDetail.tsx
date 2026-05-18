@@ -8,6 +8,7 @@ import {
   Package,
   Package2,
   Palette,
+  Pencil,
   Percent,
   Ruler,
   Tag,
@@ -19,12 +20,15 @@ import { Badge } from "@components/ui/badge";
 import { Separator } from "@components/ui/separator";
 import { useState } from "react";
 import AdminCreateVariant from "./components/AdminCreateVariant";
+import AdminUpdateVariant from "./components/AdminUpdateVariant";
 //import { AdminUpdateVariant } from "./components/AdminUpdateVariant";
 
 const AdminProductDetail = () => {
   const { id } = useParams();
   const { data, isLoading, isFetching } = useAdminProductDetail(id!);
   const [openCreate, setOpenCreate] = useState(false);
+  const [selectedVariant, setSelectedVariant] =
+    useState<AdminVariantResponse | null>(null);
 
   const getStockColor = (stock: number) => {
     if (stock < 5) {
@@ -213,13 +217,13 @@ const AdminProductDetail = () => {
                           </div>
                         </div>
 
-                        {/* <Button
-              size="icon"
-              variant="outline"
-              onClick={() => handleEditVariant(variant)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button> */}
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => setSelectedVariant(variant)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                       </div>
                     </CardHeader>
 
@@ -241,6 +245,14 @@ const AdminProductDetail = () => {
                     </CardContent>
                   </Card>
                 ))}
+                {selectedVariant && (
+                  <AdminUpdateVariant
+                    open={!!selectedVariant}
+                    onClose={() => setSelectedVariant(null)}
+                    productId={id!}
+                    variant={selectedVariant}
+                  />
+                )}
               </div>
             </div>
           </div>

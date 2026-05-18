@@ -47,10 +47,15 @@ export type CreateProductVariantFormOutput = z.output<
 >;
 
 // update
+export const updateVariantImagesSchema = z
+  .array(z.instanceof(File))
+  .max(2, "Tối đa 2 ảnh")
+  .optional();
+
 export const updateProductVariantSchema = productVariantBaseSchema
   .partial()
   .extend({
-    files: variantImagesSchema.optional(),
+    files: updateVariantImagesSchema.optional(),
 
     removeImagePublicIds: z.array(z.string()).optional(),
   });
