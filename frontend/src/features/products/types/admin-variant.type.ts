@@ -9,6 +9,16 @@ export interface AdminCreateVariantPayload {
   stock?: number;
 }
 
+export interface AdminUpdateVariantPayload {
+  color?: string;
+
+  attributes?: AdminVariantAttributes;
+
+  stock?: number;
+
+  removeImagePublicIds?: string[];
+}
+
 export interface AdminVariantResponse {
   id: string;
 

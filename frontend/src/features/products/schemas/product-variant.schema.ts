@@ -45,3 +45,20 @@ export type CreateProductVariantFormValues = z.input<
 export type CreateProductVariantFormOutput = z.output<
   typeof createProductVariantSchema
 >;
+
+// update
+export const updateProductVariantSchema = productVariantBaseSchema
+  .partial()
+  .extend({
+    files: variantImagesSchema.optional(),
+
+    removeImagePublicIds: z.array(z.string()).optional(),
+  });
+
+export type UpdateProductVariantFormValues = z.input<
+  typeof updateProductVariantSchema
+>;
+
+export type UpdateProductVariantFormOutput = z.output<
+  typeof updateProductVariantSchema
+>;
