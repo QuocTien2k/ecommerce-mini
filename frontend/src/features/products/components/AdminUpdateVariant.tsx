@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAdminUpdateVariantForm } from "../forms/use-admin-update-vairant-form";
 import { useAdminUpdateVariant } from "../hooks/useAdminUpdateVariant";
 import type { AdminVariantResponse } from "../types/admin-variant.type";
@@ -48,25 +48,6 @@ const AdminUpdateVariant = ({
   const [removedImagePublicIds, setRemovedImagePublicIds] = useState<string[]>(
     [],
   );
-
-  // watch files
-  //const selectedFiles = form.watch("files");
-
-  // preview selected files
-  //   useEffect(() => {
-  //     if (!selectedFiles?.length) {
-  //       setPreviewUrls([]);
-  //       return;
-  //     }
-
-  //     const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-
-  //     setPreviewUrls(urls);
-
-  //     return () => {
-  //       urls.forEach((url) => URL.revokeObjectURL(url));
-  //     };
-  //   }, [selectedFiles]);
 
   const selectedFiles = useWatch({
     control: form.control,
@@ -361,15 +342,6 @@ const AdminUpdateVariant = ({
                   <ImagePlus className="size-6" />
                 </div>
               </Label>
-
-              {/* {previewUrls.map((url, index) => (
-                <img
-                  key={url}
-                  src={url}
-                  alt={`Preview ${index + 1}`}
-                  className="size-28 rounded-lg border object-cover"
-                />
-              ))} */}
               {selectedFiles?.map((file, index) => (
                 <img
                   key={`${file.name}-${index}`}
