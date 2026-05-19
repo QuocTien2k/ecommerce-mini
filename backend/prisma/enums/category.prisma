@@ -1,0 +1,13 @@
+enum VariantType {
+  NONE //nồi cơm,
+
+  SIZE_COLOR  //giày, dép
+
+  STORAGE //dung lượng
+
+  SPEC  //cấu hình: laptop,....
+
+  SWITCH  //bàn phím, chuột
+
+  CUSTOM 
+}

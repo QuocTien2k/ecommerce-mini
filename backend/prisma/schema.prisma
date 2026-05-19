@@ -8,6 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum VariantType {
+  NONE //nồi cơm,
+
+  SIZE_COLOR  //giày, dép
+
+  STORAGE //dung lượng
+
+  SPEC  //cấu hình: laptop,....
+
+  SWITCH  //bàn phím, chuột
+
+  CUSTOM 
+}
 enum OrderStatus {
   PENDING        // user vừa đặt (chưa xử lý)
   CONFIRMED      // admin xác nhận (hợp lệ, còn hàng)
@@ -113,7 +126,7 @@ model Category {
   description String?
   image       String?
   imagePublicId String?
-  variantType String?
+  variantType   VariantType?
 
   parentId    String?
   parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
