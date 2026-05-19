@@ -40,6 +40,7 @@ export interface FlatCategoryItem {
   level: number;
   isActive: boolean;
   isDeleted?: boolean;
+  variantType: VariantType;
 }
 
 //Action

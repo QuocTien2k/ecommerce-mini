@@ -23,7 +23,10 @@ import {
 } from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
-import { variantTypeOptions } from "@shared/types/variant-type";
+import {
+  variantTypeOptions,
+  variantTypeLabels,
+} from "@shared/types/variant-type";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -48,6 +51,21 @@ export const UpdateCategoryForm = ({
   const selectedFile = form.watch("file");
   const parentId = form.watch("parentId");
   const isActive = form.watch("isActive");
+
+  const selectedParent = flatCategoriesQuery.data?.data.find(
+    (item) => item.id === parentId,
+  );
+
+  const isVariantLocked = category ? !category.canChangeVariantType : false;
+
+  useEffect(() => {
+    if (!selectedParent) return;
+
+    form.setValue("variantType", selectedParent.variantType, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [selectedParent, form]);
 
   //  init form change or open
   useEffect(() => {
@@ -203,6 +221,7 @@ export const UpdateCategoryForm = ({
 
             <Select
               value={form.watch("variantType")}
+              disabled={isVariantLocked || !!selectedParent}
               onValueChange={(value) =>
                 form.setValue("variantType", value as VariantType, {
                   shouldValidate: true,
@@ -221,6 +240,24 @@ export const UpdateCategoryForm = ({
                 ))}
               </SelectContent>
             </Select>
+
+            {/* parent sync info */}
+            {selectedParent && (
+              <p className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-red-700">
+                Variant type được đồng bộ theo danh mục cha:{" "}
+                <span className="font-semibold">
+                  {variantTypeLabels[selectedParent.variantType]}
+                </span>
+              </p>
+            )}
+
+            {/* locked info */}
+            {isVariantLocked && !selectedParent && (
+              <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
+                Không thể đổi variant type khi danh mục đã có sản phẩm hoặc danh
+                mục con
+              </p>
+            )}
 
             {form.formState.errors.variantType && (
               <p className="text-sm text-red-500">
