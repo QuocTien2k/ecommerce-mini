@@ -1,6 +1,9 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useUpdateCategoryForm } from "../forms/use-update-category-form";
-import type { AdminCategoryItem } from "../types/admin-category.type";
+import type {
+  AdminCategoryItem,
+  VariantType,
+} from "../types/admin-category.type";
 import { useEffect, useRef, useState } from "react";
 import { useUpdateCategoryMutation } from "../hooks/useAdminUpdateCategory";
 import { useAdminFlatCategoriesQuery } from "../hooks/useAdminCategoryFlatQuery";
@@ -20,6 +23,7 @@ import {
 } from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
+import { variantTypeOptions } from "@shared/types/variant-type";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -54,6 +58,7 @@ export const UpdateCategoryForm = ({
       description: category.description ?? "",
       parentId: category.parentId ?? undefined,
       isActive: category.isActive,
+      variantType: category.variantType,
       file: undefined,
     });
 
@@ -94,6 +99,7 @@ export const UpdateCategoryForm = ({
               description: values.description,
               parentId: values.parentId || undefined,
               isActive: values.isActive,
+              variantType: values.variantType,
             },
             file: values.file,
           }),
@@ -189,6 +195,38 @@ export const UpdateCategoryForm = ({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* {Loại variant} */}
+          <div className="space-y-2">
+            <Label>Loại variant</Label>
+
+            <Select
+              value={form.watch("variantType")}
+              onValueChange={(value) =>
+                form.setValue("variantType", value as VariantType, {
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn loại variant" />
+              </SelectTrigger>
+
+              <SelectContent className="text-black/50" position="popper">
+                {variantTypeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {form.formState.errors.variantType && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.variantType.message}
+              </p>
+            )}
           </div>
 
           {/* IMAGE */}
