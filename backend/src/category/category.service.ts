@@ -189,6 +189,7 @@ export class CategoryService {
         imagePublicId: publicId,
         parentId: dto.parentId ?? null,
         isActive: dto.isActive ?? true,
+        variantType: dto.variantType,
       },
     });
   }
@@ -375,6 +376,10 @@ export class CategoryService {
         isActive: dto.isActive ?? category.isActive,
         image: imageUrl,
         imagePublicId: publicId,
+        variantType:
+          dto.variantType !== undefined
+            ? dto.variantType
+            : category.variantType,
       },
     });
   }

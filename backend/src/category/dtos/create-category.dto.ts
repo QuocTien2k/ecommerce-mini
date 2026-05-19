@@ -5,7 +5,9 @@ import {
   IsBoolean,
   IsUUID,
   Length,
+  IsEnum,
 } from 'class-validator';
+import { VariantType } from '@prisma/client';
 
 export class CreateCategoryDto {
   @IsString()
@@ -30,4 +32,7 @@ export class CreateCategoryDto {
   @Transform(({ value }) => value === 'true')
   @IsBoolean()
   isActive?: boolean;
+
+  @IsEnum(VariantType)
+  variantType: VariantType;
 }
