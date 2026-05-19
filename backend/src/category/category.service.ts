@@ -43,6 +43,13 @@ export class CategoryService {
         },
       },
     },
+    variantType: true,
+    _count: {
+      select: {
+        children: true,
+        products: true,
+      },
+    },
     isActive: true,
     deletedAt: true,
     createdAt: true,
@@ -528,6 +535,11 @@ export class CategoryService {
       parentId: category.parentId,
 
       parentName: category.parent?.name ?? null,
+
+      variantType: category.variantType,
+
+      canChangeVariantType:
+        category._count.children === 0 && category._count.products === 0,
 
       isActive: category.isActive,
 

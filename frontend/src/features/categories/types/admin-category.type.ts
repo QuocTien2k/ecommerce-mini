@@ -28,6 +28,7 @@ export interface AdminCategoryItem {
   parentId: string | null;
   parentName: string | null;
   variantType: VariantType;
+  canChangeVariantType: boolean;
   isActive: boolean;
   deletedAt: string | null;
   createdAt: string;
