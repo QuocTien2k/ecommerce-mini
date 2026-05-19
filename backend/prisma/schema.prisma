@@ -9,17 +9,17 @@ datasource db {
 }
 
 enum VariantType {
-  NONE //nồi cơm,
+  NONE          //thiết bị gia dụng
 
-  SIZE_COLOR  //giày, dép
+  SIZE_COLOR    //thời trang
 
-  STORAGE //dung lượng
+  STORAGE       //dung lượng: điện thoại, usb
 
-  SPEC  //cấu hình: laptop,....
+  SPEC          //cấu hình: laptop, máy tính
 
-  SWITCH  //bàn phím, chuột
+  SWITCH        //thiết bị: bàn phím, chuột
 
-  CUSTOM 
+  CUSTOM
 }
 enum OrderStatus {
   PENDING        // user vừa đặt (chưa xử lý)
@@ -126,7 +126,7 @@ model Category {
   description String?
   image       String?
   imagePublicId String?
-  variantType   VariantType?
+  variantType   VariantType
 
   parentId    String?
   parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
