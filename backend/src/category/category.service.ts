@@ -179,6 +179,18 @@ export class CategoryService {
         'Không thể đổi variant type khi danh mục có danh mục con',
       );
     }
+
+    const hasProducts = await this.prisma.product.count({
+      where: {
+        categoryId,
+      },
+    });
+
+    if (hasProducts > 0) {
+      throw new BadRequestException(
+        'Không thể đổi variant type khi danh mục đã có sản phẩm',
+      );
+    }
   }
 
   async create(dto: CreateCategoryDto, file: Express.Multer.File) {
@@ -265,6 +277,7 @@ export class CategoryService {
         slug: true,
         parentId: true,
         isActive: true,
+        variantType: true,
         deletedAt: true,
       },
 
@@ -338,6 +351,7 @@ export class CategoryService {
           name: `${node.level > 1 ? '--'.repeat(node.level - 1) + ' ' : ''}${node.name}`,
           level: node.level,
           isActive: node.isActive,
+          variantType: node.variantType,
         });
 
         if (node.children.length > 0) {
