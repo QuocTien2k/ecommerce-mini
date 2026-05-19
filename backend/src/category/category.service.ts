@@ -15,7 +15,7 @@ import {
   buildPaginatedResponse,
   getPagination,
 } from '@common/utils/pagination';
-import { Prisma } from '@prisma/client';
+import { Prisma, VariantType } from '@prisma/client';
 
 @Injectable()
 export class CategoryService {
@@ -136,6 +136,51 @@ export class CategoryService {
     return count > 0;
   }
 
+  //check variantType
+  private async validateVariantTypeWithParent(
+    parentId: string | null | undefined,
+    variantType: VariantType,
+  ) {
+    // root category => allow
+    if (!parentId) return;
+
+    const parent = await this.prisma.category.findUnique({
+      where: { id: parentId },
+      select: {
+        id: true,
+        variantType: true,
+      },
+    });
+
+    if (!parent) {
+      throw new BadRequestException('Không tìm thấy danh mục cha');
+    }
+
+    if (parent.variantType !== variantType) {
+      throw new BadRequestException('Variant type phải giống danh mục cha');
+    }
+  }
+
+  //chống change variant khi có parent
+  private async validateVariantTypeChange(
+    categoryId: string,
+    currentVariantType: VariantType,
+    nextVariantType: VariantType,
+  ) {
+    // không đổi => bỏ qua
+    if (currentVariantType === nextVariantType) {
+      return;
+    }
+
+    const hasChildren = await this.hasChildren(categoryId);
+
+    if (hasChildren) {
+      throw new BadRequestException(
+        'Không thể đổi variant type khi danh mục có danh mục con',
+      );
+    }
+  }
+
   async create(dto: CreateCategoryDto, file: Express.Multer.File) {
     let slug = toSlug(dto.slug || dto.name);
     let uniqueSlug = slug;
@@ -161,6 +206,8 @@ export class CategoryService {
       if (parentLevel >= 3) {
         throw new BadRequestException('Category con vượt quá level 3');
       }
+
+      await this.validateVariantTypeWithParent(dto.parentId, dto.variantType);
     }
 
     let imageUrl: string | null = null;
@@ -313,6 +360,12 @@ export class CategoryService {
       throw new BadRequestException('Không tìm thấy danh mục');
     }
 
+    const finalParentId =
+      dto.parentId !== undefined ? dto.parentId : category.parentId;
+
+    const finalVariantType =
+      dto.variantType !== undefined ? dto.variantType : category.variantType;
+
     // HANDLE PARENT
     if (dto.parentId !== undefined) {
       if (dto.parentId === id) {
@@ -341,6 +394,14 @@ export class CategoryService {
         }
       }
     }
+
+    await this.validateVariantTypeWithParent(finalParentId, finalVariantType);
+
+    await this.validateVariantTypeChange(
+      id,
+      category.variantType,
+      finalVariantType,
+    );
 
     // HANDLE IMAGE
     let imageUrl = category.image;
