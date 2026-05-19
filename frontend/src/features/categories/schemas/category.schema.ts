@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VARIANT_TYPES } from "../types/admin-category.type";
 
 // reusable file
 const imageFileSchema = z
@@ -25,6 +26,20 @@ const categoryBaseSchema = z.object({
   parentId: z.string().optional(),
 
   isActive: z.boolean(),
+
+  variantType: z.enum(
+    [
+      VARIANT_TYPES.NONE,
+      VARIANT_TYPES.SIZE_COLOR,
+      VARIANT_TYPES.STORAGE,
+      VARIANT_TYPES.SPEC,
+      VARIANT_TYPES.SWITCH,
+      VARIANT_TYPES.CUSTOM,
+    ],
+    {
+      message: "Loại variant không hợp lệ",
+    },
+  ),
 });
 
 // create

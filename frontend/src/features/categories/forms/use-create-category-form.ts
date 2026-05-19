@@ -5,6 +5,7 @@ import {
   createCategorySchema,
   type CreateCategoryFormValues,
 } from "../schemas/category.schema";
+import { VARIANT_TYPES } from "../types/admin-category.type";
 
 export const useCreateCategoryForm = () => {
   return useForm<CreateCategoryFormValues>({
@@ -15,6 +16,7 @@ export const useCreateCategoryForm = () => {
       description: "",
       parentId: undefined,
       isActive: true,
+      variantType: VARIANT_TYPES.NONE,
       file: undefined,
     },
   });

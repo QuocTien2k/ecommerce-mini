@@ -1,3 +1,14 @@
+export const VARIANT_TYPES = {
+  NONE: "NONE",
+  SIZE_COLOR: "SIZE_COLOR",
+  STORAGE: "STORAGE",
+  SPEC: "SPEC",
+  SWITCH: "SWITCH",
+  CUSTOM: "CUSTOM",
+} as const;
+
+export type VariantType = (typeof VARIANT_TYPES)[keyof typeof VARIANT_TYPES];
+
 export interface AdminCategoryQueryParams {
   search?: string;
   isActive?: boolean;
@@ -16,7 +27,7 @@ export interface AdminCategoryItem {
   description: string | null;
   parentId: string | null;
   parentName: string | null;
-
+  variantType: VariantType;
   isActive: boolean;
   deletedAt: string | null;
   createdAt: string;
@@ -37,6 +48,7 @@ export interface CreateCategoryDto {
   description?: string;
   parentId?: string;
   isActive?: boolean;
+  variantType: VariantType;
 }
 
 export type UpdateCategoryDto = Partial<CreateCategoryDto>;
