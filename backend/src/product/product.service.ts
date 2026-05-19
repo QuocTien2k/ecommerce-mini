@@ -414,7 +414,7 @@ export class ProductService {
       where: { id: productId },
       include: {
         category: {
-          select: { id: true, name: true, slug: true },
+          select: { id: true, name: true, slug: true, variantType: true },
         },
         creator: { select: { id: true, fullname: true } },
       },
