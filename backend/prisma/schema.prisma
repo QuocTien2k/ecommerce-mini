@@ -113,6 +113,7 @@ model Category {
   description String?
   image       String?
   imagePublicId String?
+  variantType String?
 
   parentId    String?
   parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
