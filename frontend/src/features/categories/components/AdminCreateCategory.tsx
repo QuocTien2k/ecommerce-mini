@@ -20,6 +20,8 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { AsyncButton } from "@components/common/async-button";
 import { toSlug } from "@/utils/toSlug";
+import type { VariantType } from "../types/admin-category.type";
+import { variantTypeOptions } from "@shared/types/variant-type";
 
 type CreateCategoryFormProps = {
   open: boolean;
@@ -86,6 +88,8 @@ export const CreateCategoryForm = ({
               parentId: values.parentId || undefined,
 
               isActive: values.isActive,
+
+              variantType: values.variantType,
             },
 
             file: values.file,
@@ -138,6 +142,7 @@ export const CreateCategoryForm = ({
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
+          {/* {Tên danh mục} */}
           <div className="space-y-2">
             <Label>Tên danh mục</Label>
 
@@ -159,6 +164,7 @@ export const CreateCategoryForm = ({
             )}
           </div>
 
+          {/* {Mô tả} */}
           <div className="space-y-2">
             <Label>Mô tả</Label>
 
@@ -174,6 +180,7 @@ export const CreateCategoryForm = ({
             )}
           </div>
 
+          {/* {Chọn danh mục cha} */}
           <div className="space-y-2">
             <Label>Danh mục cha</Label>
 
@@ -201,6 +208,39 @@ export const CreateCategoryForm = ({
             </Select>
           </div>
 
+          {/* {Loại variant} */}
+          <div className="space-y-2">
+            <Label>Loại variant</Label>
+
+            <Select
+              value={form.watch("variantType")}
+              onValueChange={(value) =>
+                form.setValue("variantType", value as VariantType, {
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn loại variant" />
+              </SelectTrigger>
+
+              <SelectContent className="text-black/50" position="popper">
+                {variantTypeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {form.formState.errors.variantType && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.variantType.message}
+              </p>
+            )}
+          </div>
+
+          {/* {Ảnh danh mục} */}
           <div className="space-y-3">
             <Label>Ảnh danh mục</Label>
 
@@ -267,6 +307,7 @@ export const CreateCategoryForm = ({
             )}
           </div>
 
+          {/* {Hoạt động} */}
           <div className="flex items-center gap-3">
             <Checkbox
               checked={form.watch("isActive")}
