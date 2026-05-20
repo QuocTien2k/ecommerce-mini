@@ -35,6 +35,11 @@ const AdminCategoryPage = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedCategory, setSelectedCategory] =
     useState<AdminCategoryItem | null>(null);
+
+  const handleCloseUpdate = () => {
+    setOpenUpdate(false);
+    setSelectedCategory(null);
+  };
   const { loading, run } = useScopedLoading();
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
@@ -292,11 +297,13 @@ const AdminCategoryPage = () => {
         onClose={() => setOpenCreate(false)}
       />
 
-      <UpdateCategoryForm
-        open={openUpdate}
-        onClose={() => setOpenUpdate(false)}
-        category={selectedCategory}
-      />
+      {openUpdate && selectedCategory && (
+        <UpdateCategoryForm
+          open={openUpdate}
+          onClose={handleCloseUpdate}
+          category={selectedCategory}
+        />
+      )}
     </QueryStateWrapper>
   );
 };

@@ -1,8 +1,8 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useUpdateCategoryForm } from "../forms/use-update-category-form";
-import type {
-  AdminCategoryItem,
-  VariantType,
+import {
+  type AdminCategoryItem,
+  type VariantType,
 } from "../types/admin-category.type";
 import { useEffect, useRef, useState } from "react";
 import { useUpdateCategoryMutation } from "../hooks/useAdminUpdateCategory";
@@ -27,6 +27,7 @@ import {
   variantTypeOptions,
   variantTypeLabels,
 } from "@shared/types/variant-type";
+import { useWatch } from "react-hook-form";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -39,26 +40,47 @@ export const UpdateCategoryForm = ({
   onClose,
   category,
 }: UpdateCategoryFormProps) => {
+  if (!open || !category) return null;
+
   const form = useUpdateCategoryForm();
 
   const { loading, run } = useScopedLoading();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInitializingRef = useRef(false);
+  const [isFormReady, setIsFormReady] = useState(false);
 
   const updateMutation = useUpdateCategoryMutation();
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
 
   const selectedFile = form.watch("file");
-  const parentId = form.watch("parentId");
-  const isActive = form.watch("isActive");
+  // const parentId = form.watch("parentId");
+  // const isActive = form.watch("isActive");
+
+  const parentId = useWatch({
+    control: form.control,
+    name: "parentId",
+  });
+
+  const isActive = useWatch({
+    control: form.control,
+    name: "isActive",
+  });
+
+  const variantType = useWatch({
+    control: form.control,
+    name: "variantType",
+  });
 
   const selectedParent = flatCategoriesQuery.data?.data.find(
     (item) => item.id === parentId,
   );
 
   const isVariantLocked = category ? !category.canChangeVariantType : false;
+  const isReady = open && !!category && flatCategoriesQuery.isSuccess;
 
   useEffect(() => {
+    if (isInitializingRef.current) return;
     if (!selectedParent) return;
 
     form.setValue("variantType", selectedParent.variantType, {
@@ -69,7 +91,10 @@ export const UpdateCategoryForm = ({
 
   //  init form change or open
   useEffect(() => {
-    if (!category) return;
+    if (!isReady || !category) return;
+
+    isInitializingRef.current = true;
+    setIsFormReady(false);
 
     form.reset({
       name: category.name,
@@ -81,7 +106,12 @@ export const UpdateCategoryForm = ({
     });
 
     setPreviewUrl(category.image);
-  }, [category, form]);
+
+    queueMicrotask(() => {
+      isInitializingRef.current = false;
+      setIsFormReady(true);
+    });
+  }, [isReady, category, form]);
 
   // file preview
   useEffect(() => {
@@ -94,6 +124,7 @@ export const UpdateCategoryForm = ({
   }, [selectedFile]);
 
   const handleClose = () => {
+    isInitializingRef.current = false;
     form.reset();
     setPreviewUrl(null);
 
@@ -137,8 +168,7 @@ export const UpdateCategoryForm = ({
     }
   });
 
-  if (!open || !category) return null;
-
+  console.log(category.variantType);
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
@@ -218,28 +248,29 @@ export const UpdateCategoryForm = ({
           {/* {Loại variant} */}
           <div className="space-y-2">
             <Label>Loại variant</Label>
+            {isFormReady && (
+              <Select
+                value={variantType}
+                disabled={isVariantLocked || !!selectedParent}
+                onValueChange={(value) =>
+                  form.setValue("variantType", value as VariantType, {
+                    shouldValidate: true,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn loại variant" />
+                </SelectTrigger>
 
-            <Select
-              value={form.watch("variantType")}
-              disabled={isVariantLocked || !!selectedParent}
-              onValueChange={(value) =>
-                form.setValue("variantType", value as VariantType, {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn loại variant" />
-              </SelectTrigger>
-
-              <SelectContent className="text-black/50" position="popper">
-                {variantTypeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectContent className="text-black/50" position="popper">
+                  {variantTypeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             {/* parent sync info */}
             {selectedParent && (
