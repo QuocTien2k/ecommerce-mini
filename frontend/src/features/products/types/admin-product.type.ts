@@ -1,3 +1,4 @@
+import type { VariantType } from "@features/categories/types/admin-category.type";
 import type { AdminVariantResponse } from "./admin-variant.type";
 
 export type AdminProductListQueryParams = {
@@ -61,6 +62,7 @@ export type AdminProductDetail = {
     id: string;
     name: string;
     slug: string;
+    variantType: VariantType;
   };
 
   creator: {

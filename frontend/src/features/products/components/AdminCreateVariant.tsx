@@ -9,25 +9,21 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 import { AsyncButton } from "@components/common/async-button";
+import type { VariantType } from "@features/categories/types/admin-category.type";
 
 type CreateVariantFormProp = {
   open: boolean;
   onClose: () => void;
   productId: string;
+  variantType: VariantType;
 };
 
 const AdminCreateVariant = ({
   open,
   onClose,
   productId,
+  variantType,
 }: CreateVariantFormProp) => {
   const form = useAdminCreateVariantForm();
   const { loading, run } = useScopedLoading();
@@ -107,6 +103,20 @@ const AdminCreateVariant = ({
     },
   );
 
+  const variantFieldMap: Record<VariantType, React.ReactNode> = {
+    NONE: null,
+
+    SIZE_COLOR: <SizeColorVariantFields form={form} />,
+
+    STORAGE: <StorageVariantFields form={form} />,
+
+    SPEC: <SpecVariantFields form={form} />,
+
+    SWITCH: <SwitchVariantFields form={form} />,
+
+    CUSTOM: <CustomVariantFields form={form} />,
+  };
+
   if (!open || !productId) return null;
 
   return (
@@ -162,30 +172,7 @@ const AdminCreateVariant = ({
               )}
             </div>
 
-            {/* size */}
-            <div className="space-y-2">
-              <Label>Size</Label>
-
-              <Select
-                value={String(form.watch("attributes.size") || "")}
-                onValueChange={(value) =>
-                  form.setValue("attributes.size", value, {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn size" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="S">S</SelectItem>
-                  <SelectItem value="M">M</SelectItem>
-                  <SelectItem value="L">L</SelectItem>
-                  <SelectItem value="XL">XL</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {variantFieldMap[variantType]}
 
             {/* stock */}
             <div className="space-y-2">
