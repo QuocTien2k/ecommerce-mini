@@ -19,6 +19,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { CreateProductForm } from "./components/AdminCreateProduct";
 import { Link } from "react-router-dom";
+import AdminUpdateProduct from "./components/AdminUpdateProduct";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -31,7 +32,7 @@ const AdminProductPage = () => {
   const [selectedProduct, setSelectedProduct] =
     useState<AdminProductListItem | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const { loading, run } = useScopedLoading();
+  const { loading } = useScopedLoading();
 
   const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
   const { data: flatData } = useAdminFlatCategoriesQuery();
@@ -290,6 +291,18 @@ const AdminProductPage = () => {
       <CreateProductForm
         open={openCreate}
         onClose={() => setOpenCreate(false)}
+      />
+
+      <AdminUpdateProduct
+        open={openUpdate}
+        onOpenChange={(value) => {
+          setOpenUpdate(value);
+
+          if (!value) {
+            setSelectedProduct(null);
+          }
+        }}
+        product={selectedProduct}
       />
     </QueryStateWrapper>
   );
