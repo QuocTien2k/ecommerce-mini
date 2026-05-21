@@ -113,3 +113,46 @@ export type AdminCreateProductResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type AdminUpdateProductPayload = {
+  name?: string;
+
+  slug?: string;
+
+  description?: string;
+
+  price?: number;
+
+  // undefined => giữ nguyên
+  // null => xóa discount
+  // number => cập nhật
+  discountPct?: number | null;
+
+  isActive?: boolean;
+
+  categoryId?: string;
+};
+
+export type AdminUpdateProductResponse = {
+  id: string;
+
+  name: string;
+  slug: string;
+  description: string | null;
+
+  price: string;
+  discountPrice: string | null;
+  discountPct: number | null;
+
+  ratingAvg: number | null;
+  ratingCount: number;
+
+  isActive: boolean;
+
+  categoryId: string;
+
+  creatorId: string;
+
+  createdAt: string;
+  updatedAt: string;
+};

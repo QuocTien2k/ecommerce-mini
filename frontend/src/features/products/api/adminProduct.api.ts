@@ -7,6 +7,8 @@ import type {
   AdminProductListItem,
   AdminProductListQueryParams,
   AdminCreateProductPayload,
+  AdminUpdateProductPayload,
+  AdminUpdateProductResponse,
 } from "../types/admin-product.type";
 
 export const adminProductApi = {
@@ -22,4 +24,10 @@ export const adminProductApi = {
     dto: AdminCreateProductPayload,
   ): ApiResult<AdminCreateProductResponse> =>
     api.post("/admin/product/create", dto),
+
+  update: (
+    id: string,
+    dto: AdminUpdateProductPayload,
+  ): ApiResult<AdminUpdateProductResponse> =>
+    api.patch(`/admin/product/${id}`, dto),
 };

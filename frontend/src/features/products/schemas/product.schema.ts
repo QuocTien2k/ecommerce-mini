@@ -22,7 +22,7 @@ const productBaseSchema = z.object({
 
   price: z.coerce
     .number()
-    .int("Gi giá phải là số nguyên")
+    .int("Giá phải là số nguyên")
     .min(0, "Giá sản phẩm không hợp lệ"),
 
   discountPct: z.coerce
@@ -43,3 +43,18 @@ export const createProductSchema = productBaseSchema;
 export type CreateProductFormValues = z.input<typeof createProductSchema>;
 
 export type CreateProductFormOutput = z.output<typeof createProductSchema>;
+
+// update
+export const updateProductSchema = productBaseSchema.partial().extend({
+  discountPct: z
+    .union([
+      z.coerce.number().int("Phần trăm giảm phải là số nguyên").min(1).max(100),
+
+      z.null(),
+    ])
+    .optional(),
+});
+
+export type UpdateProductFormValues = z.input<typeof updateProductSchema>;
+
+export type UpdateProductFormOutput = z.output<typeof updateProductSchema>;

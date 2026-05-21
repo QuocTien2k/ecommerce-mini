@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAdminUpdateVariantForm } from "../forms/use-admin-update-vairant-form";
-import { useAdminUpdateVariant } from "../hooks/useAdminUpdateVariant";
+import { useAdminUpdateVariant } from "../hooks/useAdminUpdateProduct";
 import type { AdminVariantResponse } from "../types/admin-variant.type";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import type { UpdateProductVariantFormOutput } from "../schemas/product-variant.schema";
