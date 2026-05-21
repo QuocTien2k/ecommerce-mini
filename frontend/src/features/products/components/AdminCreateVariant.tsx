@@ -11,6 +11,7 @@ import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { AsyncButton } from "@components/common/async-button";
 import type { VariantType } from "@features/categories/types/admin-category.type";
+import { VariantFieldRenderer } from "./vairant-render/Variant-Field-Render";
 
 type CreateVariantFormProp = {
   open: boolean;
@@ -103,20 +104,6 @@ const AdminCreateVariant = ({
     },
   );
 
-  const variantFieldMap: Record<VariantType, React.ReactNode> = {
-    NONE: null,
-
-    SIZE_COLOR: <SizeColorVariantFields form={form} />,
-
-    STORAGE: <StorageVariantFields form={form} />,
-
-    SPEC: <SpecVariantFields form={form} />,
-
-    SWITCH: <SwitchVariantFields form={form} />,
-
-    CUSTOM: <CustomVariantFields form={form} />,
-  };
-
   if (!open || !productId) return null;
 
   return (
@@ -155,7 +142,7 @@ const AdminCreateVariant = ({
 
         <form onSubmit={onSubmit} className="space-y-6">
           {/* variant info */}
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5">
             {/* color */}
             <div className="space-y-2">
               <Label>Màu sắc</Label>
@@ -172,7 +159,7 @@ const AdminCreateVariant = ({
               )}
             </div>
 
-            {variantFieldMap[variantType]}
+            <VariantFieldRenderer variantType={variantType} form={form} />
 
             {/* stock */}
             <div className="space-y-2">

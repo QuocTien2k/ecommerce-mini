@@ -33,11 +33,17 @@ const productVariantBaseSchema = z.object({
     .optional(),
 });
 
-// create
-export const createProductVariantSchema = productVariantBaseSchema.extend({
-  files: variantImagesSchema,
+// shared form schema
+export const variantFormSchema = productVariantBaseSchema.extend({
+  files: z.array(z.instanceof(File)).optional(),
+
+  removeImagePublicIds: z.array(z.string()).optional(),
 });
 
+// create
+export const createProductVariantSchema = variantFormSchema.extend({
+  files: variantImagesSchema,
+});
 export type CreateProductVariantFormValues = z.input<
   typeof createProductVariantSchema
 >;
@@ -47,19 +53,11 @@ export type CreateProductVariantFormOutput = z.output<
 >;
 
 // update
-export const updateVariantImagesSchema = z
-  .array(z.instanceof(File))
-  .max(2, "Tối đa 2 ảnh")
-  .optional();
+export const updateProductVariantSchema = variantFormSchema.extend({
+  files: z.array(z.instanceof(File)).max(2, "Tối đa 2 ảnh").optional(),
 
-export const updateProductVariantSchema = productVariantBaseSchema
-  .partial()
-  .extend({
-    files: updateVariantImagesSchema.optional(),
-
-    removeImagePublicIds: z.array(z.string()).optional(),
-  });
-
+  removeImagePublicIds: z.array(z.string()).optional(),
+});
 export type UpdateProductVariantFormValues = z.input<
   typeof updateProductVariantSchema
 >;

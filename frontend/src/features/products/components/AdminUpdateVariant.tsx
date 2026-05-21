@@ -10,16 +10,11 @@ import { Button } from "@components/ui/button";
 import { ImagePlus, Trash2, Undo2, X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 import { AsyncButton } from "@components/common/async-button";
 import { cn } from "@lib/utils";
 import { useWatch } from "react-hook-form";
+import type { VariantType } from "@features/categories/types/admin-category.type";
+import { VariantFieldRenderer } from "./vairant-render/Variant-Field-Render";
 
 type AdminUpdateVariantProps = {
   open: boolean;
@@ -27,6 +22,7 @@ type AdminUpdateVariantProps = {
 
   productId: string;
   variant: AdminVariantResponse;
+  variantType: VariantType;
 };
 
 const AdminUpdateVariant = ({
@@ -34,6 +30,7 @@ const AdminUpdateVariant = ({
   onClose,
   productId,
   variant,
+  variantType,
 }: AdminUpdateVariantProps) => {
   const form = useAdminUpdateVariantForm(variant);
 
@@ -195,7 +192,7 @@ const AdminUpdateVariant = ({
 
         <form onSubmit={onSubmit} className="space-y-6">
           {/* variant info */}
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5">
             {/* color */}
             <div className="space-y-2">
               <Label>Màu sắc</Label>
@@ -212,30 +209,7 @@ const AdminUpdateVariant = ({
               )}
             </div>
 
-            {/* size */}
-            <div className="space-y-2">
-              <Label>Size</Label>
-
-              <Select
-                value={String(form.watch("attributes.size") || "")}
-                onValueChange={(value) =>
-                  form.setValue("attributes.size", value, {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn size" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="S">S</SelectItem>
-                  <SelectItem value="M">M</SelectItem>
-                  <SelectItem value="L">L</SelectItem>
-                  <SelectItem value="XL">XL</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <VariantFieldRenderer variantType={variantType} form={form} />
 
             {/* stock */}
             <div className="space-y-2">

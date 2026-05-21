@@ -42,7 +42,7 @@ const AdminProductDetail = () => {
     return "text-green-600";
   };
 
-  console.log("Data trả về: ", data?.category.variantType);
+  //console.log("Data trả về: ", data?.category.variantType);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -253,6 +253,7 @@ const AdminProductDetail = () => {
                     onClose={() => setSelectedVariant(null)}
                     productId={id!}
                     variant={selectedVariant}
+                    variantType={data?.category.variantType}
                   />
                 )}
               </div>
