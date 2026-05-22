@@ -16,6 +16,7 @@ import { NotificationModule } from './notification/notification.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { PaymentModule } from './payment/payment.module';
 import { RatingModule } from './rating/rating.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { RatingModule } from './rating/rating.module';
     VoucherModule,
     PaymentModule,
     RatingModule,
+    BrandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

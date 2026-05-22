@@ -20,6 +20,9 @@ model Product {
   creatorId     String
   creator       User   @relation("UserProducts", fields: [creatorId], references: [id])
 
+  brandId       String
+  brand         Brand    @relation(fields: [brandId], references: [id])
+
   variants      ProductVariant[]
   ratings       Rating[]
   cartItems     CartItem[]
