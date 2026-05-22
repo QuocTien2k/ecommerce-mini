@@ -96,6 +96,7 @@ model Brand {
   slug      String   @unique
 
   isActive  Boolean  @default(true)
+  deletedAt DateTime?
 
   products  Product[]
 

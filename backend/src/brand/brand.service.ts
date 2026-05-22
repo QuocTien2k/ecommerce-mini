@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -62,19 +63,47 @@ export class BrandService {
     });
   }
 
-  async toggleActive(id: string, isActive: boolean) {
+  async softDelete(id: string) {
     const brand = await this.prisma.brand.findUnique({
       where: { id },
-      select: { id: true },
     });
 
     if (!brand) {
       throw new NotFoundException('Brand không tồn tại');
     }
 
+    if (brand.deletedAt) {
+      throw new BadRequestException('Brand đã bị xoá trước đó');
+    }
+
     return this.prisma.brand.update({
       where: { id },
-      data: { isActive },
+      data: {
+        deletedAt: new Date(),
+        isActive: false,
+      },
+    });
+  }
+
+  async restore(id: string) {
+    const brand = await this.prisma.brand.findUnique({
+      where: { id },
+    });
+
+    if (!brand) {
+      throw new NotFoundException('Brand không tồn tại');
+    }
+
+    if (!brand.deletedAt) {
+      throw new BadRequestException('Brand chưa bị xoá');
+    }
+
+    return this.prisma.brand.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+        isActive: true,
+      },
     });
   }
 }
