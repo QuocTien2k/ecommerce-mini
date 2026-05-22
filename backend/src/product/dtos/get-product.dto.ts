@@ -20,7 +20,12 @@ export class GetProductsQueryDto {
   @IsString()
   categoryId?: string;
 
-  // cho admin dugn2
+  // filter brand
+  @IsOptional()
+  @IsString()
+  brandId?: string;
+
+  // cho admin dùng
   @IsOptional()
   @Transform(({ value }) => value === 'true')
   isActive?: boolean;
@@ -42,6 +47,7 @@ export class ProductListItemDto {
   isActive: boolean;
 
   categoryId: string;
+  brandId: string;
 
   createdAt: Date;
   updatedAt: Date;

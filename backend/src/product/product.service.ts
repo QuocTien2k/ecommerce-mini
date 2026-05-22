@@ -56,7 +56,16 @@ export class ProductService {
     });
 
     if (!category) {
-      throw new BadRequestException('Category không tồn tại!');
+      throw new BadRequestException('Danh mục không tồn tại!');
+    }
+
+    //check brand
+    const brand = await this.prisma.brand.findUnique({
+      where: { id: dto.brandId },
+    });
+
+    if (!brand) {
+      throw new BadRequestException('Thương hiệu không tồn tại!');
     }
 
     //discount input
@@ -88,6 +97,7 @@ export class ProductService {
             isActive: dto.isActive ?? true,
 
             categoryId: dto.categoryId,
+            brandId: dto.brandId,
             creatorId: userId,
           },
         });
@@ -129,6 +139,17 @@ export class ProductService {
       }
     }
 
+    //Validate brand
+    if (dto.brandId) {
+      const brand = await this.prisma.brand.findUnique({
+        where: { id: dto.brandId },
+      });
+
+      if (!brand) {
+        throw new BadRequestException('Brand không tồn tại!');
+      }
+    }
+
     //undefinded => giữ disocunt, null=> xóa, number => cập nhật
     const price = dto.price ?? Number(existing.price);
 
@@ -164,6 +185,7 @@ export class ProductService {
       isActive: dto.isActive ?? existing.isActive,
 
       categoryId: dto.categoryId ?? existing.categoryId,
+      brandId: dto.brandId ?? existing.brandId,
     };
 
     //Handle slug
