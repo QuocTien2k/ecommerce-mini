@@ -8,6 +8,12 @@ import { PrismaService } from '@prisma/prisma.service';
 import { CreateBrandDto } from './dtos/create-brand.dto';
 import { toSlug } from '@common/utils/slug';
 import { UpdateBrandDto } from './dtos/update-brand.dto';
+import {
+  buildPaginatedResponse,
+  getPagination,
+} from '@common/utils/pagination';
+import { GetBrandDto } from './dtos/get-brand.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class BrandService {
@@ -105,5 +111,54 @@ export class BrandService {
         isActive: true,
       },
     });
+  }
+
+  async findAll(query: GetBrandDto) {
+    const { page, limit, skip } = getPagination(query);
+
+    const where: Prisma.BrandWhereInput = {
+      deletedAt: null,
+    };
+
+    if (query.name) {
+      where.name = {
+        contains: query.name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (query.isActive !== undefined) {
+      where.isActive = query.isActive;
+    }
+
+    if (query.fromDate || query.toDate) {
+      where.createdAt = {
+        ...(query.fromDate && {
+          gte: new Date(query.fromDate),
+        }),
+
+        ...(query.toDate && {
+          lte: new Date(query.toDate),
+        }),
+      };
+    }
+
+    const [brands, total] = await this.prisma.$transaction([
+      this.prisma.brand.findMany({
+        where,
+        skip,
+        take: limit,
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+
+      this.prisma.brand.count({
+        where,
+      }),
+    ]);
+
+    return buildPaginatedResponse(brands, total, page, limit);
   }
 }
