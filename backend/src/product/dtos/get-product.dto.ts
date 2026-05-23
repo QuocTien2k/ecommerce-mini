@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, IsNumberString } from 'class-validator';
+import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
 
 export class GetProductsQueryDto {
   @IsOptional()
@@ -24,6 +24,10 @@ export class GetProductsQueryDto {
   @IsOptional()
   @IsString()
   brandId?: string;
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  priceSort?: 'asc' | 'desc';
 
   // cho admin dùng
   @IsOptional()

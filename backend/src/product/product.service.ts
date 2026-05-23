@@ -259,9 +259,15 @@ export class ProductService {
       where.categoryId = query.categoryId;
     }
 
-    if (query.search?.trim()) {
+    if (query.brandId) {
+      where.brandId = query.brandId;
+    }
+
+    const search = query.search?.trim();
+
+    if (search) {
       where.name = {
-        contains: query.search,
+        contains: search,
         mode: 'insensitive',
       };
     }
@@ -271,9 +277,9 @@ export class ProductService {
         where,
         skip,
         take: limit,
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: query.priceSort
+          ? { price: query.priceSort }
+          : { createdAt: 'desc' },
         select: {
           id: true,
           name: true,
@@ -290,6 +296,7 @@ export class ProductService {
           isActive: true,
 
           categoryId: true,
+          brandId: true,
 
           createdAt: true,
           updatedAt: true,
@@ -376,9 +383,15 @@ export class ProductService {
       where.categoryId = query.categoryId;
     }
 
-    if (query.search?.trim()) {
+    if (query.brandId) {
+      where.brandId = query.brandId;
+    }
+
+    const search = query.search?.trim();
+
+    if (search) {
       where.name = {
-        contains: query.search.trim(),
+        contains: search,
         mode: 'insensitive',
       };
     }
@@ -393,9 +406,10 @@ export class ProductService {
         where,
         skip,
         take: limit,
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: query.priceSort
+          ? { price: query.priceSort }
+          : { createdAt: 'desc' },
+
         select: {
           id: true,
           name: true,
@@ -411,6 +425,7 @@ export class ProductService {
 
           isActive: true,
           categoryId: true,
+          brandId: true,
 
           createdAt: true,
           updatedAt: true,
