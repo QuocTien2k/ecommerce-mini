@@ -17,3 +17,11 @@ export interface AdminBrandItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateBrandPayload {
+  name: string;
+  slug?: string;
+  isActive?: boolean;
+}
+
+export type CreateBrandResponse = AdminBrandItem;
