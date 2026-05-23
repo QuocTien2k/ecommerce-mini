@@ -30,6 +30,8 @@ export class AdminService {
       keyword: query.keyword?.trim(),
       isActive: this.parseBoolean(query.isActive),
       role: query.role,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
     };
   }
 
@@ -68,13 +70,16 @@ export class AdminService {
 
     const filters = this.extractFilters(query);
     const where = this.buildUserWhere(filters);
+    const orderBy: Prisma.UserOrderByWithRelationInput = filters.sortBy
+      ? { [filters.sortBy]: filters.sortOrder ?? 'desc' }
+      : { createdAt: 'desc' };
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
       }),
       this.prisma.user.count({ where }),
     ]);
