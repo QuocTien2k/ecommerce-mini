@@ -1,5 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Package, FolderTree } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Package,
+  FolderTree,
+  BadgeCheck,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type NavItem = {
@@ -13,6 +19,7 @@ const navItems: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/users", label: "Quản lý người dùng", icon: Users },
   { to: "/admin/categories", label: "Quản lý danh mục", icon: FolderTree },
+  { to: "/admin/brands", label: "Quản lý thương hiệu", icon: BadgeCheck },
   { to: "/admin/products", label: "Quản lý sản phẩm", icon: Package },
 ];
 
