@@ -6,7 +6,7 @@ import {
   Length,
 } from 'class-validator';
 
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class GetBrandDto {
   @IsOptional()
@@ -15,7 +15,11 @@ export class GetBrandDto {
   name?: string;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   isActive?: boolean;
 

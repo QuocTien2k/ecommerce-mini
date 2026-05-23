@@ -11,9 +11,9 @@ export interface AdminBrandItem {
   id: string;
   name: string;
   slug: string;
-  logo?: string | null;
   description?: string | null;
   isActive: boolean;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
