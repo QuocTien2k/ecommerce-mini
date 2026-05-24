@@ -6,6 +6,8 @@ import type {
   AdminBrandQueryParams,
   CreateBrandPayload,
   CreateBrandResponse,
+  UpdateBrandPayload,
+  UpdateBrandResponse,
 } from "../types/admin-brand.type";
 
 export const adminBrand = {
@@ -16,4 +18,9 @@ export const adminBrand = {
 
   create: (payload: CreateBrandPayload): ApiResult<CreateBrandResponse> =>
     api.post("/brands/create", payload),
+
+  update: (
+    id: string,
+    payload: UpdateBrandPayload,
+  ): ApiResult<UpdateBrandResponse> => api.patch(`/brands/${id}`, payload),
 };

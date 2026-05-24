@@ -23,5 +23,10 @@ export interface CreateBrandPayload {
   slug?: string;
   isActive?: boolean;
 }
+export interface UpdateBrandPayload {
+  name?: string;
+  isActive?: boolean;
+}
 
 export type CreateBrandResponse = AdminBrandItem;
+export type UpdateBrandResponse = AdminBrandItem;
