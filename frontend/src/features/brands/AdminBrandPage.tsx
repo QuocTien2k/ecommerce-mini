@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { Badge } from "@components/ui/badge";
 import CopyableText from "@components/common/copyable-text";
 import AminCreateBrand from "./components/AminCreateBrand";
+import AdminUpdateBrand from "./components/AdminUpdateBrand";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -31,6 +32,11 @@ const AdminBrandPage = () => {
   const { page, setPage, filters, filterActions, queryParams, resetFilters } =
     useAdminBrandFilter();
   const { data, isLoading, isFetching } = useAdminBrandQuery(queryParams);
+
+  const handleCloseUpdate = () => {
+    setOpenUpdate(false);
+    setSelectedBrand(null);
+  };
 
   const handleToggleDelete = async (brandId: string, isDeleted: boolean) => {};
 
@@ -203,6 +209,14 @@ const AdminBrandPage = () => {
           <AminCreateBrand
             open={openCreate}
             onClose={() => setOpenCreate(false)}
+          />
+        )}
+
+        {openUpdate && selectedBrand && (
+          <AdminUpdateBrand
+            open={openUpdate}
+            onClose={handleCloseUpdate}
+            brand={selectedBrand}
           />
         )}
 
