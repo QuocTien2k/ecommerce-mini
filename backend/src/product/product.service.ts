@@ -77,7 +77,7 @@ export class ProductService {
     }
 
     //Slug
-    const baseSlug = toSlug(dto.slug || dto.name);
+    const baseSlug = toSlug(dto.name);
     let attempt = 0;
 
     while (attempt < 5) {

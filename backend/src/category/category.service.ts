@@ -201,7 +201,7 @@ export class CategoryService {
   }
 
   async create(dto: CreateCategoryDto, file: Express.Multer.File) {
-    let slug = toSlug(dto.slug || dto.name);
+    let slug = toSlug(dto.name);
     let uniqueSlug = slug;
     let counter = 1;
 

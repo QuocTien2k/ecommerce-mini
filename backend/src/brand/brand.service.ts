@@ -20,7 +20,7 @@ export class BrandService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateBrandDto) {
-    const baseSlug = toSlug(dto.slug || dto.name);
+    const baseSlug = toSlug(dto.name);
     let attempt = 0;
 
     while (attempt < 5) {
