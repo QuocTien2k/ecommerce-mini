@@ -14,6 +14,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { format } from "date-fns";
 import { Badge } from "@components/ui/badge";
 import CopyableText from "@components/common/copyable-text";
+import AminCreateBrand from "./components/AminCreateBrand";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -197,6 +198,13 @@ const AdminBrandPage = () => {
             </tbody>
           </table>
         </div>
+
+        {openCreate && (
+          <AminCreateBrand
+            open={openCreate}
+            onClose={() => setOpenCreate(false)}
+          />
+        )}
 
         {/* Pagination */}
         <AppPagination
