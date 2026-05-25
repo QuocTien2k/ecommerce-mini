@@ -11,6 +11,9 @@ export type AdminProductListQueryParams = {
   // filter by category
   categoryId?: string;
 
+  // filter by brand
+  brandId?: string;
+
   // admin filter active status
   isActive?: boolean;
 };
@@ -32,6 +35,7 @@ export type AdminProductListItem = {
   isActive: boolean;
 
   categoryId: string;
+  brandId: string;
 
   createdAt: string;
   updatedAt: string;
@@ -54,6 +58,7 @@ export type AdminProductDetail = {
   isActive: boolean;
 
   categoryId: string;
+  brandId: string;
 
   createdAt: string;
   updatedAt: string;
@@ -63,6 +68,12 @@ export type AdminProductDetail = {
     name: string;
     slug: string;
     variantType: VariantType;
+  };
+
+  brand?: {
+    id: string;
+    name: string;
+    slug: string;
   };
 
   creator: {
@@ -88,6 +99,8 @@ export type AdminCreateProductPayload = {
   isActive?: boolean;
 
   categoryId: string;
+
+  brandId: string;
 };
 
 export type AdminCreateProductResponse = {
@@ -107,6 +120,7 @@ export type AdminCreateProductResponse = {
   isActive: boolean;
 
   categoryId: string;
+  brandId: string;
 
   creatorId: string;
 
@@ -131,6 +145,7 @@ export type AdminUpdateProductPayload = {
   isActive?: boolean;
 
   categoryId?: string;
+  brandId?: string;
 };
 
 export type AdminUpdateProductResponse = {
@@ -150,6 +165,7 @@ export type AdminUpdateProductResponse = {
   isActive: boolean;
 
   categoryId: string;
+  brandId: string;
 
   creatorId: string;
 

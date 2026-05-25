@@ -52,6 +52,11 @@ export class ProductListItemDto {
 
   categoryId: string;
   brandId: string;
+  brand?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 
   createdAt: Date;
   updatedAt: Date;

@@ -427,6 +427,14 @@ export class ProductService {
           categoryId: true,
           brandId: true,
 
+          brand: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+
           createdAt: true,
           updatedAt: true,
         },
@@ -452,6 +460,13 @@ export class ProductService {
       include: {
         category: {
           select: { id: true, name: true, slug: true, variantType: true },
+        },
+        brand: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
         },
         creator: { select: { id: true, fullname: true } },
       },
