@@ -21,6 +21,8 @@ import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import type { CreateProductFormOutput } from "../schemas/product.schema";
 import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
+import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
+import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -38,6 +40,9 @@ export const CreateProductForm = ({
   const createProductMutation = useAdminCreateProduct();
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+
+  const brandsQuery = useAdminBrandQuery();
+  const brands: AdminBrandItem[] = brandsQuery.data?.data?.data ?? [];
 
   // preview slug
   const productName = form.watch("name");
@@ -191,6 +196,53 @@ export const CreateProductForm = ({
               {form.formState.errors.categoryId && (
                 <p className="text-sm text-red-500">
                   {form.formState.errors.categoryId.message}
+                </p>
+              )}
+            </div>
+
+            {/* brand */}
+            <div className="space-y-2">
+              <Label>Thương hiệu</Label>
+
+              <Select
+                value={form.watch("brandId")}
+                onValueChange={(value) =>
+                  form.setValue("brandId", value, {
+                    shouldValidate: true,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn thương hiệu" />
+                </SelectTrigger>
+
+                <SelectContent
+                  className="max-h-72 p-2 text-black/70"
+                  position="popper"
+                >
+                  {brandsQuery.isLoading && (
+                    <div className="px-2 py-3 text-sm text-muted-foreground">
+                      Đang tải thương hiệu...
+                    </div>
+                  )}
+
+                  {!brandsQuery.isLoading && brands.length === 0 && (
+                    <div className="px-2 py-3 text-sm text-muted-foreground">
+                      Không có thương hiệu
+                    </div>
+                  )}
+
+                  {brands.map((brand) => (
+                    <SelectItem key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {form.formState.errors.brandId && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.brandId.message}
                 </p>
               )}
             </div>

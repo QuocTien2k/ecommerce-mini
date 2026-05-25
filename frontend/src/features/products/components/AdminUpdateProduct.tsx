@@ -23,6 +23,8 @@ import {
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import { Controller } from "react-hook-form";
+import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
+import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -45,9 +47,12 @@ const AdminUpdateProduct = ({
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
   const categories = flatCategoriesQuery.data?.data ?? [];
-  console.log("Category dạng flat: ", categories);
+  // console.log("Category dạng flat: ", categories);
   const categoriesReady =
     !flatCategoriesQuery.isLoading && categories.length > 0;
+
+  const brandsQuery = useAdminBrandQuery();
+  const brands: AdminBrandItem[] = brandsQuery.data?.data?.data ?? [];
 
   // watch
   const productName = form.watch("name");
@@ -69,6 +74,7 @@ const AdminUpdateProduct = ({
       isActive: product.isActive,
 
       categoryId: product.categoryId,
+      brandId: product.brandId,
     });
   }, [product, open, categoriesReady, form]);
 
@@ -92,8 +98,6 @@ const AdminUpdateProduct = ({
             data: {
               name: values.name || undefined,
 
-              slug: values.slug || undefined,
-
               description: values.description || undefined,
 
               price: values.price,
@@ -106,6 +110,7 @@ const AdminUpdateProduct = ({
               isActive: values.isActive,
 
               categoryId: values.categoryId || undefined,
+              brandId: values.brandId || undefined,
             },
           }),
         );
@@ -193,19 +198,6 @@ const AdminUpdateProduct = ({
               )}
             </div>
 
-            {/* slug */}
-            <div className="space-y-2 md:col-span-2">
-              <Label>Slug</Label>
-
-              <Input placeholder="product-slug" {...form.register("slug")} />
-
-              {form.formState.errors.slug && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.slug.message}
-                </p>
-              )}
-            </div>
-
             {/* description */}
             <div className="space-y-2 md:col-span-2">
               <Label>Mô tả</Label>
@@ -262,6 +254,46 @@ const AdminUpdateProduct = ({
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                );
+              }}
+            />
+
+            {/* brand */}
+            <Controller
+              control={form.control}
+              name="brandId"
+              render={({ field }) => {
+                return (
+                  <div className="space-y-2">
+                    <Label>Thương hiệu</Label>
+
+                    <Select
+                      key={field.value}
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue>
+                          {brands.find((b) => b.id === field.value)?.name ||
+                            "Chọn thương hiệu"}
+                        </SelectValue>
+                      </SelectTrigger>
+
+                      <SelectContent position="popper">
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={String(brand.id)}>
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {form.formState.errors.brandId && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.brandId.message}
+                      </p>
+                    )}
                   </div>
                 );
               }}
