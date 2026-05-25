@@ -20,6 +20,8 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { CreateProductForm } from "./components/AdminCreateProduct";
 import { Link } from "react-router-dom";
 import AdminUpdateProduct from "./components/AdminUpdateProduct";
+import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
+import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -36,9 +38,11 @@ const AdminProductPage = () => {
 
   const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
   const { data: flatData } = useAdminFlatCategoriesQuery();
+  const { data: brandsQuery } = useAdminBrandQuery();
 
   const products: AdminProductListItem[] = data?.data?.data ?? [];
   const flatCategories: FlatCategoryItem[] = flatData?.data ?? [];
+  const brands: AdminBrandItem[] = brandsQuery?.data?.data ?? [];
 
   const meta = data?.data?.meta;
 
@@ -71,6 +75,7 @@ const AdminProductPage = () => {
           filters={filters}
           actions={filterActions}
           flatCategories={flatCategories}
+          brands={brands}
           onReset={resetFilters}
         />
 

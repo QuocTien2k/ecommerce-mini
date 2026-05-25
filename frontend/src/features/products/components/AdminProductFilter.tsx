@@ -10,21 +10,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import type { FlatCategoryItem } from "@/features/categories/types/admin-category.type";
+import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 
 type Props = {
   filters: {
     search: string;
     isActive: "" | "true" | "false";
     categoryId: string;
+    brandId: string;
+    priceSort: "" | "asc" | "desc";
   };
 
   actions: {
     setSearch: (value: string) => void;
     setIsActive: (value: "" | "true" | "false") => void;
     setCategoryId: (value: string) => void;
+    setBrandId: (value: string) => void;
+    setPriceSort: (value: "" | "asc" | "desc") => void;
   };
 
   flatCategories: FlatCategoryItem[];
+  brands: AdminBrandItem[];
 
   onReset: () => void;
 };
@@ -33,6 +39,7 @@ const AdminProductFilter = ({
   filters,
   actions,
   flatCategories,
+  brands = [],
   onReset,
 }: Props) => {
   return (
@@ -66,6 +73,54 @@ const AdminProductFilter = ({
                 {category.name}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Brand */}
+      <div className="w-60">
+        <Select
+          value={filters.brandId || "ALL"}
+          onValueChange={(value) =>
+            actions.setBrandId(value === "ALL" ? "" : value)
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Tất cả thương hiệu" />
+          </SelectTrigger>
+
+          <SelectContent position="popper">
+            <SelectItem value="ALL">Tất cả thương hiệu</SelectItem>
+
+            {brands?.map((brand) => (
+              <SelectItem key={brand.id} value={brand.id}>
+                {brand.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Price Sort */}
+      <div className="w-60">
+        <Select
+          value={filters.priceSort || "DEFAULT"}
+          onValueChange={(value) =>
+            actions.setPriceSort(
+              value === "DEFAULT" ? "" : (value as "asc" | "desc"),
+            )
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Sắp xếp giá" />
+          </SelectTrigger>
+
+          <SelectContent position="popper">
+            <SelectItem value="DEFAULT">Mặc định</SelectItem>
+
+            <SelectItem value="asc">Giá thấp đến cao</SelectItem>
+
+            <SelectItem value="desc">Giá cao đến thấp</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -13,11 +13,17 @@ export const useAdminProductFilter = () => {
   /* "": không filter */
   const [categoryId, setCategoryId] = useState("");
 
+  /* "": không filter */
+  const [brandId, setBrandId] = useState("");
+
+  /* "": không sort */
+  const [priceSort, setPriceSort] = useState<"" | "asc" | "desc">("");
+
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, isActive, categoryId]);
+  }, [debouncedSearch, isActive, categoryId, brandId, priceSort]);
 
   const queryParams = useMemo<AdminProductListQueryParams>(() => {
     const params: AdminProductListQueryParams = {
@@ -40,8 +46,18 @@ export const useAdminProductFilter = () => {
       params.categoryId = categoryId;
     }
 
+    // brand
+    if (brandId) {
+      params.brandId = brandId;
+    }
+
+    // price sort
+    if (priceSort) {
+      params.priceSort = priceSort;
+    }
+
     return params;
-  }, [page, debouncedSearch, isActive, categoryId]);
+  }, [page, debouncedSearch, isActive, categoryId, brandId, priceSort]);
 
   const resetFilters = () => {
     setPage(1);
@@ -51,18 +67,26 @@ export const useAdminProductFilter = () => {
     setIsActive("");
 
     setCategoryId("");
+
+    setBrandId("");
+
+    setPriceSort("");
   };
 
   const filters = {
     search,
     isActive,
     categoryId,
+    brandId,
+    priceSort,
   };
 
   const filterActions = {
     setSearch,
     setIsActive,
     setCategoryId,
+    setBrandId,
+    setPriceSort,
   };
 
   return {

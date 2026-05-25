@@ -14,6 +14,9 @@ export type AdminProductListQueryParams = {
   // filter by brand
   brandId?: string;
 
+  // sort by price
+  priceSort?: "asc" | "desc";
+
   // admin filter active status
   isActive?: boolean;
 };
