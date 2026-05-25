@@ -23,4 +23,9 @@ export const adminBrand = {
     id: string,
     payload: UpdateBrandPayload,
   ): ApiResult<UpdateBrandResponse> => api.patch(`/brands/${id}`, payload),
+
+  softDelete: (id: string): ApiResult<void> =>
+    api.patch(`/brands/${id}/softDelete`),
+
+  restore: (id: string): ApiResult<void> => api.patch(`/brands/${id}/restore`),
 };

@@ -16,8 +16,11 @@ import { Badge } from "@components/ui/badge";
 import CopyableText from "@components/common/copyable-text";
 import AminCreateBrand from "./components/AminCreateBrand";
 import AdminUpdateBrand from "./components/AdminUpdateBrand";
+import { useAdminBrandAction } from "./hooks/useAdminStatusMutation";
+import { sonnerToast } from "@lib/sonner-toast";
+import { getErrorMessage } from "@lib/error";
 
-type PendingAction = "update" | "delete" | "restore" | null;
+type PendingAction = "update" | "softDelete" | "restore" | null;
 
 const AdminBrandPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -32,13 +35,47 @@ const AdminBrandPage = () => {
   const { page, setPage, filters, filterActions, queryParams, resetFilters } =
     useAdminBrandFilter();
   const { data, isLoading, isFetching } = useAdminBrandQuery(queryParams);
+  const { mutateAsync: handleBrandAction } = useAdminBrandAction();
 
   const handleCloseUpdate = () => {
     setOpenUpdate(false);
     setSelectedBrand(null);
   };
 
-  const handleToggleDelete = async (brandId: string, isDeleted: boolean) => {};
+  const handleToggleDelete = async (brandId: string, isDeleted: boolean) => {
+    if (pendingId) return;
+
+    sonnerToast.dismiss("brand-action-error");
+
+    const action: PendingAction = isDeleted ? "restore" : "softDelete";
+
+    setPendingId(brandId);
+    setPendingAction(action);
+
+    try {
+      const result = await run(
+        () =>
+          handleBrandAction({
+            id: brandId,
+            action,
+          }),
+        {
+          minDuration: 500,
+        },
+      );
+
+      sonnerToast.success(result.message);
+    } catch (error) {
+      console.error("Toggle brand delete error:", error);
+
+      sonnerToast.error(getErrorMessage(error, "Thao tác thất bại"), {
+        id: "brand-action-error",
+      });
+    } finally {
+      setPendingId(null);
+      setPendingAction(null);
+    }
+  };
 
   const brands: AdminBrandItem[] = data?.data?.data ?? [];
   const meta = data?.data?.meta;
@@ -171,7 +208,7 @@ const AdminBrandPage = () => {
                           loading={
                             loading &&
                             pendingId === brand.id &&
-                            (pendingAction === "delete" ||
+                            (pendingAction === "softDelete" ||
                               pendingAction === "restore")
                           }
                           variant={isDeleted ? "secondary" : "destructive"}
