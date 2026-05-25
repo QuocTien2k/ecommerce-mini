@@ -35,6 +35,7 @@ const productBaseSchema = z.object({
   isActive: z.boolean().optional(),
 
   categoryId: z.string().uuid("Danh mục không hợp lệ"),
+  brandId: z.string().uuid("Thương hiệu không hợp lệ"),
 });
 
 // create

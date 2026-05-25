@@ -22,6 +22,7 @@ export const useAdminUpdateProductForm = () => {
 
       isActive: true,
       categoryId: "",
+      brandId: "",
     },
 
     mode: "onSubmit",

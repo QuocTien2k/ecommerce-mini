@@ -65,6 +65,7 @@ export const CreateProductForm = ({
             discountPct: values.discountPct || undefined,
             isActive: values.isActive,
             categoryId: values.categoryId,
+            brandId: values.brandId,
           }),
         );
 

@@ -18,6 +18,7 @@ export const useAdminCreateProductForm = () => {
       discountPct: undefined,
       isActive: true,
       categoryId: "",
+      brandId: "",
     },
 
     mode: "onSubmit",
