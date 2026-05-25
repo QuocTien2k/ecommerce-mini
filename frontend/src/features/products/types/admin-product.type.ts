@@ -23,7 +23,7 @@ export type AdminProductListItem = {
 
   name: string;
   slug: string;
-  description: string;
+  description: string | null;
 
   price: string;
   discountPrice: string | null;
@@ -36,6 +36,11 @@ export type AdminProductListItem = {
 
   categoryId: string;
   brandId: string;
+  brand: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 
   createdAt: string;
   updatedAt: string;
@@ -52,7 +57,7 @@ export type AdminProductDetail = {
   discountPrice: string | null;
   discountPct: number | null;
 
-  ratingAvg: number;
+  ratingAvg: number | null;
   ratingCount: number;
 
   isActive: boolean;
