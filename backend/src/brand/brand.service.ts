@@ -85,6 +85,7 @@ export class BrandService {
     const productCount = await this.prisma.product.count({
       where: {
         brandId: id,
+        isActive: true,
       },
     });
 
