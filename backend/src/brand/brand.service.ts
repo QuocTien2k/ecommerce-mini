@@ -129,9 +129,7 @@ export class BrandService {
   async findAll(query: GetBrandDto) {
     const { page, limit, skip } = getPagination(query);
 
-    const where: Prisma.BrandWhereInput = {
-      deletedAt: null,
-    };
+    const where: Prisma.BrandWhereInput = {};
 
     if (query.name) {
       where.name = {
