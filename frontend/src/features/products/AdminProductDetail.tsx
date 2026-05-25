@@ -42,7 +42,7 @@ const AdminProductDetail = () => {
     return "text-green-600";
   };
 
-  //console.log("Data trả về: ", data?.category.variantType);
+  //console.log("Data trả về: ", data?.brand?.name);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -87,50 +87,73 @@ const AdminProductDetail = () => {
 
                 <Separator />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-xl border p-4">
-                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-                      <Tag className="size-4" />
-                      Danh mục
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+                  {/* Danh mục */}
+                  <div className="rounded-2xl border border-emerald-500 bg-emerald-50 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-emerald-700">
+                      <Tag className="size-5" />
+                      <span className="font-semibold">Danh mục</span>
                     </div>
-
-                    <p className="font-medium">{data.category.name}</p>
+                    <p className="text-xl font-bold text-emerald-900">
+                      {data.category.name}
+                    </p>
                   </div>
 
-                  <div className="rounded-xl border p-4">
-                    <div className="mb-2 text-sm text-muted-foreground">
-                      Giá bán
+                  {/* Thương hiệu */}
+                  <div className="rounded-2xl border border-violet-500 bg-violet-50 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-violet-700">
+                      <Package className="size-5" />
+                      <span className="font-semibold">Thương hiệu</span>
                     </div>
+                    <p className="text-xl font-bold text-violet-900">
+                      {data.brand?.name || "N/A"}
+                    </p>
+                  </div>
 
-                    <p className="text-xl font-bold">
+                  {/* Giá bán */}
+                  <div className="rounded-2xl border border-green-600 bg-green-50 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-green-700">
+                      <span className="font-semibold">Giá bán</span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-800">
                       {Number(data.price).toLocaleString("vi-VN")}₫
                     </p>
                   </div>
 
-                  <div className="rounded-xl border p-4">
-                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-                      <Percent className="size-4" />
-                      Giảm giá
+                  {/* Giảm giá */}
+                  <div className="rounded-2xl border border-rose-500 bg-rose-50 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-rose-700">
+                      <Percent className="size-5" />
+                      <span className="font-semibold">Giảm giá</span>
                     </div>
-
-                    <p className="font-medium">{data.discountPct ?? 0}%</p>
+                    <p className="text-2xl font-bold text-rose-700">
+                      {data.discountPct ?? 0}%
+                    </p>
                   </div>
 
-                  <div className="rounded-xl border p-4">
-                    <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
-                      <User className="size-4" />
-                      Người tạo
+                  {/* Người tạo */}
+                  <div className="rounded-2xl border border-amber-500 bg-amber-50 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-amber-700">
+                      <User className="size-5" />
+                      <span className="font-semibold">Người tạo</span>
                     </div>
-
-                    <p className="font-medium">{data.creator.fullname}</p>
+                    <p className="text-lg font-semibold text-amber-900">
+                      {data.creator.fullname}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">Trạng thái:</span>
-
-                  <Badge variant={data.isActive ? "default" : "secondary"}>
-                    {data.isActive ? "Active" : "Inactive"}
+                  <Badge
+                    variant={data.isActive ? "default" : "secondary"}
+                    className={
+                      data.isActive
+                        ? "bg-emerald-600 hover:bg-emerald-600 text-white"
+                        : ""
+                    }
+                  >
+                    {data.isActive ? "Đang hoạt động" : "Không hoạt động"}
                   </Badge>
                 </div>
               </CardContent>

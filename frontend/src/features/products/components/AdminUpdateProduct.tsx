@@ -218,13 +218,13 @@ const AdminUpdateProduct = ({
               control={form.control}
               name="categoryId"
               render={({ field }) => {
-                console.log("field:", typeof field.value, field.value);
+                // console.log("field:", typeof field.value, field.value);
 
-                console.log(
-                  "category:",
-                  typeof categories[0]?.id,
-                  categories[0]?.id,
-                );
+                // console.log(
+                //   "category:",
+                //   typeof categories[0]?.id,
+                //   categories[0]?.id,
+                // );
 
                 return (
                   <div className="space-y-2">
