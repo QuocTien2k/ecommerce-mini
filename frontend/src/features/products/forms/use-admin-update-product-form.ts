@@ -12,7 +12,6 @@ export const useAdminUpdateProductForm = () => {
 
     defaultValues: {
       name: "",
-      slug: "",
       description: "",
       price: 0,
 

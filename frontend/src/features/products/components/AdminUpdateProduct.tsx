@@ -61,10 +61,9 @@ const AdminUpdateProduct = ({
   // reset form when product changes
   useEffect(() => {
     if (!product || !open || !categoriesReady) return;
-    console.log("PRODUCT CATEGORY:", product.categoryId);
+    //console.log("PRODUCT CATEGORY:", product.categoryId);
     form.reset({
       name: product.name,
-      slug: product.slug,
       description: product.description || "",
 
       price: Number(product.price),

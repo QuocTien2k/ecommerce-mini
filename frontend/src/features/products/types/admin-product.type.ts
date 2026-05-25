@@ -93,8 +93,6 @@ export type AdminProductDetail = {
 export type AdminCreateProductPayload = {
   name: string;
 
-  slug?: string;
-
   description?: string;
 
   price: number;
@@ -135,8 +133,6 @@ export type AdminCreateProductResponse = {
 
 export type AdminUpdateProductPayload = {
   name?: string;
-
-  slug?: string;
 
   description?: string;
 

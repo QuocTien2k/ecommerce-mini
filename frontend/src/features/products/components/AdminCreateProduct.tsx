@@ -64,7 +64,6 @@ export const CreateProductForm = ({
         const result = await run(() =>
           createProductMutation.mutateAsync({
             name: values.name,
-            slug: values.slug || undefined,
             description: values.description || undefined,
             price: values.price,
             discountPct: values.discountPct || undefined,

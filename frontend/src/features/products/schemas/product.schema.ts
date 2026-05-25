@@ -8,13 +8,6 @@ const productBaseSchema = z.object({
     .min(3, "Tên sản phẩm phải có ít nhất 3 ký tự")
     .max(255, "Tên sản phẩm không được vượt quá 255 ký tự"),
 
-  slug: z
-    .string()
-    .trim()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug không hợp lệ")
-    .optional()
-    .or(z.literal("")),
-
   description: z
     .string()
     .max(2000, "Mô tả không được vượt quá 2000 ký tự")
