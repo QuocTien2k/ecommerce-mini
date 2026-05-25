@@ -82,6 +82,18 @@ export class BrandService {
       throw new BadRequestException('Brand đã bị xoá trước đó');
     }
 
+    const productCount = await this.prisma.product.count({
+      where: {
+        brandId: id,
+      },
+    });
+
+    if (productCount > 0) {
+      throw new BadRequestException(
+        'Không thể xoá thương hiệu đang có sản phẩm',
+      );
+    }
+
     return this.prisma.brand.update({
       where: { id },
       data: {
