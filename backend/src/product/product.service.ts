@@ -435,6 +435,7 @@ export class ProductService {
           ratingCount: true,
 
           isActive: true,
+          deletedAt: true,
           categoryId: true,
           brandId: true,
 

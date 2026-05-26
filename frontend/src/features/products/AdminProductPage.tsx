@@ -90,6 +90,8 @@ const AdminProductPage = () => {
     }
   };
 
+  console.log("Data trả về: ", products);
+
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
@@ -224,11 +226,13 @@ const AdminProductPage = () => {
 
                     {/* STATUS */}
                     <td className="px-4 py-3">
-                      <Badge
-                        variant={product.isActive ? "secondary" : "destructive"}
-                      >
-                        {product.isActive ? "Đang hoạt động" : "Tạm khóa"}
-                      </Badge>
+                      {product.deletedAt ? (
+                        <Badge variant="destructive">Đã xóa</Badge>
+                      ) : product.isActive ? (
+                        <Badge variant="secondary">Đang hoạt động</Badge>
+                      ) : (
+                        <Badge variant="outline">Tạm khóa</Badge>
+                      )}
                     </td>
 
                     {/* CREATED AT */}
