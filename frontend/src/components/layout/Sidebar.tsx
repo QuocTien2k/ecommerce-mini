@@ -5,6 +5,7 @@ import {
   Package,
   FolderTree,
   BadgeCheck,
+  TicketPercent,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -21,6 +22,7 @@ const navItems: NavItem[] = [
   { to: "/admin/categories", label: "Quản lý danh mục", icon: FolderTree },
   { to: "/admin/brands", label: "Quản lý thương hiệu", icon: BadgeCheck },
   { to: "/admin/products", label: "Quản lý sản phẩm", icon: Package },
+  { to: "/admin/vouchers", label: "Quản lý voucher", icon: TicketPercent },
 ];
 
 const Sidebar: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {

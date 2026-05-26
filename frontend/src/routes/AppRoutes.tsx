@@ -18,6 +18,7 @@ import AdminCategoryPage from "@features/categories/AdminCategoryPage";
 import AdminProductPage from "@features/products/AdminProductPage";
 import AdminProductDetail from "@features/products/AdminProductDetail";
 import AdminBrandPage from "@features/brands/AdminBrandPage";
+import AdminVoucherPage from "@features/vouchers/AdminVoucherPage";
 
 const AppRoutes = () => {
   return (
@@ -32,6 +33,7 @@ const AppRoutes = () => {
             <Route path="brands" element={<AdminBrandPage />} />
             <Route path="products" element={<AdminProductPage />} />
             <Route path="products/:id" element={<AdminProductDetail />} />
+            <Route path="vouchers" element={<AdminVoucherPage />} />
 
             {/* thêm các route admin khác */}
           </Route>
