@@ -256,9 +256,16 @@ export const CreateProductForm = ({
 
               <Input
                 type="number"
-                min={0}
-                placeholder="0"
-                {...form.register("price")}
+                placeholder="Nhập giá sản phẩm..."
+                {...form.register("price", {
+                  setValueAs: (value) => {
+                    if (value === "" || value === null || value === undefined) {
+                      return undefined;
+                    }
+                    const num = Number(value);
+                    return isNaN(num) ? undefined : Math.floor(num); // đảm bảo số nguyên
+                  },
+                })}
               />
 
               {form.formState.errors.price && (
@@ -274,10 +281,11 @@ export const CreateProductForm = ({
 
               <Input
                 type="number"
-                min={0}
-                max={100}
                 placeholder="0"
-                {...form.register("discountPct")}
+                {...form.register("discountPct", {
+                  setValueAs: (value) =>
+                    value === "" || value == null ? undefined : Number(value),
+                })}
               />
 
               {form.formState.errors.discountPct && (

@@ -13,16 +13,18 @@ const productBaseSchema = z.object({
     .max(2000, "Mô tả không được vượt quá 2000 ký tự")
     .optional(),
 
-  price: z.coerce
-    .number()
+  price: z
+    .number({
+      error: "Vui lòng nhập giá sản phẩm",
+    })
     .int("Giá phải là số nguyên")
-    .min(0, "Giá sản phẩm không hợp lệ"),
+    .min(1, "Giá sản phẩm tối thiểu 1đ"),
 
-  discountPct: z.coerce
+  discountPct: z
     .number()
     .int("Phần trăm giảm phải là số nguyên")
-    .min(1)
-    .max(100)
+    .min(1, "Giảm giá tối thiểu là 1%")
+    .max(100, "Giảm giá tối đa là 100%")
     .optional(),
 
   isActive: z.boolean().optional(),
