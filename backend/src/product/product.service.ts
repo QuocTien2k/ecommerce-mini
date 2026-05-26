@@ -235,11 +235,21 @@ export class ProductService {
   }
 
   softDelete(id: string) {
-    return this.toggleActive(id, false);
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   }
 
   restore(id: string) {
-    return this.toggleActive(id, true);
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+      },
+    });
   }
 
   //lists product for user
