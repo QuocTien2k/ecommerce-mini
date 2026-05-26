@@ -51,20 +51,23 @@ const AdminProductPage = () => {
 
   const totalPages = meta?.totalPages ?? 1;
 
-  const handleToggleStatus = async (productId: string, isActive: boolean) => {
+  const handleProductLifecycle = async (
+    productId: string,
+    action: Exclude<PendingAction, "update" | null>,
+  ) => {
     if (pendingId) return;
 
     sonnerToast.dismiss("category-status-error");
 
     setPendingId(productId);
-    setPendingAction(isActive ? "restore" : "delete");
+    setPendingAction(action);
 
     try {
       const result = await run(
         () =>
           mutateAsync({
             productId,
-            isActive,
+            action,
           }),
         {
           minDuration: 500,
@@ -264,16 +267,19 @@ const AdminProductPage = () => {
                               pendingAction === "restore")
                           }
                           variant={
-                            product.isActive ? "destructive" : "secondary"
+                            product.deletedAt ? "secondary" : "destructive"
                           }
                           onClick={() =>
-                            handleToggleStatus(product.id, product.isActive)
+                            handleProductLifecycle(
+                              product.id,
+                              product.deletedAt ? "restore" : "delete",
+                            )
                           }
                         >
-                          {product.isActive ? (
-                            <Trash2 className="w-4 h-4" />
-                          ) : (
+                          {product.deletedAt ? (
                             <RotateCcw className="w-4 h-4" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
                           )}
                         </AsyncButton>
                       </div>

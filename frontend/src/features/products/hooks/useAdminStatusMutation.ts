@@ -8,12 +8,12 @@ export const useAdminStatusMutation = () => {
   return useMutation({
     mutationFn: async ({
       productId,
-      isActive,
+      action,
     }: {
       productId: string;
-      isActive: boolean;
+      action: "delete" | "restore";
     }) => {
-      if (isActive) {
+      if (action === "delete") {
         return adminProductApi.softDelete(productId);
       }
 
