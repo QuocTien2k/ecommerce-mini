@@ -2,11 +2,11 @@ import { api } from "@shared/api/axios";
 import type { ApiResult } from "@shared/types/api-result";
 import type { PaginatedResponse } from "@shared/types/pagination";
 import type {
+  AdminCreateProductPayload,
   AdminCreateProductResponse,
   AdminProductDetail,
   AdminProductListItem,
   AdminProductListQueryParams,
-  AdminCreateProductPayload,
   AdminUpdateProductPayload,
   AdminUpdateProductResponse,
 } from "../types/admin-product.type";
