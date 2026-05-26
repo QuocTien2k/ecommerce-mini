@@ -59,6 +59,15 @@ export class ProductService {
       throw new BadRequestException('Danh mục không tồn tại!');
     }
 
+    const hasChildren = await this.prisma.category.findFirst({
+      where: { parentId: category.id, deletedAt: null },
+      select: { id: true },
+    });
+
+    if (hasChildren) {
+      throw new BadRequestException('Chỉ được tạo sản phẩm ở danh mục cuối');
+    }
+
     //check brand
     const brand = await this.prisma.brand.findUnique({
       where: { id: dto.brandId },

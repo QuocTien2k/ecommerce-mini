@@ -23,6 +23,7 @@ import type { CreateProductFormOutput } from "../schemas/product.schema";
 import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
+import { getCategoryDisplayName } from "@/utils/category-display-name";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -40,6 +41,9 @@ export const CreateProductForm = ({
   const createProductMutation = useAdminCreateProduct();
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+  const selectableCategories =
+    flatCategoriesQuery.data?.data.filter((category) => category.level !== 1) ??
+    [];
 
   const brandsQuery = useAdminBrandQuery();
   const brands: AdminBrandItem[] = brandsQuery.data?.data?.data ?? [];
@@ -183,10 +187,10 @@ export const CreateProductForm = ({
                   className="max-h-72 p-2 text-black/50"
                   position="popper"
                 >
-                  {flatCategoriesQuery.data?.data?.map((category) => (
+                  {selectableCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {"— ".repeat(category.level - 1)}
-                      {category.name}
+                      {"—".repeat(category.level - 1)}
+                      {getCategoryDisplayName(category.name)}
                     </SelectItem>
                   ))}
                 </SelectContent>

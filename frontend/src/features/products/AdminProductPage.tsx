@@ -24,6 +24,7 @@ import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import { useAdminStatusMutation } from "./hooks/useAdminStatusMutation";
 import { getErrorMessage } from "@lib/error";
+import { getCategoryDisplayName } from "@/utils/category-display-name";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -89,8 +90,6 @@ const AdminProductPage = () => {
       setPendingAction(null);
     }
   };
-
-  console.log("Data trả về: ", products);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -178,7 +177,7 @@ const AdminProductPage = () => {
                     <td className="px-4 py-3">
                       {category ? (
                         <CopyableText
-                          value={category.name}
+                          value={getCategoryDisplayName(category.name)}
                           className="
                   px-2 py-1
                   font-sans text-sm font-semibold
@@ -229,9 +228,13 @@ const AdminProductPage = () => {
                       {product.deletedAt ? (
                         <Badge variant="destructive">Đã xóa</Badge>
                       ) : product.isActive ? (
-                        <Badge variant="secondary">Đang hoạt động</Badge>
+                        <Badge className="bg-violet-100 text-violet-700 border border-violet-200 hover:bg-violet-100">
+                          Đang hoạt động
+                        </Badge>
                       ) : (
-                        <Badge variant="outline">Tạm khóa</Badge>
+                        <Badge className="bg-orange-100 text-orange-700 border border-orange-200 hover:bg-orange-100">
+                          Tạm khóa
+                        </Badge>
                       )}
                     </td>
 
