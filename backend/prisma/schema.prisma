@@ -319,6 +319,7 @@ model Product {
   ratingSum     Int    @default(0)
 
   isActive      Boolean @default(true)
+  deletedAt     DateTime?
 
   categoryId    String
   category      Category @relation(fields: [categoryId], references: [id])

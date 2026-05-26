@@ -26,7 +26,7 @@ export class ProductService {
   private async toggleActive(id: string, isActive: boolean) {
     const existing = await this.prisma.product.findUnique({
       where: { id },
-      select: { id: true, isActive: true },
+      select: { id: true, isActive: true, deletedAt: true },
     });
 
     if (!existing) {
@@ -39,7 +39,7 @@ export class ProductService {
 
     return this.prisma.product.update({
       where: { id },
-      data: { isActive },
+      data: { isActive, deletedAt: isActive ? null : new Date() },
     });
   }
 
@@ -253,6 +253,7 @@ export class ProductService {
     // build where condition
     const where: Prisma.ProductWhereInput = {
       isActive: true,
+      deletedAt: null,
     };
 
     if (query.categoryId) {
