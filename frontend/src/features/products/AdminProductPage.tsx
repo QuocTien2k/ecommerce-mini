@@ -22,6 +22,8 @@ import { Link } from "react-router-dom";
 import AdminUpdateProduct from "./components/AdminUpdateProduct";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
+import { useAdminStatusMutation } from "./hooks/useAdminStatusMutation";
+import { getErrorMessage } from "@lib/error";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -34,11 +36,12 @@ const AdminProductPage = () => {
   const [selectedProduct, setSelectedProduct] =
     useState<AdminProductListItem | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const { loading } = useScopedLoading();
+  const { loading, run } = useScopedLoading();
 
   const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
   const { data: flatData } = useAdminFlatCategoriesQuery();
   const { data: brandsQuery } = useAdminBrandQuery();
+  const { mutateAsync } = useAdminStatusMutation();
 
   const products: AdminProductListItem[] = data?.data?.data ?? [];
   const flatCategories: FlatCategoryItem[] = flatData?.data ?? [];
@@ -48,13 +51,40 @@ const AdminProductPage = () => {
 
   const totalPages = meta?.totalPages ?? 1;
 
-  const handleToggleStatus = async (productId: string, isDeleted: boolean) => {
+  const handleToggleStatus = async (productId: string, isActive: boolean) => {
     if (pendingId) return;
 
     sonnerToast.dismiss("category-status-error");
 
     setPendingId(productId);
-    setPendingAction(isDeleted ? "restore" : "delete");
+    setPendingAction(isActive ? "restore" : "delete");
+
+    try {
+      const result = await run(
+        () =>
+          mutateAsync({
+            productId,
+            isActive,
+          }),
+        {
+          minDuration: 500,
+        },
+      );
+
+      sonnerToast.success(result.message);
+    } catch (error) {
+      console.error("Toggle product status error:", error);
+
+      sonnerToast.error(
+        getErrorMessage(error, "Thay đổi trạng thái thất bại"),
+        {
+          id: "product-status-error",
+        },
+      );
+    } finally {
+      setPendingId(null);
+      setPendingAction(null);
+    }
   };
 
   return (

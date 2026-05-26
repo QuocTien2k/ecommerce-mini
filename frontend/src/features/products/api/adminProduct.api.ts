@@ -30,4 +30,10 @@ export const adminProductApi = {
     dto: AdminUpdateProductPayload,
   ): ApiResult<AdminUpdateProductResponse> =>
     api.patch(`/admin/product/${id}`, dto),
+
+  softDelete: (id: string): ApiResult<AdminUpdateProductResponse> =>
+    api.patch(`/admin/product/soft/${id}`),
+
+  restore: (id: string): ApiResult<AdminUpdateProductResponse> =>
+    api.patch(`/admin/product/restore/${id}`),
 };

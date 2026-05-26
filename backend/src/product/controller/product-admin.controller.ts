@@ -61,15 +61,15 @@ export class ProductControllerAdmin {
     return await this.productService.update(id, dto);
   }
 
-  @Patch(':id/deactivate')
+  @Patch('soft/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @ResponseMessage('Tạm ẩn sản phẩm thành công!')
+  @ResponseMessage('Tạm khóa phẩm thành công!')
   async softDelete(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.productService.softDelete(id);
   }
 
-  @Patch(':id/activate')
+  @Patch('restore/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Khôi phục sản phẩm thành công!')
