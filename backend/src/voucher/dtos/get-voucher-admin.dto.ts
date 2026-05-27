@@ -7,7 +7,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { VoucherType, VoucherScope } from '@prisma/client';
 import { VoucherStatus } from '@voucher/enum/voucher-status.enum';
 
@@ -42,7 +42,6 @@ export class GetVouchersAdminDto {
   status?: VoucherStatus;
 
   @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
   isActive?: boolean;
 }
