@@ -98,7 +98,7 @@ export class VoucherService {
       minOrderValue: dto.minOrderValue,
       usageLimit: dto.usageLimit,
       scope: dto.scope,
-      isActive: true,
+      isActive: dto.isActive ?? true,
       startAt: new Date(dto.startAt),
       endAt: new Date(dto.endAt),
 
