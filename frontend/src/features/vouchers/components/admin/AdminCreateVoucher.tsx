@@ -1,4 +1,5 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { getCategoryDisplayName } from "@/utils/category-display-name";
 import { AsyncButton } from "@components/common/async-button";
 import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@components/ui/select";
 import { Textarea } from "@components/ui/textarea";
+import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
 import { useAdminCreateVoucherForm } from "@features/vouchers/forms/use-admin-create-voucher-form";
 import { useAdminCreateVoucher } from "@features/vouchers/hooks/admin/useAdminCreateVoucher";
 import type { CreateVoucherFormOutput } from "@features/vouchers/schema/admin-voucher";
@@ -41,6 +43,11 @@ export const AdminCreateVoucher = ({
   const { loading, run } = useScopedLoading();
 
   const createVoucherMutation = useAdminCreateVoucher();
+  const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+  const selectableCategories =
+    flatCategoriesQuery.data?.data.filter((category) => category.level !== 1) ??
+    [];
+  const selectedCategoryIds = form.watch("categoryIds") ?? [];
 
   const handleClose = () => {
     form.reset();
@@ -273,32 +280,107 @@ export const AdminCreateVoucher = ({
               <FieldError error={form.formState.errors.scope} />
             </div>
 
-            {/* Time start */}
-            <div className="space-y-2">
-              <Label htmlFor="startAt">Bắt đầu</Label>
+            {form.watch("scope") === VOUCHER_SCOPES.PRODUCT && (
+              <div className="space-y-2">
+                <Label htmlFor="productIds">Danh sách productIds</Label>
 
-              <Input
-                id="startAt"
-                type="datetime-local"
-                {...form.register("startAt")}
-              />
+                <Textarea
+                  id="productIds"
+                  placeholder="product-id-1, product-id-2"
+                  onChange={(e) => {
+                    const values = e.target.value
+                      .split(",")
+                      .map((item) => item.trim())
+                      .filter(Boolean);
 
-              <FieldError error={form.formState.errors.startAt} />
-            </div>
+                    form.setValue("productIds", values);
+                  }}
+                />
 
-            {/* Time end */}
-            <div className="space-y-2">
-              <Label htmlFor="endAt">Kết thúc</Label>
+                <FieldError error={form.formState.errors.productIds} />
+              </div>
+            )}
 
-              <Input
-                id="endAt"
-                type="datetime-local"
-                {...form.register("endAt")}
-              />
+            {/* CATEGORY SELECT */}
+            {form.watch("scope") === VOUCHER_SCOPES.CATEGORY && (
+              <div className="space-y-3">
+                <Label>Danh mục áp dụng</Label>
 
-              <FieldError error={form.formState.errors.endAt} />
-            </div>
+                <div className="max-h-72 space-y-2 overflow-y-auto rounded-md border p-3">
+                  {selectableCategories.map((category) => {
+                    const selected =
+                      selectedCategoryIds?.includes(category.id) ?? false;
+
+                    return (
+                      <label
+                        key={category.id}
+                        className="flex cursor-pointer items-center gap-2"
+                      >
+                        <Checkbox
+                          checked={selected}
+                          onCheckedChange={(checked) => {
+                            const current = form.getValues("categoryIds") ?? [];
+
+                            if (checked) {
+                              form.setValue(
+                                "categoryIds",
+                                [...current, category.id],
+                                {
+                                  shouldValidate: true,
+                                },
+                              );
+                            } else {
+                              form.setValue(
+                                "categoryIds",
+                                current.filter((id) => id !== category.id),
+                                {
+                                  shouldValidate: true,
+                                },
+                              );
+                            }
+                          }}
+                        />
+
+                        <span className="text-sm">
+                          {"—".repeat(category.level - 1)}
+                          {getCategoryDisplayName(category.name)}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <FieldError error={form.formState.errors.categoryIds} />
+              </div>
+            )}
           </div>
+
+          {/* Time start */}
+          <div className="space-y-2">
+            <Label htmlFor="startAt">Bắt đầu</Label>
+
+            <Input
+              id="startAt"
+              type="datetime-local"
+              {...form.register("startAt")}
+            />
+
+            <FieldError error={form.formState.errors.startAt} />
+          </div>
+
+          {/* Time end */}
+          <div className="space-y-2">
+            <Label htmlFor="endAt">Kết thúc</Label>
+
+            <Input
+              id="endAt"
+              type="datetime-local"
+              {...form.register("endAt")}
+            />
+
+            <FieldError error={form.formState.errors.endAt} />
+          </div>
+
           {/* Active */}
           <div className="flex items-center gap-3 pt-8">
             <Checkbox
@@ -317,48 +399,6 @@ export const AdminCreateVoucher = ({
 
             <Label>Kích hoạt ngay</Label>
           </div>
-
-          {form.watch("scope") === VOUCHER_SCOPES.PRODUCT && (
-            <div className="space-y-2">
-              <Label htmlFor="productIds">Danh sách productIds</Label>
-
-              <Textarea
-                id="productIds"
-                placeholder="product-id-1, product-id-2"
-                onChange={(e) => {
-                  const values = e.target.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean);
-
-                  form.setValue("productIds", values);
-                }}
-              />
-
-              <FieldError error={form.formState.errors.productIds} />
-            </div>
-          )}
-
-          {form.watch("scope") === VOUCHER_SCOPES.CATEGORY && (
-            <div className="space-y-2">
-              <Label htmlFor="categoryIds">Danh sách categoryIds</Label>
-
-              <Textarea
-                id="categoryIds"
-                placeholder="category-id-1, category-id-2"
-                onChange={(e) => {
-                  const values = e.target.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean);
-
-                  form.setValue("categoryIds", values);
-                }}
-              />
-
-              <FieldError error={form.formState.errors.categoryIds} />
-            </div>
-          )}
 
           <div className="flex justify-end gap-3">
             <Button
