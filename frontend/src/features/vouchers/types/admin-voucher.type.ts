@@ -77,14 +77,14 @@ export interface CreateVoucherPayload {
 
   minOrderValue?: number;
 
-  usageLimit?: number;
+  usageLimit: number;
 
-  scope?: VoucherScope;
+  scope: VoucherScope;
 
-  isActive?: boolean;
+  isActive: boolean;
 
-  startAt?: string;
-  endAt?: string;
+  startAt: string;
+  endAt: string;
 
   productIds?: string[];
 

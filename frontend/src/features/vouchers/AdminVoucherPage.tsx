@@ -18,6 +18,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import CopyableText from "@components/common/copyable-text";
+import { AdminCreateVoucher } from "./components/admin/AdminCreateVoucher";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -295,6 +296,12 @@ const AdminVoucherPage = () => {
           onPageChange={setPage}
         />
       </div>
+
+      {/* Create */}
+      <AdminCreateVoucher
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+      />
     </QueryStateWrapper>
   );
 };

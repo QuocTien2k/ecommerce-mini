@@ -16,21 +16,21 @@ export const useAdminCreateVoucherForm = () => {
 
       type: VOUCHER_TYPES.PERCENT,
 
-      value: 0,
+      value: 1,
 
       maxDiscount: undefined,
 
       minOrderValue: undefined,
 
-      usageLimit: undefined,
+      usageLimit: 1,
 
       scope: VOUCHER_SCOPES.ORDER,
 
       isActive: true,
 
-      startAt: undefined,
+      startAt: "",
 
-      endAt: undefined,
+      endAt: "",
 
       productIds: [],
 

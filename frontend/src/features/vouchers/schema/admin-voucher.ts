@@ -1,6 +1,27 @@
 import { z } from "zod";
 import { VOUCHER_SCOPES, VOUCHER_TYPES } from "../types/admin-voucher.type";
 
+const optionalPositiveNumber = (
+  invalidMessage: string,
+  minValue: number,
+  minMessage: string,
+) =>
+  z.preprocess(
+    (value) => {
+      if (value === "" || Number.isNaN(value)) {
+        return undefined;
+      }
+
+      return value;
+    },
+    z
+      .number({
+        error: invalidMessage,
+      })
+      .min(minValue, minMessage)
+      .optional(),
+  );
+
 export const createVoucherSchema = z
   .object({
     code: z
@@ -11,27 +32,37 @@ export const createVoucherSchema = z
 
     type: z.enum([VOUCHER_TYPES.PERCENT, VOUCHER_TYPES.FIXED]),
 
-    value: z.number().min(0, "Giá trị không được nhỏ hơn 0"),
+    value: z.number().min(1, "Giá trị phải >= 1"),
 
-    maxDiscount: z.number().min(0, "maxDiscount không hợp lệ").optional(),
+    maxDiscount: optionalPositiveNumber(
+      "Giảm tối đa không hợp lệ",
+      1,
+      "Giảm tối đa phải >= 1",
+    ),
 
-    minOrderValue: z.number().min(0, "minOrderValue không hợp lệ").optional(),
+    minOrderValue: optionalPositiveNumber(
+      "Đơn tối thiểu không hợp lệ",
+      0,
+      "Đơn tối thiểu không được nhỏ hơn 0",
+    ),
 
-    usageLimit: z.number().min(1, "usageLimit phải >= 1").optional(),
+    usageLimit: z
+      .number({
+        error: "Giới hạn sử dụng không hợp lệ",
+      })
+      .min(1, "Giới hạn sử dụng phải >= 1"),
 
-    scope: z
-      .enum([
-        VOUCHER_SCOPES.ORDER,
-        VOUCHER_SCOPES.PRODUCT,
-        VOUCHER_SCOPES.CATEGORY,
-      ])
-      .default(VOUCHER_SCOPES.ORDER),
+    scope: z.enum([
+      VOUCHER_SCOPES.ORDER,
+      VOUCHER_SCOPES.PRODUCT,
+      VOUCHER_SCOPES.CATEGORY,
+    ]),
 
     isActive: z.boolean().default(true),
 
-    startAt: z.string().optional(),
+    startAt: z.string().min(1, "Thời gian bắt đầu là bắt buộc"),
 
-    endAt: z.string().optional(),
+    endAt: z.string().min(1, "Thời gian kết thúc là bắt buộc"),
 
     productIds: z.array(z.string()).optional(),
 
@@ -69,8 +100,6 @@ export const createVoucherSchema = z
   // startAt < endAt
   .refine(
     (data) => {
-      if (!data.startAt || !data.endAt) return true;
-
       return new Date(data.startAt).getTime() <= new Date(data.endAt).getTime();
     },
     {
