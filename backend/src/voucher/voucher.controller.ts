@@ -40,13 +40,9 @@ export class VoucherController {
   @Get('admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy danh sách voucher thành công!')
   async getVouchersAdmin(@Query() query: GetVouchersAdminDto) {
-    const data = await this.voucherService.getVouchersAdmin(query);
-
-    return {
-      message: 'Lấy danh sách voucher thành công!',
-      data,
-    };
+    return await this.voucherService.getVouchersAdmin(query);
   }
 
   @Post('')
