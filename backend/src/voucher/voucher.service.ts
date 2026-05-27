@@ -97,10 +97,10 @@ export class VoucherService {
       maxDiscount: dto.maxDiscount,
       minOrderValue: dto.minOrderValue,
       usageLimit: dto.usageLimit,
-      scope: dto.scope ?? VoucherScope.ORDER,
-      isActive: dto.isActive ?? true,
-      startAt: dto.startAt ? new Date(dto.startAt) : null,
-      endAt: dto.endAt ? new Date(dto.endAt) : null,
+      scope: dto.scope,
+      isActive: true,
+      startAt: new Date(dto.startAt),
+      endAt: new Date(dto.endAt),
 
       products:
         dto.scope === VoucherScope.PRODUCT && dto.productIds
@@ -135,6 +135,7 @@ export class VoucherService {
     }
   }
 
+  /* Gửi voucher cho user */
   async assignVoucherToUsers(voucherId: string, dto: AssignVoucherDto) {
     const { userIds, usagePerUser } = dto;
 

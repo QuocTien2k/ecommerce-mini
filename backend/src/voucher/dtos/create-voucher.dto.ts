@@ -22,7 +22,7 @@ export class CreateVoucherDto {
 
   @Type(() => Number)
   @IsNumber()
-  @Min(0)
+  @Min(1)
   value: number;
 
   @ValidateIf((o) => o.type === VoucherType.PERCENT)
@@ -37,11 +37,11 @@ export class CreateVoucherDto {
   @Min(0)
   minOrderValue?: number;
 
-  @IsOptional()
+  // bắt buộc
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  usageLimit?: number;
+  usageLimit: number;
 
   @IsOptional()
   @IsEnum(VoucherScope)
@@ -51,13 +51,13 @@ export class CreateVoucherDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @IsOptional()
+  // bắt buộc
   @IsDateString()
-  startAt?: string;
+  startAt: string;
 
-  @IsOptional()
+  // bắt buộc
   @IsDateString()
-  endAt?: string;
+  endAt: string;
 
   @IsOptional()
   @IsArray()
