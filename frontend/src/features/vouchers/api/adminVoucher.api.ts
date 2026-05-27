@@ -15,7 +15,7 @@ export const adminVoucherApi = {
     api.get("/voucher/admin", { params }),
 
   createVoucher: (payload: CreateVoucherPayload): ApiResult<AdminVoucher> =>
-    api.post("/voucher/admin", payload),
+    api.post("/voucher/", payload),
 
   updateVoucher: (
     id: string,

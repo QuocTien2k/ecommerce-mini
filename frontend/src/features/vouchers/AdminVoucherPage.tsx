@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { AsyncButton } from "@components/common/async-button";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import CopyableText from "@components/common/copyable-text";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -113,18 +114,10 @@ const AdminVoucherPage = () => {
                   >
                     {/* CODE */}
                     <td className="px-4 py-3">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-semibold tracking-wide">
-                          {voucher.code}
-                        </span>
-
-                        <Badge
-                          variant="secondary"
-                          className="w-fit font-mono text-[11px]"
-                        >
-                          ID: {voucher.id.slice(0, 8)}
-                        </Badge>
-                      </div>
+                      <CopyableText
+                        value={voucher.code}
+                        className="px-2 py-1 font-sans text-sm font-semibold text-primary hover:text-primary"
+                      />
                     </td>
 
                     {/* TYPE */}
