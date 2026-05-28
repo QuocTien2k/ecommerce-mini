@@ -156,3 +156,40 @@ export const createVoucherSchema = z
 export type CreateVoucherFormValues = z.input<typeof createVoucherSchema>;
 
 export type CreateVoucherFormOutput = z.output<typeof createVoucherSchema>;
+
+//update
+export const updateVoucherSchema = z
+  .object({
+    isActive: z.boolean().optional(),
+
+    startAt: z.string().min(1, "Thời gian bắt đầu không hợp lệ").optional(),
+    endAt: z.string().min(1, "Thời gian kết thúc không hợp lệ").optional(),
+
+    usageLimit: z
+      .number({
+        error: "Giới hạn sử dụng không hợp lệ",
+      })
+      .min(1, "Giới hạn sử dụng phải >= 1")
+      .optional(),
+
+    minOrderValue: optionalPositiveNumber(
+      "Đơn tối thiểu không hợp lệ",
+      0,
+      "Đơn tối thiểu không được nhỏ hơn 0",
+    ),
+  })
+
+  .refine(
+    (data) => {
+      if (!data.startAt || !data.endAt) return true;
+
+      return new Date(data.startAt).getTime() <= new Date(data.endAt).getTime();
+    },
+    {
+      path: ["endAt"],
+      message: "Thời gian kết thúc phải sau hoặc bằng thời gian bắt đầu",
+    },
+  );
+export type UpdateVoucherFormValues = z.input<typeof updateVoucherSchema>;
+
+export type UpdateVoucherFormOutput = z.output<typeof updateVoucherSchema>;

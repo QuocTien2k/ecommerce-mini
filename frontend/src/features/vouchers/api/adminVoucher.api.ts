@@ -20,5 +20,5 @@ export const adminVoucherApi = {
   updateVoucher: (
     id: string,
     payload: UpdateVoucherPayload,
-  ): ApiResult<AdminVoucher> => api.patch(`/voucher/admin/${id}`, payload),
+  ): ApiResult<AdminVoucher> => api.patch(`/voucher/${id}`, payload),
 };
