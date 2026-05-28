@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import { Textarea } from "@components/ui/textarea";
 import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
 import { useAdminCreateVoucherForm } from "@features/vouchers/forms/use-admin-create-voucher-form";
 import { useAdminCreateVoucher } from "@features/vouchers/hooks/admin/useAdminCreateVoucher";
@@ -40,6 +39,7 @@ export const AdminCreateVoucher = ({
   onClose,
 }: CreateVoucherFormProps) => {
   const form = useAdminCreateVoucherForm();
+  const type = form.watch("type");
 
   const { loading, run } = useScopedLoading();
 
@@ -194,8 +194,9 @@ export const AdminCreateVoucher = ({
               />
 
               <span className="text-xs text-muted-foreground">
-                Voucher FIXED: nhập số tiền giảm. Voucher PERCENT: nhập phần
-                trăm giảm.
+                {type === VOUCHER_TYPES.FIXED
+                  ? "Nhập số tiền muốn giảm. Ví dụ: 50000"
+                  : "Nhập phần trăm giảm. Ví dụ: 20 nghĩa là giảm 20%"}
               </span>
 
               <FieldError error={form.formState.errors.value} />
@@ -213,6 +214,12 @@ export const AdminCreateVoucher = ({
                     valueAsNumber: true,
                   })}
                 />
+
+                <span className="text-xs text-muted-foreground">
+                  {type === VOUCHER_TYPES.FIXED
+                    ? "Voucher giảm cố định không cần giới hạn giảm tối đa."
+                    : "Nhập số tiền giảm tối đa. Ví dụ: 100000 nghĩa là giảm nhiều nhất 100.000đ."}
+                </span>
 
                 <FieldError error={form.formState.errors.maxDiscount} />
               </div>
