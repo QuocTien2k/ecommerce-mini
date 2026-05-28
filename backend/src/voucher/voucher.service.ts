@@ -373,7 +373,22 @@ export class VoucherService {
     });
 
     if (assigned) {
-      throw new BadRequestException('Voucher đã được assign, không thể update');
+      const forbidden = [
+        'code',
+        'type',
+        'value',
+        'scope',
+        'productIds',
+        'categoryIds',
+      ];
+
+      const hasForbidden = forbidden.some((f) => dto[f] !== undefined);
+
+      if (hasForbidden) {
+        throw new BadRequestException(
+          'Voucher đã được sử dụng, chỉ được cập nhật trạng thái hoặc thông tin vận hành',
+        );
+      }
     }
 
     this.validateUpdate(dto, voucher);
