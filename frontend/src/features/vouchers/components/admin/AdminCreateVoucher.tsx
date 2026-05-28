@@ -28,6 +28,7 @@ import {
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { X } from "lucide-react";
+import { AdminProductSelector } from "./AdminProductSelector";
 
 type CreateVoucherFormProps = {
   open: boolean;
@@ -281,24 +282,14 @@ export const AdminCreateVoucher = ({
             </div>
 
             {form.watch("scope") === VOUCHER_SCOPES.PRODUCT && (
-              <div className="space-y-2">
-                <Label htmlFor="productIds">Danh sách productIds</Label>
-
-                <Textarea
-                  id="productIds"
-                  placeholder="product-id-1, product-id-2"
-                  onChange={(e) => {
-                    const values = e.target.value
-                      .split(",")
-                      .map((item) => item.trim())
-                      .filter(Boolean);
-
-                    form.setValue("productIds", values);
-                  }}
-                />
-
-                <FieldError error={form.formState.errors.productIds} />
-              </div>
+              <AdminProductSelector
+                value={form.watch("productIds") ?? []}
+                onChange={(value) =>
+                  form.setValue("productIds", value, {
+                    shouldValidate: true,
+                  })
+                }
+              />
             )}
 
             {/* CATEGORY SELECT */}
