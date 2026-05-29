@@ -18,6 +18,7 @@ import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 import { ApplyVoucherDto } from './dtos/apply-voucher.dto';
 import { ApplyVoucherResult } from '@common/types/voucher.type';
 import { NotificationsGateway } from '@notification/notification.gateway';
+import { VoucherDetailAdminResponseDto } from './dtos/voucher-detail.dto';
 
 @Injectable()
 export class VoucherService {
@@ -323,6 +324,76 @@ export class VoucherService {
     ]);
 
     return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  async getVoucherDetailForAdmin(
+    voucherId: string,
+  ): Promise<VoucherDetailAdminResponseDto> {
+    if (!voucherId?.trim()) {
+      throw new BadRequestException('Voucher ID không được để trống');
+    }
+
+    const voucher = await this.prisma.voucher.findFirst({
+      where: {
+        id: voucherId,
+        isDeleted: false,
+      },
+      include: {
+        products: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!voucher) {
+      throw new NotFoundException(
+        `Không tìm thấy voucher với ID: ${voucherId}`,
+      );
+    }
+
+    return {
+      id: voucher.id,
+      code: voucher.code,
+      type: voucher.type,
+      value: Number(voucher.value),
+      maxDiscount: voucher.maxDiscount
+        ? Number(voucher.maxDiscount)
+        : undefined,
+      minOrderValue: voucher.minOrderValue
+        ? Number(voucher.minOrderValue)
+        : undefined,
+      usageLimit: voucher.usageLimit ?? 0,
+      usedCount: voucher.usedCount,
+      scope: voucher.scope,
+      isActive: voucher.isActive,
+      startAt: voucher.startAt,
+      endAt: voucher.endAt,
+      createdAt: voucher.createdAt,
+      updatedAt: voucher.updatedAt,
+
+      // IDs
+      productIds: voucher.products.map((p) => p.id),
+      categoryIds: voucher.categories.map((c) => c.id),
+
+      // Thông tin hiển thị
+      products: voucher.products.map((p) => ({
+        id: p.id,
+        name: p.name,
+      })),
+      categories: voucher.categories.map((c) => ({
+        id: c.id,
+        name: c.name,
+      })),
+    };
   }
 
   /* Case update*/

@@ -21,6 +21,7 @@ import { GetMyVouchersDto } from './dtos/get-my-voucher.dto';
 import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
+import { GetVoucherDetailAdminDto } from './dtos/voucher-detail.dto';
 
 @Controller('voucher')
 export class VoucherController {
@@ -43,6 +44,14 @@ export class VoucherController {
   @ResponseMessage('Lấy danh sách voucher thành công!')
   async getVouchersAdmin(@Query() query: GetVouchersAdminDto) {
     return await this.voucherService.getVouchersAdmin(query);
+  }
+
+  @Get(':voucherId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy chi tiết voucher thành công!')
+  async getVoucherDetail(@Param() dto: GetVoucherDetailAdminDto) {
+    return this.voucherService.getVoucherDetailForAdmin(dto.voucherId);
   }
 
   @Post('')
