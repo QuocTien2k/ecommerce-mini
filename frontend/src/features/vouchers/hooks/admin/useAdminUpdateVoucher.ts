@@ -1,7 +1,10 @@
 import { adminVoucherApi } from "@features/vouchers/api/adminVoucher.api";
 import type { UpdateVoucherPayload } from "@features/vouchers/types/admin-voucher.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ADMIN_VOUCHERS_QUERY_KEY } from "./useAdminVoucherQuery";
+import {
+  ADMIN_VOUCHER_DETAIL_QUERY_KEY,
+  ADMIN_VOUCHERS_QUERY_KEY,
+} from "./useAdminVoucherQuery";
 
 export type UpdateVoucherFormValues = {
   id: string;
@@ -16,10 +19,15 @@ export const useAdminUpdateVoucher = () => {
       return await adminVoucherApi.updateVoucher(id, data);
     },
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       // invalidate list only
       queryClient.invalidateQueries({
         queryKey: [ADMIN_VOUCHERS_QUERY_KEY],
+      });
+
+      // invalidate detail
+      queryClient.invalidateQueries({
+        queryKey: [ADMIN_VOUCHER_DETAIL_QUERY_KEY, variables.id],
       });
     },
   });

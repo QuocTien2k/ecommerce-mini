@@ -15,11 +15,12 @@ import { cn } from "@lib/utils";
 import { Badge } from "@components/ui/badge";
 import { format } from "date-fns";
 import { AsyncButton } from "@components/common/async-button";
-import { RotateCcw, Trash2 } from "lucide-react";
+import { Eye, RotateCcw, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import CopyableText from "@components/common/copyable-text";
 import { AdminCreateVoucher } from "./components/admin/AdminCreateVoucher";
 import { AdminUpdateVoucher } from "./components/admin/AdminUpdateVoucher";
+import AdminVoucherDetailModal from "./components/admin/AdminVoucherDetail";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -27,6 +28,7 @@ const AdminVoucherPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [selectedVoucher, setSelectedVoucher] = useState<AdminVoucher | null>(
     null,
@@ -96,6 +98,7 @@ const AdminVoucherPage = () => {
                 <th className="px-4 py-3 text-center font-medium w-40">
                   Hành động
                 </th>
+                <th className="px-4 py-3 font-medium">Chi tiết</th>
               </tr>
             </thead>
 
@@ -272,6 +275,20 @@ const AdminVoucherPage = () => {
                         </AsyncButton>
                       </div>
                     </td>
+
+                    {/* DETAIL */}
+                    <td className="px-4 py-3">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setSelectedVoucher(voucher);
+                          setOpenDetail(true);
+                        }}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </td>
                   </tr>
                 );
               })}
@@ -311,6 +328,12 @@ const AdminVoucherPage = () => {
           setSelectedVoucher(null);
         }}
         voucher={selectedVoucher}
+      />
+
+      <AdminVoucherDetailModal
+        open={openDetail}
+        onOpenChange={setOpenDetail}
+        voucherId={selectedVoucher?.id}
       />
     </QueryStateWrapper>
   );
