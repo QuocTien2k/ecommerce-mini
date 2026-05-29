@@ -50,6 +50,22 @@ export interface AdminVoucher {
   updatedAt: string;
 }
 
+export interface AdminVoucherDetail extends AdminVoucher {
+  productIds: string[];
+
+  categoryIds: string[];
+
+  products: {
+    id: string;
+    name: string;
+  }[];
+
+  categories: {
+    id: string;
+    name: string;
+  }[];
+}
+
 export interface GetAdminVouchersQuery {
   page?: number;
   limit?: number;

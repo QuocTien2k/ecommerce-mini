@@ -3,6 +3,7 @@ import type { ApiResult } from "@shared/types/api-result";
 import type { PaginatedResponse } from "@shared/types/pagination";
 import type {
   AdminVoucher,
+  AdminVoucherDetail,
   CreateVoucherPayload,
   GetAdminVouchersQuery,
   UpdateVoucherPayload,
@@ -13,6 +14,9 @@ export const adminVoucherApi = {
     params?: GetAdminVouchersQuery,
   ): ApiResult<PaginatedResponse<AdminVoucher>> =>
     api.get("/voucher/admin", { params }),
+
+  getVoucherDetail: (voucherId: string): ApiResult<AdminVoucherDetail> =>
+    api.get(`/voucher/${voucherId}`),
 
   createVoucher: (payload: CreateVoucherPayload): ApiResult<AdminVoucher> =>
     api.post("/voucher/", payload),
