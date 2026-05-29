@@ -15,12 +15,15 @@ import { cn } from "@lib/utils";
 import { Badge } from "@components/ui/badge";
 import { format } from "date-fns";
 import { AsyncButton } from "@components/common/async-button";
-import { Eye, RotateCcw, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import CopyableText from "@components/common/copyable-text";
 import { AdminCreateVoucher } from "./components/admin/AdminCreateVoucher";
 import { AdminUpdateVoucher } from "./components/admin/AdminUpdateVoucher";
 import AdminVoucherDetailModal from "./components/admin/AdminVoucherDetail";
+import { sonnerToast } from "@lib/sonner-toast";
+import { useAdminSoftDeleteVoucher } from "./hooks/admin/useAdminSofteDeleteVoucher";
+import { ConfirmModal } from "@components/common/confirm";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -29,6 +32,10 @@ const AdminVoucherPage = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(
+    null,
+  );
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [selectedVoucher, setSelectedVoucher] = useState<AdminVoucher | null>(
     null,
@@ -38,6 +45,7 @@ const AdminVoucherPage = () => {
     useAdminVoucherFilter();
   const { data, isLoading, isFetching } = useAdminVouchersQuery(queryParams);
   const { loading, run } = useScopedLoading();
+  const { mutateAsync: softDeleteVoucher } = useAdminSoftDeleteVoucher();
 
   const vouchers: AdminVoucher[] = data?.data?.data ?? [];
   const meta = data?.data?.meta;
@@ -45,7 +53,30 @@ const AdminVoucherPage = () => {
   const totalPages = meta?.totalPages ?? 1;
 
   const handleVoucherDelete = async (voucherId: string) => {
-    console.log("Voucher id: ", voucherId);
+    setPendingId(voucherId);
+    setPendingAction("delete");
+    try {
+      const result = await run(() => softDeleteVoucher(voucherId));
+
+      sonnerToast.success(result.message);
+    } finally {
+      setPendingId(null);
+      setPendingAction(null);
+    }
+  };
+
+  const handleOpenDeleteModal = (voucherId: string) => {
+    setSelectedVoucherId(voucherId);
+    setOpenDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedVoucherId) return;
+
+    await handleVoucherDelete(selectedVoucherId);
+
+    setOpenDeleteModal(false);
+    setSelectedVoucherId(null);
   };
 
   return (
@@ -269,7 +300,7 @@ const AdminVoucherPage = () => {
                             pendingAction === "delete"
                           }
                           variant="destructive"
-                          onClick={() => handleVoucherDelete(voucher.id)}
+                          onClick={() => handleOpenDeleteModal(voucher.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </AsyncButton>
@@ -281,6 +312,7 @@ const AdminVoucherPage = () => {
                       <Button
                         size="icon"
                         variant="ghost"
+                        disabled={voucher.isDeleted}
                         onClick={() => {
                           setSelectedVoucher(voucher);
                           setOpenDetail(true);
@@ -314,6 +346,20 @@ const AdminVoucherPage = () => {
           onPageChange={setPage}
         />
       </div>
+
+      <ConfirmModal
+        open={openDeleteModal}
+        loading={loading}
+        destructive
+        title="Xóa voucher"
+        description="Voucher sẽ bị vô hiệu hóa và không thể sử dụng lại."
+        confirmText="Xóa voucher"
+        onCancel={() => {
+          setOpenDeleteModal(false);
+          setSelectedVoucherId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      />
 
       {/* Create */}
       <AdminCreateVoucher

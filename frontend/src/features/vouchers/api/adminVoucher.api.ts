@@ -25,4 +25,7 @@ export const adminVoucherApi = {
     id: string,
     payload: UpdateVoucherPayload,
   ): ApiResult<AdminVoucher> => api.patch(`/voucher/${id}`, payload),
+
+  softDeleteVoucher: (voucherId: string): ApiResult<AdminVoucher> =>
+    api.patch(`/voucher/soft/${voucherId}`),
 };
