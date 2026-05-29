@@ -307,7 +307,6 @@ export class VoucherService {
 
     const finalWhere = {
       ...where,
-      isDeleted: false,
     };
 
     const [data, total] = await Promise.all([
