@@ -25,6 +25,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { Controller } from "react-hook-form";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
+import { getCategoryDisplayName } from "@/utils/category-display-name";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -50,6 +51,10 @@ const AdminUpdateProduct = ({
   // console.log("Category dạng flat: ", categories);
   const categoriesReady =
     !flatCategoriesQuery.isLoading && categories.length > 0;
+
+  const selectableCategories =
+    flatCategoriesQuery.data?.data.filter((category) => category.level !== 1) ??
+    [];
 
   const brandsQuery = useAdminBrandQuery();
   const brands: AdminBrandItem[] = brandsQuery.data?.data?.data ?? [];
@@ -243,12 +248,10 @@ const AdminUpdateProduct = ({
                       </SelectTrigger>
 
                       <SelectContent position="popper">
-                        {categories.map((category) => (
-                          <SelectItem
-                            key={category.id}
-                            value={String(category.id)}
-                          >
-                            {category.name}
+                        {selectableCategories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {"—".repeat(category.level - 1)}
+                            {getCategoryDisplayName(category.name)}
                           </SelectItem>
                         ))}
                       </SelectContent>
