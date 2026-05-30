@@ -204,6 +204,7 @@ export class CategoryService {
     let slug = toSlug(dto.name);
     let uniqueSlug = slug;
     let counter = 1;
+    let variantType = dto.variantType;
 
     while (
       await this.prisma.category.findUnique({ where: { slug: uniqueSlug } })
@@ -215,6 +216,10 @@ export class CategoryService {
     if (dto.parentId) {
       const parent = await this.prisma.category.findUnique({
         where: { id: dto.parentId },
+        select: {
+          id: true,
+          variantType: true,
+        },
       });
 
       if (!parent) {
@@ -226,7 +231,7 @@ export class CategoryService {
         throw new BadRequestException('Category con vượt quá level 3');
       }
 
-      await this.validateVariantTypeWithParent(dto.parentId, dto.variantType);
+      variantType = parent.variantType;
     }
 
     let imageUrl: string | null = null;
@@ -255,7 +260,7 @@ export class CategoryService {
         imagePublicId: publicId,
         parentId: dto.parentId ?? null,
         isActive: dto.isActive ?? true,
-        variantType: dto.variantType,
+        variantType,
       },
     });
   }
