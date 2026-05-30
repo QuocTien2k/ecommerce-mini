@@ -1,6 +1,7 @@
 import type { VariantType } from "@features/categories/types/admin-category.type";
 import SizeColor from "./SizeColor";
 import { type UseFormReturn } from "react-hook-form";
+import Storage from "./Storage";
 
 type VariantFormValues = {
   attributes?: Record<string, string | number>;
