@@ -21,6 +21,7 @@ import { Separator } from "@components/ui/separator";
 import { useState } from "react";
 import AdminCreateVariant from "./components/AdminCreateVariant";
 import AdminUpdateVariant from "./components/AdminUpdateVariant";
+import { ATTRIBUTE_LABELS } from "@shared/types/variant-type";
 //import { AdminUpdateVariant } from "./components/AdminUpdateVariant";
 
 const AdminProductDetail = () => {
@@ -209,19 +210,22 @@ const AdminProductDetail = () => {
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <Ruler className="h-4 w-4 text-muted-foreground" />
+                          {Object.entries(variant.attributes ?? {}).map(
+                            ([key, value]) => (
+                              <div
+                                key={key}
+                                className="flex items-center gap-2"
+                              >
+                                <p className="text-base font-medium">
+                                  <span className="mr-1 text-sm font-medium text-muted-foreground">
+                                    {ATTRIBUTE_LABELS[key] ?? key}:
+                                  </span>
 
-                            <p className="text-base font-medium">
-                              <span className="mr-1 text-sm font-medium text-muted-foreground">
-                                Size:
-                              </span>
-
-                              <span className="font-semibold">
-                                {variant.attributes?.size ?? "-"}
-                              </span>
-                            </p>
-                          </div>
+                                  <span className="font-semibold">{value}</span>
+                                </p>
+                              </div>
+                            ),
+                          )}
 
                           <div className="flex items-center gap-2">
                             <Package2 className="h-4 w-4 text-muted-foreground" />
