@@ -1,13 +1,13 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useUpdateCategoryForm } from "../forms/use-update-category-form";
-import { type VariantType } from "../types/admin-category.type";
+import { VARIANT_TYPES, type VariantType } from "../types/admin-category.type";
 import { useEffect, useRef, useState } from "react";
 import { useUpdateCategoryMutation } from "../hooks/useAdminUpdateCategory";
 import { useAdminFlatCategoriesQuery } from "../hooks/useAdminCategoryFlatQuery";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, Info, X, ArrowRight } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { Textarea } from "@components/ui/textarea";
@@ -26,6 +26,7 @@ import {
 } from "@shared/types/variant-type";
 import { useWatch } from "react-hook-form";
 import { useAdminCategoryDetailQuery } from "../hooks/useAdminCategoryDetail";
+import { getCategoryContextLabel } from "@/utils/category/get-category-context";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -54,6 +55,12 @@ export const UpdateCategoryForm = ({
     open ? categoryId : undefined,
   );
   const detail = categoryDetailQuery.data?.data;
+  const categoryContext = detail
+    ? getCategoryContextLabel({
+        level: detail.level,
+        parentName: detail.parentName,
+      })
+    : null;
 
   const selectedFile = form.watch("file");
 
@@ -83,9 +90,10 @@ export const UpdateCategoryForm = ({
     flatCategoriesQuery.isSuccess &&
     categoryDetailQuery.isSuccess;
 
-  console.log(categoryId);
-  console.log(categoryDetailQuery.data?.data.id);
+  // console.log(categoryId);
+  // console.log(categoryDetailQuery.data?.data.id);
 
+  // Đồng bộ variantType theo danh mục cha.
   useEffect(() => {
     if (isInitializingRef.current) return;
     if (!selectedParent) return;
@@ -179,6 +187,8 @@ export const UpdateCategoryForm = ({
     }
   });
 
+  console.log("Chi tiết: ", detail);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
@@ -194,6 +204,32 @@ export const UpdateCategoryForm = ({
           <Button variant="destructive" size="icon" onClick={handleClose}>
             <X className="h-4 w-4" />
           </Button>
+        </div>
+
+        {/*Info */}
+        <div className="mb-4 rounded-xl border border-muted bg-muted/40 p-3 shadow-sm">
+          <div className="flex gap-3">
+            {/* Icon column */}
+            <div className="flex flex-col items-center">
+              <Info className="h-5 w-5 text-indigo-500" />
+              <div className="mt-1 h-full w-px bg-muted" />
+            </div>
+
+            {/* Content */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">
+                {categoryContext?.label || "Không có tiêu đề"}
+              </p>
+
+              <p className="text-xs text-muted-foreground flex items-center gap-2 leading-relaxed">
+                <ArrowRight className="h-5 w-5 shrink-0 text-orange-500" />
+                <span>
+                  <span className="font-medium text-foreground">Gợi ý:</span>{" "}
+                  {categoryContext?.description || "Không có mô tả"}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
@@ -235,9 +271,15 @@ export const UpdateCategoryForm = ({
 
             <Select
               value={parentId || "none"}
-              onValueChange={(value) =>
-                form.setValue("parentId", value === "none" ? undefined : value)
-              }
+              onValueChange={(value) => {
+                const nextParentId = value === "none" ? undefined : value;
+
+                form.setValue("parentId", nextParentId);
+
+                if (value === "none") {
+                  form.setValue("variantType", VARIANT_TYPES.NONE);
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Chọn danh mục cha" />

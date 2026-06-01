@@ -23,7 +23,7 @@ import type { CreateProductFormOutput } from "../schemas/product.schema";
 import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
-import { getCategoryDisplayName } from "@/utils/category-display-name";
+import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 
 type CreateProductFormProps = {
   open: boolean;

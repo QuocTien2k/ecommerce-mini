@@ -1,5 +1,5 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
-import { getCategoryDisplayName } from "@/utils/category-display-name";
+import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { AsyncButton } from "@components/common/async-button";
 import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";

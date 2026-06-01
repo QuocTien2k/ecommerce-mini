@@ -24,7 +24,7 @@ import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import { useAdminStatusMutation } from "./hooks/useAdminStatusMutation";
 import { getErrorMessage } from "@lib/error";
-import { getCategoryDisplayName } from "@/utils/category-display-name";
+import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 

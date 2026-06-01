@@ -25,7 +25,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { Controller } from "react-hook-form";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
-import { getCategoryDisplayName } from "@/utils/category-display-name";
+import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 
 type AdminUpdateProductProps = {
   open: boolean;
