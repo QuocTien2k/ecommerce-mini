@@ -28,6 +28,7 @@ import {
   variantTypeLabels,
 } from "@shared/types/variant-type";
 import { useWatch } from "react-hook-form";
+import { useAdminCategoryDetailQuery } from "../hooks/useAdminCategoryDetail";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -52,10 +53,11 @@ export const UpdateCategoryForm = ({
 
   const updateMutation = useUpdateCategoryMutation();
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+  const categoryDetailQuery = useAdminCategoryDetailQuery(
+    open ? category.id : undefined,
+  );
 
   const selectedFile = form.watch("file");
-  // const parentId = form.watch("parentId");
-  // const isActive = form.watch("isActive");
 
   const parentId = useWatch({
     control: form.control,
@@ -77,7 +79,11 @@ export const UpdateCategoryForm = ({
   );
 
   const isVariantLocked = category ? !category.canChangeVariantType : false;
-  const isReady = open && !!category && flatCategoriesQuery.isSuccess;
+  const isReady =
+    open &&
+    !!category &&
+    flatCategoriesQuery.isSuccess &&
+    categoryDetailQuery.isSuccess;
 
   useEffect(() => {
     if (isInitializingRef.current) return;
@@ -91,27 +97,31 @@ export const UpdateCategoryForm = ({
 
   //  init form change or open
   useEffect(() => {
-    if (!isReady || !category) return;
+    if (!isReady) return;
+
+    const detail = categoryDetailQuery.data?.data;
+
+    if (!detail) return;
 
     isInitializingRef.current = true;
     setIsFormReady(false);
 
     form.reset({
-      name: category.name,
-      description: category.description ?? "",
-      parentId: category.parentId ?? undefined,
-      isActive: category.isActive,
-      variantType: category.variantType,
+      name: detail.name,
+      description: detail.description ?? "",
+      parentId: detail.parentId ?? undefined,
+      isActive: detail.isActive,
+      variantType: detail.variantType,
       file: undefined,
     });
 
-    setPreviewUrl(category.image);
+    setPreviewUrl(detail.image);
 
     queueMicrotask(() => {
       isInitializingRef.current = false;
       setIsFormReady(true);
     });
-  }, [isReady, category, form]);
+  }, [isReady, categoryDetailQuery.data, form]);
 
   // file preview
   useEffect(() => {
@@ -236,8 +246,7 @@ export const UpdateCategoryForm = ({
                 <SelectItem value="none">Không có danh mục cha</SelectItem>
                 {flatCategoriesQuery.data?.data?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {"ㅤ".repeat((category.level - 1) * 2)}
-                    {category.name}
+                    {`${"— ".repeat(category.level - 1)}${category.name}`}
                   </SelectItem>
                 ))}
               </SelectContent>

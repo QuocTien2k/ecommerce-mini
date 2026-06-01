@@ -34,6 +34,29 @@ export interface AdminCategoryItem {
   createdAt: string;
 }
 
+export interface AdminCategoryDetail {
+  id: string;
+  name: string;
+  slug: string;
+
+  description: string | null;
+
+  image: string | null;
+  imagePublicId: string | null;
+
+  parentId: string | null;
+  parentName: string | null;
+
+  level: number;
+
+  variantType: VariantType;
+
+  isActive: boolean;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FlatCategoryItem {
   id: string;
   name: string;
