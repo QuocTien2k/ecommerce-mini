@@ -1,9 +1,6 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useUpdateCategoryForm } from "../forms/use-update-category-form";
-import {
-  type AdminCategoryItem,
-  type VariantType,
-} from "../types/admin-category.type";
+import { type VariantType } from "../types/admin-category.type";
 import { useEffect, useRef, useState } from "react";
 import { useUpdateCategoryMutation } from "../hooks/useAdminUpdateCategory";
 import { useAdminFlatCategoriesQuery } from "../hooks/useAdminCategoryFlatQuery";
@@ -33,15 +30,15 @@ import { useAdminCategoryDetailQuery } from "../hooks/useAdminCategoryDetail";
 type UpdateCategoryFormProps = {
   open: boolean;
   onClose: () => void;
-  category: AdminCategoryItem | null;
+  categoryId?: string;
 };
 
 export const UpdateCategoryForm = ({
   open,
   onClose,
-  category,
+  categoryId,
 }: UpdateCategoryFormProps) => {
-  if (!open || !category) return null;
+  if (!open || !categoryId) return null;
 
   const form = useUpdateCategoryForm();
 
@@ -54,8 +51,9 @@ export const UpdateCategoryForm = ({
   const updateMutation = useUpdateCategoryMutation();
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
   const categoryDetailQuery = useAdminCategoryDetailQuery(
-    open ? category.id : undefined,
+    open ? categoryId : undefined,
   );
+  const detail = categoryDetailQuery.data?.data;
 
   const selectedFile = form.watch("file");
 
@@ -78,12 +76,15 @@ export const UpdateCategoryForm = ({
     (item) => item.id === parentId,
   );
 
-  const isVariantLocked = category ? !category.canChangeVariantType : false;
+  const isVariantLocked = detail ? !detail.canChangeVariantType : false;
   const isReady =
     open &&
-    !!category &&
+    !!categoryId &&
     flatCategoriesQuery.isSuccess &&
     categoryDetailQuery.isSuccess;
+
+  console.log(categoryId);
+  console.log(categoryDetailQuery.data?.data.id);
 
   useEffect(() => {
     if (isInitializingRef.current) return;
@@ -146,13 +147,13 @@ export const UpdateCategoryForm = ({
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
-    if (!category || loading) return;
+    if (!categoryId || loading) return;
 
     try {
       const result = await run(
         () =>
           updateMutation.mutateAsync({
-            id: category.id,
+            id: categoryId,
             data: {
               name: values.name,
               description: values.description,

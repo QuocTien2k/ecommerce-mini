@@ -33,12 +33,11 @@ const AdminCategoryPage = () => {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openCreate, setOpenCreate] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
-  const [selectedCategory, setSelectedCategory] =
-    useState<AdminCategoryItem | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
 
   const handleCloseUpdate = () => {
     setOpenUpdate(false);
-    setSelectedCategory(null);
+    setSelectedCategoryId("");
   };
   const { loading, run } = useScopedLoading();
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
@@ -236,7 +235,7 @@ const AdminCategoryPage = () => {
                             pendingAction === "update"
                           }
                           onClick={() => {
-                            setSelectedCategory(category);
+                            setSelectedCategoryId(category.id);
                             setOpenUpdate(true);
                           }}
                         >
@@ -297,11 +296,11 @@ const AdminCategoryPage = () => {
         onClose={() => setOpenCreate(false)}
       />
 
-      {openUpdate && selectedCategory && (
+      {openUpdate && selectedCategoryId && (
         <UpdateCategoryForm
           open={openUpdate}
           onClose={handleCloseUpdate}
-          category={selectedCategory}
+          categoryId={selectedCategoryId}
         />
       )}
     </QueryStateWrapper>

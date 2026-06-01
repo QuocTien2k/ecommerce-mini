@@ -55,6 +55,8 @@ export interface AdminCategoryDetail {
 
   createdAt: string;
   updatedAt: string;
+
+  canChangeVariantType: boolean;
 }
 
 export interface FlatCategoryItem {
