@@ -45,6 +45,14 @@ export class CategoryControllerAdmin {
     return await this.categoryService.getFlatCategoryTree();
   }
 
+  //detail
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getDetail(@Param('id') categoryId: string) {
+    return await this.categoryService.getDetail(categoryId);
+  }
+
   // ACTIONS
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)

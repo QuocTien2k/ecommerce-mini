@@ -10,7 +10,10 @@ import { toSlug } from '@common/utils/slug';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 import { CategoryTreeNode, FlatCategoryItem } from './dtos/tree-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { AdminCategoryQueryDto } from './dtos/admin-category.dto';
+import {
+  AdminCategoryQueryDto,
+  CategoryDetailDto,
+} from './dtos/admin-category.dto';
 import {
   buildPaginatedResponse,
   getPagination,
@@ -554,6 +557,74 @@ export class CategoryService {
     }));
 
     return buildPaginatedResponse(data, total, page, limit);
+  }
+
+  //list detail for admin
+  async getDetail(id: string): Promise<CategoryDetailDto> {
+    const category = await this.prisma.category.findUnique({
+      where: { id },
+
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+
+        description: true,
+
+        image: true,
+        imagePublicId: true,
+
+        parentId: true,
+
+        parent: {
+          select: {
+            id: true,
+            name: true,
+            parentId: true,
+
+            parent: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+
+        variantType: true,
+
+        isActive: true,
+
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!category) {
+      throw new BadRequestException('Không tìm thấy danh mục');
+    }
+
+    return {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+
+      description: category.description,
+
+      image: category.image,
+      imagePublicId: category.imagePublicId,
+
+      parentId: category.parentId,
+      parentName: category.parent?.name ?? null,
+
+      level: this.getCategoryLevelFromTree(category),
+
+      variantType: category.variantType,
+
+      isActive: category.isActive,
+
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+    };
   }
 
   //soft delete

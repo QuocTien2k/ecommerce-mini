@@ -1,5 +1,6 @@
 import { IsBoolean, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { VariantType } from '@prisma/client';
 
 export class AdminCategoryQueryDto {
   @IsOptional()
@@ -37,4 +38,27 @@ export class AdminCategoryQueryDto {
   @Type(() => Number)
   @Min(1)
   limit: number = 10;
+}
+
+export class CategoryDetailDto {
+  id: string;
+  name: string;
+  slug: string;
+
+  description: string | null;
+
+  image: string | null;
+  imagePublicId: string | null;
+
+  parentId: string | null;
+  parentName: string | null;
+
+  level: number;
+
+  variantType: VariantType;
+
+  isActive: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
