@@ -143,10 +143,29 @@ export class CategoryService {
       },
     });
 
+    // console.log('hasChildren count', {
+    //   categoryId,
+    //   count,
+    // });
+
+    // const children = await this.prisma.category.findMany({
+    //   where: {
+    //     parentId: categoryId,
+    //     deletedAt: null,
+    //   },
+    //   select: {
+    //     id: true,
+    //     name: true,
+    //     parentId: true,
+    //   },
+    // });
+
+    // console.log('children', children);
+
     return count > 0;
   }
 
-  //check variantType
+  //validate variant type with parent category
   private async validateVariantTypeWithParent(
     parentId: string | null | undefined,
     variantType: VariantType,
@@ -171,23 +190,17 @@ export class CategoryService {
     }
   }
 
-  //chống change variant khi có parent
-  private async validateVariantTypeChange(
-    categoryId: string,
-    currentVariantType: VariantType,
-    nextVariantType: VariantType,
-  ) {
-    // không đổi => bỏ qua
-    if (currentVariantType === nextVariantType) {
-      return;
-    }
-
+  // kiểm tra danh mục có được phép đổi variant type
+  private async canChangeVariantType(categoryId: string): Promise<boolean> {
     const hasChildren = await this.hasChildren(categoryId);
 
+    // console.log('hasChildren', {
+    //   categoryId,
+    //   hasChildren,
+    // });
+
     if (hasChildren) {
-      throw new BadRequestException(
-        'Không thể đổi variant type khi danh mục có danh mục con',
-      );
+      return false;
     }
 
     const hasProducts = await this.prisma.product.count({
@@ -196,9 +209,35 @@ export class CategoryService {
       },
     });
 
-    if (hasProducts > 0) {
+    // console.log('hasProducts', {
+    //   categoryId,
+    //   hasProducts,
+    // });
+
+    return hasProducts === 0;
+  }
+
+  // validate việc thay đổi variant type, chặn khi đã có sản phẩm hoặc danh mục con
+  private async validateVariantTypeChange(
+    categoryId: string,
+    currentVariantType: VariantType,
+    nextVariantType: VariantType,
+  ) {
+    // console.log('validateVariantTypeChange', {
+    //   categoryId,
+    //   currentVariantType,
+    //   nextVariantType,
+    // });
+    if (currentVariantType === nextVariantType) {
+      return;
+    }
+
+    const canChange = await this.canChangeVariantType(categoryId);
+    //console.log('canChange', canChange);
+
+    if (!canChange) {
       throw new BadRequestException(
-        'Không thể đổi variant type khi danh mục đã có sản phẩm',
+        'Không thể đổi variant type khi danh mục đã có sản phẩm hoặc danh mục con',
       );
     }
   }
@@ -624,6 +663,7 @@ export class CategoryService {
 
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
+      canChangeVariantType: await this.canChangeVariantType(category.id),
     };
   }
 

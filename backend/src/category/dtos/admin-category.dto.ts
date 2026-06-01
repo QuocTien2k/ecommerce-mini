@@ -61,4 +61,5 @@ export class CategoryDetailDto {
 
   createdAt: Date;
   updatedAt: Date;
+  canChangeVariantType: boolean;
 }
