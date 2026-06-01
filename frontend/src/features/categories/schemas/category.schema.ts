@@ -43,9 +43,21 @@ const categoryBaseSchema = z.object({
 });
 
 // create
-export const createCategorySchema = categoryBaseSchema.extend({
-  file: imageFileSchema,
-});
+export const createCategorySchema = categoryBaseSchema
+  .extend({
+    file: imageFileSchema.optional(),
+  })
+  .superRefine(({ parentId, file }, ctx) => {
+    const isLevel1 = !parentId;
+
+    if (isLevel1 && !file) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["file"],
+        message: "Danh mục cấp 1 bắt buộc phải có ảnh",
+      });
+    }
+  });
 
 // update
 export const updateCategorySchema = categoryBaseSchema.extend({
