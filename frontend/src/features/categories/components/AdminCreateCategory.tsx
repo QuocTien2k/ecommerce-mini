@@ -14,13 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, Info, X } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { AsyncButton } from "@components/common/async-button";
 import { toSlug } from "@/utils/toSlug";
-import type { VariantType } from "../types/admin-category.type";
+import { VARIANT_TYPES, type VariantType } from "../types/admin-category.type";
 import { variantTypeOptions } from "@shared/types/variant-type";
 
 type CreateCategoryFormProps = {
@@ -38,6 +38,9 @@ export const CreateCategoryForm = ({
 
   //preview slug
   const categoryName = form.watch("name");
+
+  //parentId
+  const parentId = form.watch("parentId");
 
   // watch file
   const selectedFile = form.watch("file");
@@ -70,6 +73,26 @@ export const CreateCategoryForm = ({
   const createCategoryMutation = useCreateCategoryMutation();
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+
+  const selectedParent = flatCategoriesQuery.data?.data.find(
+    (item) => item.id === parentId,
+  );
+
+  useEffect(() => {
+    if (selectedParent) {
+      form.setValue("variantType", selectedParent.variantType, {
+        shouldValidate: true,
+      });
+
+      return;
+    }
+
+    form.setValue("variantType", VARIANT_TYPES.NONE, {
+      shouldValidate: true,
+    });
+  }, [selectedParent, form]);
+
+  const isVariantInherited = !!selectedParent;
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (loading) return;
@@ -185,9 +208,15 @@ export const CreateCategoryForm = ({
             <Label>Danh mục cha</Label>
 
             <Select
-              value={form.watch("parentId") ?? ""}
+              value={form.watch("parentId") ?? "none"}
               onValueChange={(value) =>
-                form.setValue("parentId", value || undefined)
+                form.setValue(
+                  "parentId",
+                  value === "none" ? undefined : value,
+                  {
+                    shouldValidate: true,
+                  },
+                )
               }
             >
               <SelectTrigger>
@@ -198,10 +227,10 @@ export const CreateCategoryForm = ({
                 className="max-h-72 p-2 text-black/50"
                 position="popper"
               >
+                <SelectItem value="none">Không có danh mục cha</SelectItem>
                 {flatCategoriesQuery.data?.data?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {"".repeat(category.level - 1)}
-                    {category.name}
+                    {`${"".repeat(category.level - 1)}${category.name}`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -213,6 +242,7 @@ export const CreateCategoryForm = ({
             <Label>Loại variant</Label>
 
             <Select
+              disabled={isVariantInherited}
               value={form.watch("variantType")}
               onValueChange={(value) =>
                 form.setValue("variantType", value as VariantType, {
@@ -232,6 +262,12 @@ export const CreateCategoryForm = ({
                 ))}
               </SelectContent>
             </Select>
+            {isVariantInherited && (
+              <div className="flex items-center gap-2 text-xs font-medium text-green-600">
+                <Info className="h-3.5 w-3.5" />
+                <span>Loại variant được kế thừa từ danh mục cha</span>
+              </div>
+            )}
 
             {form.formState.errors.variantType && (
               <p className="text-sm text-red-500">

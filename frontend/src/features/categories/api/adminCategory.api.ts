@@ -36,6 +36,7 @@ export const adminCategory = {
     data: Partial<CreateCategoryDto>,
     file?: File,
   ): ApiResult<AdminCategoryItem> => {
+    //console.log("Update Payload: ", data);
     return api.patch(
       `/admin/category/${id}`,
       buildFormData(data, file ? { file } : undefined),

@@ -242,11 +242,14 @@ export const UpdateCategoryForm = ({
                 <SelectValue placeholder="Chọn danh mục cha" />
               </SelectTrigger>
 
-              <SelectContent className="max-h-72 p-2 text-black/50">
+              <SelectContent
+                className="max-h-72 p-2 text-black/50"
+                position="popper"
+              >
                 <SelectItem value="none">Không có danh mục cha</SelectItem>
                 {flatCategoriesQuery.data?.data?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {`${"— ".repeat(category.level - 1)}${category.name}`}
+                    {`${"".repeat(category.level - 1)}${category.name}`}
                   </SelectItem>
                 ))}
               </SelectContent>
