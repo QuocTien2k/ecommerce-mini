@@ -18,6 +18,7 @@ export interface AdminUpdateVariantPayload {
   stock?: number;
 
   removeImagePublicIds?: string[];
+  imageUrls?: string[];
 }
 
 export interface AdminVariantResponse {

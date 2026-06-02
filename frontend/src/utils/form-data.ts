@@ -43,9 +43,10 @@ export const buildFormData = <T extends object>(
   return formData;
 };
 
+type ArrayFormKey = "imageUrls" | "removeImagePublicIds";
 export const appendArrayField = (
   formData: FormData,
-  key: string,
+  key: ArrayFormKey,
   values?: string[],
 ) => {
   if (!values?.length) return;

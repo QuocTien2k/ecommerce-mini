@@ -24,9 +24,15 @@ export const adminProductVariantApi = {
     data: AdminUpdateVariantPayload,
     files?: File[],
   ): ApiResult<AdminUpdateVariantResponse> => {
-    return api.patch(
-      `/admin/product-variant/${id}`,
-      buildFormData(data, { files: files || [] }),
+    const formData = buildFormData(data, { files: files || [] });
+
+    appendArrayField(
+      formData,
+      "removeImagePublicIds",
+      data.removeImagePublicIds,
     );
+    appendArrayField(formData, "imageUrls", data.imageUrls); // optional future-safe
+
+    return api.patch(`/admin/product-variant/${id}`, formData);
   },
 };
