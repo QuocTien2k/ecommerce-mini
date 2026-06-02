@@ -90,17 +90,39 @@ export class ProductVariantService {
     const normalizedAttributes = this.normalizeAttributes(dto.attributes);
 
     //Upload images
-    if (!files || files.length === 0) {
-      throw new BadRequestException('Phải upload ít nhất 1 ảnh');
+    const hasFiles = files && files.length > 0;
+    const hasImageUrls = dto.imageUrls && dto.imageUrls.length > 0;
+
+    if (!hasFiles && !hasImageUrls) {
+      throw new BadRequestException('Phải upload ảnh hoặc cung cấp URL ảnh');
     }
 
-    const uploads = await this.cloudinaryService.uploadMultipleImages(
-      files,
-      'product-variants',
-    );
+    // Không cho phép dùng đồng thời
+    if (hasFiles && hasImageUrls) {
+      throw new BadRequestException(
+        'Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời',
+      );
+    }
 
-    const images = uploads.map((item) => item.secure_url);
-    const imagePublicIds = uploads.map((item) => item.public_id);
+    let images: string[] = [];
+    let imagePublicIds: string[] = [];
+
+    // Option 1: Upload Cloudinary
+    if (hasFiles) {
+      const uploads = await this.cloudinaryService.uploadMultipleImages(
+        files,
+        'product-variants',
+      );
+
+      images = uploads.map((item) => item.secure_url);
+      imagePublicIds = uploads.map((item) => item.public_id);
+    }
+
+    // Option 2: Dùng URL ngoài
+    if (hasImageUrls) {
+      images = dto.imageUrls!;
+      imagePublicIds = [];
+    }
 
     const attributes =
       dto.attributes && Object.keys(dto.attributes).length > 0
@@ -108,7 +130,6 @@ export class ProductVariantService {
         : Prisma.JsonNull;
 
     try {
-      //Create variant
       return await this.prisma.productVariant.create({
         data: {
           productId: dto.productId,
@@ -127,6 +148,8 @@ export class ProductVariantService {
       if (error.code === 'P2002') {
         throw new BadRequestException('Biến thể sản phẩm đã tồn tại');
       }
+
+      throw error;
     }
   }
 
@@ -143,71 +166,102 @@ export class ProductVariantService {
       throw new NotFoundException('Biến thể không tồn tại');
     }
 
+    const isCloudinaryVariant = variant.imagePublicIds.length > 0;
+    const isExternalVariant = variant.imagePublicIds.length === 0;
+
+    // Không cho phép trộn 2 nguồn ảnh
+    if (files?.length && dto.imageUrls?.length) {
+      throw new BadRequestException(
+        'Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời',
+      );
+    }
+
     let images = [...variant.images];
     let imagePublicIds = [...variant.imagePublicIds];
 
-    //Xóa ảnh theo publicId
-    if (dto.removeImagePublicIds?.length) {
-      const validPublicIds = dto.removeImagePublicIds.filter((id) =>
-        imagePublicIds.some((pubId) => pubId.endsWith(id)),
-      );
-
-      const fullPublicIdsToRemove = validPublicIds.map(
-        (id) => imagePublicIds.find((pubId) => pubId.endsWith(id))!,
-      );
-
-      //delete cloud
-      await Promise.all(
-        fullPublicIdsToRemove.map((publicId) =>
-          this.cloudinaryService.deleteImage(publicId),
-        ),
-      );
-
-      // filter theo index
-      const newImages: string[] = [];
-      const newPublicIds: string[] = [];
-
-      for (let i = 0; i < imagePublicIds.length; i++) {
-        if (!fullPublicIdsToRemove.includes(imagePublicIds[i])) {
-          newImages.push(images[i]);
-          newPublicIds.push(imagePublicIds[i]);
-        }
-      }
-
-      images = newImages;
-      imagePublicIds = newPublicIds;
-    }
-
-    //Upload ảnh mới
     let uploadedPublicIds: string[] = [];
 
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        if (!file.mimetype.startsWith('image/')) {
-          throw new BadRequestException('File phải là hình ảnh');
+    // cloudinary
+    if (isCloudinaryVariant) {
+      if (dto.imageUrls?.length) {
+        throw new BadRequestException(
+          'Biến thể này đang sử dụng ảnh Cloudinary',
+        );
+      }
+
+      // Xóa ảnh cloudinary
+      if (dto.removeImagePublicIds?.length) {
+        const validPublicIds = dto.removeImagePublicIds.filter((id) =>
+          imagePublicIds.some((pubId) => pubId.endsWith(id)),
+        );
+
+        const fullPublicIdsToRemove = validPublicIds.map(
+          (id) => imagePublicIds.find((pubId) => pubId.endsWith(id))!,
+        );
+
+        await Promise.all(
+          fullPublicIdsToRemove.map((publicId) =>
+            this.cloudinaryService.deleteImage(publicId),
+          ),
+        );
+
+        const newImages: string[] = [];
+        const newPublicIds: string[] = [];
+
+        for (let i = 0; i < imagePublicIds.length; i++) {
+          if (!fullPublicIdsToRemove.includes(imagePublicIds[i])) {
+            newImages.push(images[i]);
+            newPublicIds.push(imagePublicIds[i]);
+          }
         }
-      });
 
-      const uploads = await this.cloudinaryService.uploadMultipleImages(
-        files,
-        'product-variants',
-      );
+        images = newImages;
+        imagePublicIds = newPublicIds;
+      }
 
-      images.push(...uploads.map((i) => i.secure_url));
-      imagePublicIds.push(...uploads.map((i) => i.public_id));
-      uploadedPublicIds = uploads.map((i) => i.public_id);
+      // Upload ảnh mới
+      if (files?.length) {
+        const uploads = await this.cloudinaryService.uploadMultipleImages(
+          files,
+          'product-variants',
+        );
+
+        images.push(...uploads.map((i) => i.secure_url));
+        imagePublicIds.push(...uploads.map((i) => i.public_id));
+
+        uploadedPublicIds = uploads.map((i) => i.public_id);
+      }
     }
 
-    //Validate ảnh
+    // Link ảnh
+    if (isExternalVariant) {
+      if (dto.removeImagePublicIds?.length) {
+        throw new BadRequestException('Biến thể này không sử dụng Cloudinary');
+      }
+
+      if (files?.length) {
+        throw new BadRequestException(
+          'Biến thể này đang sử dụng URL ảnh ngoài',
+        );
+      }
+
+      // Thay toàn bộ danh sách ảnh
+      if (dto.imageUrls !== undefined) {
+        images = dto.imageUrls;
+      }
+    }
+
+    // Validate phải còn ít nhất 1 ảnh
     if (images.length === 0) {
       throw new BadRequestException('Biến thể phải có ít nhất 1 ảnh');
     }
 
-    //Recompute attributesHash nếu attributes thay đổi
+    // Recompute attributesHash nếu attributes thay đổi
     let attributes:
       | Prisma.InputJsonValue
       | Prisma.NullableJsonNullValueInput
       | undefined = variant.attributes as Prisma.InputJsonValue;
+
     let attributesHash = variant.attributesHash;
 
     if (dto.attributes !== undefined) {
@@ -227,6 +281,7 @@ export class ProductVariantService {
         where: { id },
         data: {
           color: dto.color ?? variant.color,
+
           attributes,
           attributesHash,
 
@@ -237,7 +292,7 @@ export class ProductVariantService {
         },
       });
     } catch (error) {
-      // rollback uploaded images nếu DB fail
+      // rollback cloudinary uploads nếu DB fail
       if (uploadedPublicIds.length) {
         await Promise.all(
           uploadedPublicIds.map((id) => this.cloudinaryService.deleteImage(id)),
@@ -249,6 +304,7 @@ export class ProductVariantService {
           'Biến thể với màu sắc và thuộc tính này đã tồn tại',
         );
       }
+
       throw error;
     }
   }

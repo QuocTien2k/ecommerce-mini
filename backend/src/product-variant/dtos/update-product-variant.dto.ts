@@ -1,5 +1,12 @@
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 
 export class UpdateProductVariantDto {
   @IsOptional()
@@ -15,6 +22,7 @@ export class UpdateProductVariantDto {
   @Min(0)
   stock?: number;
 
+  // Cloudinary
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -29,4 +37,10 @@ export class UpdateProductVariantDto {
     return value;
   })
   removeImagePublicIds?: string[]; // key
+
+  // External
+  @IsOptional()
+  @IsArray()
+  @IsUrl({}, { each: true })
+  imageUrls?: string[];
 }
