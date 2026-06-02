@@ -33,7 +33,7 @@ const productVariantBaseSchema = z.object({
   stock: z.coerce
     .number()
     .int("Tồn kho phải là số nguyên")
-    .min(0, "Tồn kho không hợp lệ")
+    .min(1, "Tồn kho không hợp lệ")
     .optional(),
 });
 

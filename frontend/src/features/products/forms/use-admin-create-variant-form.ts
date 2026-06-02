@@ -17,7 +17,7 @@ export const useAdminCreateVariantForm = () => {
     defaultValues: {
       color: "",
       attributes: {},
-      stock: 0,
+      stock: 1,
       files: [],
       imageUrls: [],
     },
