@@ -19,6 +19,7 @@ export const useAdminCreateVariantForm = () => {
       attributes: {},
       stock: 0,
       files: [],
+      imageUrls: [],
     },
 
     mode: "onSubmit",

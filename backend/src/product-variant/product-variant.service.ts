@@ -51,6 +51,7 @@ export class ProductVariantService {
     }));
   }
 
+  /*================ Case create ================*/
   private normalizeAttributes(
     attributes?: Record<string, string | number>,
   ): string | null {
@@ -70,8 +71,6 @@ export class ProductVariantService {
 
     return JSON.stringify(normalizedObject);
   }
-
-  /*================ Case create ================*/
 
   //Validate product existence and active status
   private async validateProduct(productId: string) {
@@ -114,7 +113,7 @@ export class ProductVariantService {
 
     if (hasFiles) {
       const uploads = await this.cloudinaryService.uploadMultipleImages(
-        files,
+        files!,
         'product-variants',
       );
 

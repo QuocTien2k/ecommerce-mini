@@ -8,7 +8,7 @@ import {
   IsUrl,
   ArrayMinSize,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateProductVariantDto {
   @IsString()
@@ -29,6 +29,18 @@ export class CreateProductVariantDto {
   stock?: number;
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      return undefined;
+    }
+
+    return Array.isArray(value) ? value : [value];
+  })
   @IsArray()
   @ArrayMinSize(1)
   @IsUrl({}, { each: true })

@@ -7,7 +7,11 @@ export const variantImagesSchema = z
       message: "File ảnh không hợp lệ",
     }),
   )
-  .min(1, "Phải upload ít nhất 1 ảnh")
+  .max(2, "Tối đa 2 ảnh");
+
+// reusable image urls
+export const variantImageUrlsSchema = z
+  .array(z.string().url("URL ảnh không hợp lệ"))
   .max(2, "Tối đa 2 ảnh");
 
 // reusable attributes
@@ -36,14 +40,35 @@ const productVariantBaseSchema = z.object({
 // shared form schema
 export const variantFormSchema = productVariantBaseSchema.extend({
   files: z.array(z.instanceof(File)).optional(),
-
+  imageUrls: variantImageUrlsSchema.optional(),
   removeImagePublicIds: z.array(z.string()).optional(),
 });
 
 // create
-export const createProductVariantSchema = variantFormSchema.extend({
-  files: variantImagesSchema,
-});
+export const createProductVariantSchema = variantFormSchema
+  .extend({})
+  .superRefine((data, ctx) => {
+    const hasFiles = (data.files?.length ?? 0) > 0;
+    const hasImageUrls = (data.imageUrls?.length ?? 0) > 0;
+
+    if (!hasFiles && !hasImageUrls) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["files"],
+        message: "Phải upload ảnh hoặc cung cấp URL ảnh",
+      });
+    }
+
+    if (hasFiles && hasImageUrls) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["files"],
+        message:
+          "Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời",
+      });
+    }
+  });
+
 export type CreateProductVariantFormValues = z.input<
   typeof createProductVariantSchema
 >;

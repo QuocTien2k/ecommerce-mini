@@ -42,3 +42,17 @@ export const buildFormData = <T extends object>(
 
   return formData;
 };
+
+export const appendArrayField = (
+  formData: FormData,
+  key: string,
+  values?: string[],
+) => {
+  if (!values?.length) return;
+
+  formData.delete(key);
+
+  values.forEach((value) => {
+    formData.append(key, value);
+  });
+};

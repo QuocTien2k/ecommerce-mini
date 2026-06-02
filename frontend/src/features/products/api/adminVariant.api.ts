@@ -6,17 +6,18 @@ import type {
   AdminUpdateVariantResponse,
 } from "../types/admin-variant.type";
 import { api } from "@shared/api/axios";
-import { buildFormData } from "@/utils/form-data";
+import { appendArrayField, buildFormData } from "@/utils/form-data";
 
 export const adminProductVariantApi = {
   create: (
     data: AdminCreateVariantPayload,
     files: File[],
   ): ApiResult<AdminCreateVariantResponse> => {
-    return api.post(
-      "/admin/product-variant/create",
-      buildFormData(data, { files }),
-    );
+    const formData = buildFormData(data, { files });
+
+    appendArrayField(formData, "imageUrls", data.imageUrls);
+
+    return api.post("/admin/product-variant/create", formData);
   },
   update: (
     id: string,

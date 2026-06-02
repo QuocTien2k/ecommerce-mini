@@ -33,30 +33,52 @@ const AdminCreateVariant = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageSource, setImageSource] = useState<"upload" | "url">("upload");
+  const [imageUrl1, setImageUrl1] = useState("");
+  const [imageUrl2, setImageUrl2] = useState("");
 
   // watch files
   const selectedFiles = form.watch("files");
+  const imageUrls = form.watch("imageUrls");
 
   //preview file ảnh
   useEffect(() => {
-    if (!selectedFiles?.length) {
-      setPreviewUrl(null);
+    if (selectedFiles?.length) {
+      const url = URL.createObjectURL(selectedFiles[0]);
+
+      setPreviewUrl(url);
+
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+
+    if (imageUrls?.length) {
+      setPreviewUrl(imageUrls[0]);
       return;
     }
 
-    const url = URL.createObjectURL(selectedFiles[0]);
+    setPreviewUrl(null);
+  }, [selectedFiles, imageUrls]);
 
-    setPreviewUrl(url);
+  useEffect(() => {
+    if (imageSource === "upload") {
+      form.setValue("imageUrls", []);
+      return;
+    }
 
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [selectedFiles]);
+    form.setValue("files", []);
+  }, [imageSource, form]);
 
   const handleClose = () => {
     form.reset();
     form.clearErrors();
+
+    setImageUrl1("");
+    setImageUrl2("");
+
     setPreviewUrl(null);
+    setImageSource("upload");
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -66,7 +88,7 @@ const AdminCreateVariant = ({
 
   const onSubmit = form.handleSubmit(
     async (values: CreateProductVariantFormOutput) => {
-      console.log("SUBMIT");
+      //console.log("SUBMIT");
       if (loading) return;
 
       sonnerToast.dismiss("create-variant-error");
@@ -79,9 +101,12 @@ const AdminCreateVariant = ({
               color: values.color,
               attributes: values.attributes,
               stock: values.stock,
+              imageUrls: values.imageUrls?.length
+                ? values.imageUrls
+                : undefined,
             },
 
-            files: values.files,
+            files: values.files ?? [],
           }),
         );
 
@@ -103,6 +128,15 @@ const AdminCreateVariant = ({
       console.log(errors);
     },
   );
+
+  //handle value input path
+  const syncImageUrls = (url1: string, url2: string) => {
+    const urls = [url1, url2].map((url) => url.trim()).filter(Boolean);
+
+    form.setValue("imageUrls", urls, {
+      shouldValidate: true,
+    });
+  };
 
   if (!open || !productId) return null;
 
@@ -182,89 +216,173 @@ const AdminCreateVariant = ({
             </div>
           </div>
 
-          {/* upload images */}
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label>Ảnh variant</Label>
+          <div className="space-y-2">
+            <Label>Nguồn ảnh</Label>
 
-              <p className="text-xs text-muted-foreground">
-                Upload từ 1 đến 4 ảnh
-              </p>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={imageSource === "upload"}
+                  onChange={() => setImageSource("upload")}
+                />
+
+                <span>Upload ảnh</span>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={imageSource === "url"}
+                  onChange={() => setImageSource("url")}
+                />
+
+                <span>Dán URL ảnh</span>
+              </label>
             </div>
+          </div>
 
-            <input
-              ref={fileInputRef}
-              id="variant-images"
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
+          {/* upload images */}
+          {imageSource === "upload" && (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label>Ảnh variant</Label>
 
-                form.setValue("files", files, {
-                  shouldValidate: true,
-                });
-              }}
-            />
+                <p className="text-xs text-muted-foreground">
+                  Upload từ 1 đến 4 ảnh
+                </p>
+              </div>
 
-            <div className="flex items-center gap-4">
-              <Label
-                htmlFor="variant-images"
-                className="
+              <input
+                ref={fileInputRef}
+                id="variant-images"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+
+                  form.setValue("files", files, {
+                    shouldValidate: true,
+                  });
+                }}
+              />
+
+              <div className="flex items-center gap-4">
+                <Label
+                  htmlFor="variant-images"
+                  className="
           flex size-28 cursor-pointer items-center justify-center
           overflow-hidden rounded-lg border border-dashed
           bg-muted transition hover:bg-muted/80
         "
-              >
-                {previewUrl ? (
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                    <ImagePlus className="size-6" />
-                  </div>
-                )}
-              </Label>
+                >
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                      <ImagePlus className="size-6" />
+                    </div>
+                  )}
+                </Label>
 
-              <div className="space-y-1">
-                <Label
-                  htmlFor="variant-images"
-                  className="
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="variant-images"
+                    className="
             cursor-pointer text-sm font-medium
             text-blue-500 hover:underline
           "
-                >
-                  Chọn ảnh
-                </Label>
+                  >
+                    Chọn ảnh
+                  </Label>
+
+                  <p className="text-xs text-muted-foreground">
+                    PNG, JPG, WEBP - tối đa 2 ảnh
+                  </p>
+
+                  {!!selectedFiles?.length && (
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">
+                        Đã chọn {selectedFiles.length} ảnh
+                      </p>
+
+                      <p className="max-w-60 truncate text-xs text-muted-foreground">
+                        {selectedFiles[0].name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {form.formState.errors.files && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.files.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {imageSource === "url" && (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label>URL ảnh</Label>
 
                 <p className="text-xs text-muted-foreground">
-                  PNG, JPG, WEBP - tối đa 2 ảnh
+                  Tối đa 2 URL ảnh
                 </p>
-
-                {!!selectedFiles?.length && (
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      Đã chọn {selectedFiles.length} ảnh
-                    </p>
-
-                    <p className="max-w-60 truncate text-xs text-muted-foreground">
-                      {selectedFiles[0].name}
-                    </p>
-                  </div>
-                )}
               </div>
-            </div>
 
-            {form.formState.errors.files && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.files.message}
-              </p>
-            )}
-          </div>
+              <Input
+                placeholder="https://example.com/image-1.jpg"
+                value={imageUrl1}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  setImageUrl1(value);
+                  syncImageUrls(value, imageUrl2);
+                }}
+              />
+
+              <Input
+                placeholder="https://example.com/image-2.jpg"
+                value={imageUrl2}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  setImageUrl2(value);
+                  syncImageUrls(imageUrl1, value);
+                }}
+              />
+
+              {previewUrl && (
+                <div className="overflow-hidden rounded-lg border">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-28 w-28 object-cover"
+                  />
+                </div>
+              )}
+
+              {form.formState.errors.imageUrls && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.imageUrls.message}
+                </p>
+              )}
+
+              {form.formState.errors.files && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.files.message}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* actions */}
           <div className="flex items-center justify-end gap-3 border-t pt-4">

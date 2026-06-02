@@ -7,6 +7,7 @@ export interface AdminCreateVariantPayload {
   color: string;
   attributes?: AdminVariantAttributes;
   stock?: number;
+  imageUrls?: string[];
 }
 
 export interface AdminUpdateVariantPayload {
