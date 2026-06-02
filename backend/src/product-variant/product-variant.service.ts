@@ -7,7 +7,7 @@ import { CreateProductVariantDto } from './dtos/create-product-variant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
 import { UpdateProductVariantDto } from './dtos/update-product-variant.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, ProductVariant } from '@prisma/client';
 
 @Injectable()
 export class ProductVariantService {
@@ -71,11 +71,16 @@ export class ProductVariantService {
     return JSON.stringify(normalizedObject);
   }
 
-  async create(dto: CreateProductVariantDto, files: Express.Multer.File[]) {
-    //Check product
+  /*================ Case create ================*/
+
+  //Validate product existence and active status
+  private async validateProduct(productId: string) {
     const product = await this.prisma.product.findUnique({
-      where: { id: dto.productId },
-      select: { id: true, isActive: true },
+      where: { id: productId },
+      select: {
+        id: true,
+        isActive: true,
+      },
     });
 
     if (!product) {
@@ -86,48 +91,73 @@ export class ProductVariantService {
       throw new BadRequestException('Sản phẩm đã bị vô hiệu hóa');
     }
 
-    //Normalize attributes
-    const normalizedAttributes = this.normalizeAttributes(dto.attributes);
+    return product;
+  }
 
-    //Upload images
-    const hasFiles = files && files.length > 0;
-    const hasImageUrls = dto.imageUrls && dto.imageUrls.length > 0;
+  //Resolve variant images from either Cloudinary uploads or external image URLs
+  private async resolveCreateVariantImages(
+    files?: Express.Multer.File[],
+    imageUrls?: string[],
+  ) {
+    const hasFiles = (files?.length ?? 0) > 0;
+    const hasImageUrls = (imageUrls?.length ?? 0) > 0;
 
     if (!hasFiles && !hasImageUrls) {
       throw new BadRequestException('Phải upload ảnh hoặc cung cấp URL ảnh');
     }
 
-    // Không cho phép dùng đồng thời
     if (hasFiles && hasImageUrls) {
       throw new BadRequestException(
         'Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời',
       );
     }
 
-    let images: string[] = [];
-    let imagePublicIds: string[] = [];
-
-    // Option 1: Upload Cloudinary
     if (hasFiles) {
       const uploads = await this.cloudinaryService.uploadMultipleImages(
         files,
         'product-variants',
       );
 
-      images = uploads.map((item) => item.secure_url);
-      imagePublicIds = uploads.map((item) => item.public_id);
+      return {
+        images: uploads.map((i) => i.secure_url),
+        imagePublicIds: uploads.map((i) => i.public_id),
+      };
     }
 
-    // Option 2: Dùng URL ngoài
-    if (hasImageUrls) {
-      images = dto.imageUrls!;
-      imagePublicIds = [];
+    return {
+      images: imageUrls!,
+      imagePublicIds: [],
+    };
+  }
+
+  //Convert attributes to Prisma JSON value.
+  private buildAttributes(attributes?: Record<string, string | number>) {
+    return attributes && Object.keys(attributes).length > 0
+      ? attributes
+      : Prisma.JsonNull;
+  }
+
+  //Convert Prisma unique constraint error into business exception.
+  private handleVariantDuplicateError(error: any): never {
+    if (error.code === 'P2002') {
+      throw new BadRequestException('Biến thể sản phẩm đã tồn tại');
     }
 
-    const attributes =
-      dto.attributes && Object.keys(dto.attributes).length > 0
-        ? dto.attributes
-        : Prisma.JsonNull;
+    throw error;
+  }
+
+  //create
+  async create(dto: CreateProductVariantDto, files: Express.Multer.File[]) {
+    await this.validateProduct(dto.productId);
+
+    const normalizedAttributes = this.normalizeAttributes(dto.attributes);
+
+    const { images, imagePublicIds } = await this.resolveCreateVariantImages(
+      files,
+      dto.imageUrls,
+    );
+
+    const attributes = this.buildAttributes(dto.attributes);
 
     try {
       return await this.prisma.productVariant.create({
@@ -145,19 +175,14 @@ export class ProductVariantService {
         },
       });
     } catch (error) {
-      if (error.code === 'P2002') {
-        throw new BadRequestException('Biến thể sản phẩm đã tồn tại');
-      }
-
-      throw error;
+      this.handleVariantDuplicateError(error);
     }
   }
 
-  async update(
-    id: string,
-    dto: UpdateProductVariantDto,
-    files?: Express.Multer.File[],
-  ) {
+  /*================ Case update ================*/
+
+  //Find variant by id or throw not found exception.
+  private async getVariantOrThrow(id: string) {
     const variant = await this.prisma.productVariant.findUnique({
       where: { id },
     });
@@ -166,22 +191,36 @@ export class ProductVariantService {
       throw new NotFoundException('Biến thể không tồn tại');
     }
 
-    const isCloudinaryVariant = variant.imagePublicIds.length > 0;
-    const isExternalVariant = variant.imagePublicIds.length === 0;
+    return variant;
+  }
 
-    // Không cho phép trộn 2 nguồn ảnh
-    if (files?.length && dto.imageUrls?.length) {
+  //Validate that request does not mix Cloudinary uploads and external image URLs.
+  private validateImageSourceConflict(
+    files?: Express.Multer.File[],
+    imageUrls?: string[],
+  ) {
+    if (files?.length && imageUrls?.length) {
       throw new BadRequestException(
         'Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời',
       );
     }
+  }
+
+  /**
+   * Process variant images based on its current image source.
+   * Supports Cloudinary variants and external URL variants.
+   */
+  private async processVariantImages(
+    variant: ProductVariant,
+    dto: UpdateProductVariantDto,
+    files?: Express.Multer.File[],
+  ) {
+    const isCloudinaryVariant = variant.imagePublicIds.length > 0;
 
     let images = [...variant.images];
     let imagePublicIds = [...variant.imagePublicIds];
-
     let uploadedPublicIds: string[] = [];
 
-    // cloudinary
     if (isCloudinaryVariant) {
       if (dto.imageUrls?.length) {
         throw new BadRequestException(
@@ -189,7 +228,6 @@ export class ProductVariantService {
         );
       }
 
-      // Xóa ảnh cloudinary
       if (dto.removeImagePublicIds?.length) {
         const validPublicIds = dto.removeImagePublicIds.filter((id) =>
           imagePublicIds.some((pubId) => pubId.endsWith(id)),
@@ -219,7 +257,6 @@ export class ProductVariantService {
         imagePublicIds = newPublicIds;
       }
 
-      // Upload ảnh mới
       if (files?.length) {
         const uploads = await this.cloudinaryService.uploadMultipleImages(
           files,
@@ -231,10 +268,7 @@ export class ProductVariantService {
 
         uploadedPublicIds = uploads.map((i) => i.public_id);
       }
-    }
-
-    // Link ảnh
-    if (isExternalVariant) {
+    } else {
       if (dto.removeImagePublicIds?.length) {
         throw new BadRequestException('Biến thể này không sử dụng Cloudinary');
       }
@@ -245,18 +279,23 @@ export class ProductVariantService {
         );
       }
 
-      // Thay toàn bộ danh sách ảnh
       if (dto.imageUrls !== undefined) {
         images = dto.imageUrls;
       }
     }
 
-    // Validate phải còn ít nhất 1 ảnh
-    if (images.length === 0) {
-      throw new BadRequestException('Biến thể phải có ít nhất 1 ảnh');
-    }
+    return {
+      images,
+      imagePublicIds,
+      uploadedPublicIds,
+    };
+  }
 
-    // Recompute attributesHash nếu attributes thay đổi
+  //Recompute attributes and attributes hash when variant attributes change.
+  private buildUpdatedAttributes(
+    variant: ProductVariant,
+    dto: UpdateProductVariantDto,
+  ) {
     let attributes:
       | Prisma.InputJsonValue
       | Prisma.NullableJsonNullValueInput
@@ -276,6 +315,49 @@ export class ProductVariantService {
         : this.normalizeAttributes(dto.attributes);
     }
 
+    return {
+      attributes,
+      attributesHash,
+    };
+  }
+
+  //Ensure variant still contains at least one image.
+  private validateVariantImages(images: string[]) {
+    if (images.length === 0) {
+      throw new BadRequestException('Biến thể phải có ít nhất 1 ảnh');
+    }
+  }
+
+  //Remove uploaded Cloudinary images when database update fails
+  private async rollbackUploadedImages(uploadedPublicIds: string[]) {
+    if (!uploadedPublicIds.length) {
+      return;
+    }
+
+    await Promise.all(
+      uploadedPublicIds.map((id) => this.cloudinaryService.deleteImage(id)),
+    );
+  }
+
+  async update(
+    id: string,
+    dto: UpdateProductVariantDto,
+    files?: Express.Multer.File[],
+  ) {
+    const variant = await this.getVariantOrThrow(id);
+
+    this.validateImageSourceConflict(files, dto.imageUrls);
+
+    const { images, imagePublicIds, uploadedPublicIds } =
+      await this.processVariantImages(variant, dto, files);
+
+    this.validateVariantImages(images);
+
+    const { attributes, attributesHash } = this.buildUpdatedAttributes(
+      variant,
+      dto,
+    );
+
     try {
       return await this.prisma.productVariant.update({
         where: { id },
@@ -292,12 +374,7 @@ export class ProductVariantService {
         },
       });
     } catch (error) {
-      // rollback cloudinary uploads nếu DB fail
-      if (uploadedPublicIds.length) {
-        await Promise.all(
-          uploadedPublicIds.map((id) => this.cloudinaryService.deleteImage(id)),
-        );
-      }
+      await this.rollbackUploadedImages(uploadedPublicIds);
 
       if (error.code === 'P2002') {
         throw new BadRequestException(
