@@ -13,7 +13,7 @@ const productBaseSchema = z.object({
     .max(2000, "Mô tả không được vượt quá 2000 ký tự")
     .optional(),
 
-  price: z
+  price: z.coerce
     .number({
       error: "Vui lòng nhập giá sản phẩm",
     })
