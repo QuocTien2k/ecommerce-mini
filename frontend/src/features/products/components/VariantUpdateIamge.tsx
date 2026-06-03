@@ -62,7 +62,7 @@ export const VariantUpdateImageManager = ({
         <>
           {/* OLD IMAGES */}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             {variant.images.map((image, index) => {
               const publicId = variant.imagePublicIds[index];
 
@@ -71,34 +71,37 @@ export const VariantUpdateImageManager = ({
               return (
                 <div
                   key={publicId}
-                  className="relative overflow-hidden rounded-lg border"
+                  className="relative rounded-lg border bg-muted/20 p-2"
                 >
-                  <img
-                    src={image}
-                    alt=""
-                    className={`h-40 w-full object-cover ${
-                      removed ? "opacity-40" : ""
-                    }`}
-                  />
-
-                  <div className="absolute right-2 top-2">
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant={removed ? "secondary" : "destructive"}
-                      onClick={() => toggleRemoveCloudinaryImage(publicId)}
-                    >
-                      {removed ? (
-                        <Undo2 className="h-4 w-4" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                  <div className="flex justify-center">
+                    <img
+                      src={image}
+                      alt=""
+                      className={`h-24 w-24 object-contain transition-opacity ${
+                        removed ? "opacity-40" : ""
+                      }`}
+                    />
                   </div>
 
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant={removed ? "secondary" : "destructive"}
+                    className="absolute right-1 top-1 h-7 w-7"
+                    onClick={() => toggleRemoveCloudinaryImage(publicId)}
+                  >
+                    {removed ? (
+                      <Undo2 className="h-3.5 w-3.5" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+
                   {removed && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-medium text-white">
-                      Sẽ bị xóa
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50">
+                      <span className="text-xs font-medium text-white">
+                        Sẽ bị xóa
+                      </span>
                     </div>
                   )}
                 </div>
@@ -108,7 +111,7 @@ export const VariantUpdateImageManager = ({
 
           {/* NEW FILES */}
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Input
               type="file"
               multiple
@@ -117,17 +120,19 @@ export const VariantUpdateImageManager = ({
             />
 
             {files.length > 0 && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 {files.map((file) => (
                   <div
                     key={`${file.name}-${file.size}`}
-                    className="overflow-hidden rounded-lg border"
+                    className="rounded-lg border bg-muted/20 p-2"
                   >
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt=""
-                      className="h-40 w-full object-cover"
-                    />
+                    <div className="flex justify-center">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt=""
+                        className="h-24 w-24 object-contain"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -140,11 +145,11 @@ export const VariantUpdateImageManager = ({
             {urls.map((url, index) => (
               <div key={index} className="rounded-lg border p-3 space-y-3">
                 {!!url && (
-                  <div className="overflow-hidden rounded-md border">
+                  <div className="flex justify-center rounded-md border bg-muted/20 p-2">
                     <img
                       src={url}
                       alt={`variant-${index}`}
-                      className="h-40 w-full object-cover"
+                      className="h-24 w-24 object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
