@@ -24,6 +24,8 @@ export const useAdminUpdateVariantForm = (variant: AdminVariantResponse) => {
 
       files: [],
 
+      imageUrls: undefined,
+
       removeImagePublicIds: [],
     },
 

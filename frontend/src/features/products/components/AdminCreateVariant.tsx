@@ -216,6 +216,7 @@ const AdminCreateVariant = ({
             </div>
           </div>
 
+          {/* image source */}
           <div className="space-y-2">
             <Label>Nguồn ảnh</Label>
 

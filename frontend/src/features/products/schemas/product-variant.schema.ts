@@ -1,18 +1,16 @@
 import { z } from "zod";
 
+const MAX_IMAGES = 2;
+
 // reusable image
 export const variantImagesSchema = z
-  .array(
-    z.instanceof(File, {
-      message: "File ảnh không hợp lệ",
-    }),
-  )
-  .max(2, "Tối đa 2 ảnh");
+  .array(z.instanceof(File, { message: "File ảnh không hợp lệ" }))
+  .max(MAX_IMAGES, "Tối đa 2 ảnh");
 
 // reusable image urls
 export const variantImageUrlsSchema = z
   .array(z.string().url("URL ảnh không hợp lệ"))
-  .max(2, "Tối đa 2 ảnh");
+  .max(MAX_IMAGES, "Tối đa 2 ảnh");
 
 // reusable attributes
 export const variantAttributesSchema = z.record(
@@ -78,11 +76,27 @@ export type CreateProductVariantFormOutput = z.output<
 >;
 
 // update
-export const updateProductVariantSchema = variantFormSchema.extend({
-  files: z.array(z.instanceof(File)).max(2, "Tối đa 2 ảnh").optional(),
+export const updateProductVariantSchema = variantFormSchema
+  .extend({
+    files: variantImagesSchema.optional(),
 
-  removeImagePublicIds: z.array(z.string()).optional(),
-});
+    removeImagePublicIds: z.array(z.string()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasFiles = (data.files?.length ?? 0) > 0;
+    const hasUrls = (data.imageUrls?.length ?? 0) > 0;
+
+    // XOR rule (same as create)
+    if (hasFiles && hasUrls) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["files"],
+        message:
+          "Chỉ được upload ảnh hoặc cung cấp URL ảnh, không được dùng đồng thời",
+      });
+    }
+  });
+
 export type UpdateProductVariantFormValues = z.input<
   typeof updateProductVariantSchema
 >;
