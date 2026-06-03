@@ -42,5 +42,16 @@ export class UpdateProductVariantDto {
   @IsOptional()
   @IsArray()
   @IsUrl({}, { each: true })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [value];
+      }
+    }
+
+    return value;
+  })
   imageUrls?: string[];
 }
