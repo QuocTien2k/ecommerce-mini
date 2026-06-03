@@ -28,7 +28,6 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  @Length(0, 2000)
   description?: string;
 
   @Type(() => Number)

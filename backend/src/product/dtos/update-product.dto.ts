@@ -24,7 +24,6 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsString()
-  @Length(0, 2000)
   description?: string;
 
   @IsOptional()
