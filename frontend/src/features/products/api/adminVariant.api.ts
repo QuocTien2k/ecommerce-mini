@@ -31,7 +31,7 @@ export const adminProductVariantApi = {
       "removeImagePublicIds",
       data.removeImagePublicIds,
     );
-    appendArrayField(formData, "imageUrls", data.imageUrls); // optional future-safe
+    //appendArrayField(formData, "imageUrls", data.imageUrls); // optional future-safe
 
     return api.patch(`/admin/product-variant/${id}`, formData);
   },

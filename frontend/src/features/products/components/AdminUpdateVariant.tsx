@@ -61,6 +61,10 @@ const AdminUpdateVariant = ({
     async (values: UpdateProductVariantFormOutput) => {
       if (loading) return;
 
+      console.log("submit data", values);
+      console.log("imageUrls", values.imageUrls);
+      console.log("isArray", Array.isArray(values.imageUrls));
+
       sonnerToast.dismiss("update-variant-error");
 
       try {
@@ -96,7 +100,7 @@ const AdminUpdateVariant = ({
 
   if (!open || !variant) return null;
 
-  // console.log(variant);
+  console.log(variant);
 
   return (
     <div
