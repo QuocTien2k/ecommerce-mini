@@ -250,7 +250,7 @@ const AdminCreateVariant = ({
                 <Label>Ảnh variant</Label>
 
                 <p className="text-xs text-muted-foreground">
-                  Upload từ 1 đến 4 ảnh
+                  Upload từ 1 đến 2 ảnh
                 </p>
               </div>
 

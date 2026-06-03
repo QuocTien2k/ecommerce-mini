@@ -3,6 +3,8 @@ import type { AdminVariantResponse } from "../types/admin-variant.type";
 import { ImagePlus, Trash2, Undo2, UploadCloud } from "lucide-react";
 import { Input } from "@components/ui/input";
 import { cn } from "@lib/utils";
+import { useState } from "react";
+import { ConfirmModal } from "@components/common/confirm";
 
 type VariantUpdateImageManagerProps = {
   variant: AdminVariantResponse;
@@ -29,6 +31,7 @@ export const VariantUpdateImageManager = ({
   removeImagePublicIds,
   onRemoveImagePublicIdsChange,
 }: VariantUpdateImageManagerProps) => {
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
   const isCloudinaryVariant = variant.imagePublicIds.length > 0;
 
   const toggleRemoveCloudinaryImage = (publicId: string) => {
@@ -51,7 +54,16 @@ export const VariantUpdateImageManager = ({
 
   const activeOldImages = variant.images.length - removeImagePublicIds.length;
 
-  const currentImageCount = activeOldImages + files.length;
+  //const currentImageCount = activeOldImages + files.length;
+
+  const cloudinaryImageCount =
+    variant.images.length - removeImagePublicIds.length + files.length;
+
+  const externalImageCount = urls.length;
+
+  const currentImageCount = isCloudinaryVariant
+    ? cloudinaryImageCount
+    : externalImageCount;
 
   const canAddMore = currentImageCount < MAX_IMAGES;
 
@@ -103,7 +115,7 @@ export const VariantUpdateImageManager = ({
                     type="button"
                     size="icon"
                     variant={removed ? "secondary" : "destructive"}
-                    className="absolute right-1 top-1 h-7 w-7"
+                    className="absolute right-1 top-1 h-7 w-7 z-10"
                     onClick={() => toggleRemoveCloudinaryImage(publicId)}
                   >
                     {removed ? (
@@ -125,7 +137,6 @@ export const VariantUpdateImageManager = ({
             })}
           </div>
 
-          {/* NEW FILES */}
           {/* NEW FILES */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -156,10 +167,15 @@ export const VariantUpdateImageManager = ({
                 "flex flex-col items-center justify-center rounded-lg border border-dashed px-4 py-6 text-center transition-colors",
                 canAddMore
                   ? "cursor-pointer bg-muted/30 hover:bg-muted/50"
-                  : "cursor-not-allowed border-muted bg-muted/10 opacity-50",
+                  : "cursor-not-allowed border-amber-300 bg-amber-50",
               )}
             >
-              <UploadCloud className="mb-2 h-6 w-6 text-muted-foreground" />
+              <UploadCloud
+                className={cn(
+                  "mb-2 h-6 w-6",
+                  canAddMore ? "text-muted-foreground" : "text-amber-600",
+                )}
+              />
 
               <span className="text-sm font-medium">
                 {canAddMore ? "Chọn ảnh mới" : "Không thể thêm ảnh"}
@@ -239,11 +255,7 @@ export const VariantUpdateImageManager = ({
                   <Button
                     type="button"
                     variant="destructive"
-                    onClick={() => {
-                      const next = urls.filter((_, i) => i !== index);
-
-                      onImageUrlsChange(next);
-                    }}
+                    onClick={() => setDeleteIndex(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -251,6 +263,23 @@ export const VariantUpdateImageManager = ({
               </div>
             ))}
           </div>
+
+          <ConfirmModal
+            open={deleteIndex !== null}
+            destructive
+            title="Xóa ảnh URL"
+            description="Ảnh URL này sẽ bị xóa khỏi biểu mẫu. Bạn có chắc chắn muốn tiếp tục?"
+            confirmText="Xóa"
+            cancelText="Hủy"
+            onCancel={() => setDeleteIndex(null)}
+            onConfirm={() => {
+              if (deleteIndex === null) return;
+
+              onImageUrlsChange(urls.filter((_, i) => i !== deleteIndex));
+
+              setDeleteIndex(null);
+            }}
+          />
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">

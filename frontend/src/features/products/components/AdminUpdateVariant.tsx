@@ -100,7 +100,7 @@ const AdminUpdateVariant = ({
 
   if (!open || !variant) return null;
 
-  console.log(variant);
+  //console.log(variant);
 
   return (
     <div
