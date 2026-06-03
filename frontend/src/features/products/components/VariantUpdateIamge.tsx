@@ -1,7 +1,8 @@
 import { Button } from "@components/ui/button";
 import type { AdminVariantResponse } from "../types/admin-variant.type";
-import { ImagePlus, Trash2, Undo2 } from "lucide-react";
+import { ImagePlus, Trash2, Undo2, UploadCloud } from "lucide-react";
 import { Input } from "@components/ui/input";
+import { cn } from "@lib/utils";
 
 type VariantUpdateImageManagerProps = {
   variant: AdminVariantResponse;
@@ -44,16 +45,33 @@ export const VariantUpdateImageManager = ({
     onRemoveImagePublicIdsChange([...removeImagePublicIds, publicId]);
   };
 
-  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files ?? []);
+  const urls = imageUrls ?? variant.images;
 
-    onFilesChange(selected);
+  const MAX_IMAGES = 2;
+
+  const activeOldImages = variant.images.length - removeImagePublicIds.length;
+
+  const currentImageCount = activeOldImages + files.length;
+
+  const canAddMore = currentImageCount < MAX_IMAGES;
+
+  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files ?? []);
+
+    const availableSlots = MAX_IMAGES - activeOldImages - files.length;
+
+    if (availableSlots <= 0) {
+      e.target.value = "";
+      return;
+    }
+
+    const nextFiles = selectedFiles.slice(0, availableSlots);
+
+    onFilesChange([...files, ...nextFiles]);
+
+    e.target.value = "";
   };
 
-  const urls = imageUrls && imageUrls.length > 0 ? imageUrls : variant.images;
-  const MAX_IMAGES = 3;
-
-  const canAddMore = urls.length < MAX_IMAGES;
   return (
     <div className="space-y-4">
       <h3 className="font-medium">Hình ảnh biến thể</h3>
@@ -61,11 +79,9 @@ export const VariantUpdateImageManager = ({
       {isCloudinaryVariant ? (
         <>
           {/* OLD IMAGES */}
-
           <div className="grid grid-cols-3 gap-3">
             {variant.images.map((image, index) => {
               const publicId = variant.imagePublicIds[index];
-
               const removed = removeImagePublicIds.includes(publicId);
 
               return (
@@ -110,22 +126,69 @@ export const VariantUpdateImageManager = ({
           </div>
 
           {/* NEW FILES */}
-
+          {/* NEW FILES */}
           <div className="space-y-3">
-            <Input
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {currentImageCount}/{MAX_IMAGES} ảnh
+              </span>
+
+              {!canAddMore && (
+                <span className="text-xs text-amber-600">
+                  Đã đạt giới hạn ảnh
+                </span>
+              )}
+            </div>
+
+            <input
+              id={`variant-images-${variant.id}`}
               type="file"
               multiple
               accept="image/*"
               onChange={handleFilesChange}
+              className="hidden"
+              disabled={!canAddMore}
             />
+
+            <label
+              htmlFor={canAddMore ? `variant-images-${variant.id}` : undefined}
+              className={cn(
+                "flex flex-col items-center justify-center rounded-lg border border-dashed px-4 py-6 text-center transition-colors",
+                canAddMore
+                  ? "cursor-pointer bg-muted/30 hover:bg-muted/50"
+                  : "cursor-not-allowed border-muted bg-muted/10 opacity-50",
+              )}
+            >
+              <UploadCloud className="mb-2 h-6 w-6 text-muted-foreground" />
+
+              <span className="text-sm font-medium">
+                {canAddMore ? "Chọn ảnh mới" : "Không thể thêm ảnh"}
+              </span>
+
+              <span className="mt-1 text-xs text-muted-foreground">
+                JPG, PNG, WEBP • Tối đa {MAX_IMAGES} ảnh
+              </span>
+            </label>
 
             {files.length > 0 && (
               <div className="grid grid-cols-3 gap-3">
-                {files.map((file) => (
+                {files.map((file, index) => (
                   <div
-                    key={`${file.name}-${file.size}`}
-                    className="rounded-lg border bg-muted/20 p-2"
+                    key={`${file.name}-${file.size}-${index}`}
+                    className="relative rounded-lg border bg-muted/20 p-2"
                   >
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      className="absolute right-1 top-1 h-7 w-7"
+                      onClick={() =>
+                        onFilesChange(files.filter((_, i) => i !== index))
+                      }
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+
                     <div className="flex justify-center">
                       <img
                         src={URL.createObjectURL(file)}
@@ -133,6 +196,10 @@ export const VariantUpdateImageManager = ({
                         className="h-24 w-24 object-contain"
                       />
                     </div>
+
+                    <p className="mt-2 truncate text-center text-xs text-muted-foreground">
+                      {file.name}
+                    </p>
                   </div>
                 ))}
               </div>

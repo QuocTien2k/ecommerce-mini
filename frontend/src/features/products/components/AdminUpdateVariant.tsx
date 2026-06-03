@@ -36,7 +36,7 @@ const AdminUpdateVariant = ({
 
   const files = form.watch("files") ?? [];
 
-  const imageUrls = form.watch("imageUrls");
+  const imageUrls = form.watch("imageUrls") ?? variant.images;
 
   const removeImagePublicIds = form.watch("removeImagePublicIds") ?? [];
 
