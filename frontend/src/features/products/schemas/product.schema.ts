@@ -8,10 +8,7 @@ const productBaseSchema = z.object({
     .min(3, "Tên sản phẩm phải có ít nhất 3 ký tự")
     .max(255, "Tên sản phẩm không được vượt quá 255 ký tự"),
 
-  description: z
-    .string()
-    .max(2000, "Mô tả không được vượt quá 2000 ký tự")
-    .optional(),
+  description: z.string().optional(),
 
   price: z.coerce
     .number({

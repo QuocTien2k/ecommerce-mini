@@ -26,6 +26,7 @@ import { Controller } from "react-hook-form";
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
+import { Editor } from "@components/editor/Editor";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -206,9 +207,12 @@ const AdminUpdateProduct = ({
             <div className="space-y-2 md:col-span-2">
               <Label>Mô tả</Label>
 
-              <Textarea
-                placeholder="Mô tả sản phẩm..."
-                {...form.register("description")}
+              <Controller
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <Editor value={field.value} onChange={field.onChange} />
+                )}
               />
 
               {form.formState.errors.description && (

@@ -15,7 +15,6 @@ import {
   Link as LinkIcon,
   Unlink,
   UnderlineIcon,
-  Heading1,
 } from "lucide-react";
 import type { Editor } from "@tiptap/react";
 import { ToolbarButton } from "./ToolbarButton";

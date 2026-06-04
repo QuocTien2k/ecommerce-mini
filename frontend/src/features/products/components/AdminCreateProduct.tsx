@@ -9,7 +9,7 @@ import { X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
-import { Textarea } from "@components/ui/textarea";
+import { Controller } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ import { useAdminCreateProductForm } from "../forms/use-admin-create-product-for
 import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
+import { Editor } from "@components/editor/Editor";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -42,7 +43,7 @@ export const CreateProductForm = ({
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
   const selectableCategories =
-    flatCategoriesQuery.data?.data.filter((category) => category.level !== 1) ??
+    flatCategoriesQuery.data?.data.filter((category) => category.level === 3) ??
     [];
 
   const brandsQuery = useAdminBrandQuery();
@@ -154,15 +155,16 @@ export const CreateProductForm = ({
             {/* description */}
             <div className="space-y-2 md:col-span-2">
               <Label>Mô tả</Label>
-
-              <Textarea
-                placeholder="Mô tả sản phẩm..."
-                {...form.register("description")}
+              <Controller
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <Editor value={field.value} onChange={field.onChange} />
+                )}
               />
-
               {form.formState.errors.description && (
                 <p className="text-sm text-red-500">
-                  {form.formState.errors.description.message}
+                  {form.formState.errors.description.message}{" "}
                 </p>
               )}
             </div>
