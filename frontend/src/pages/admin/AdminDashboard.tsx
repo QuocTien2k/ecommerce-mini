@@ -6,6 +6,10 @@ const AdminDashboard = () => {
 
   return (
     <>
+      <p
+        data-placeholder="Nhập mô tả sản phẩm..."
+        className="is-editor-empty"
+      ></p>
       <Editor value={value} onChange={setValue} />
 
       <div className="mt-4 flex gap-2">

@@ -9,16 +9,18 @@ import {
   ListOrdered,
   Table,
   Eraser,
-  Link,
+  Link as LinkIcon,
+  Unlink,
+  UnderlineIcon,
 } from "lucide-react";
-
 import type { Editor } from "@tiptap/react";
 import { ToolbarButton } from "./ToolbarButton";
+import Underline from "@tiptap/extension-underline";
 
 type Props = {
   editor: Editor | null;
 };
-
+export const underlineExtension = Underline;
 export function EditorToolbar({ editor }: Props) {
   if (!editor) return null;
 
@@ -34,16 +36,25 @@ export function EditorToolbar({ editor }: Props) {
         onClick={() => editor.chain().focus().redo().run()}
       />
 
+      {/* Bold */}
       <ToolbarButton
         active={editor.isActive("bold")}
         icon={<Bold size={16} />}
         onClick={() => editor.chain().focus().toggleBold().run()}
       />
 
+      {/* Italic */}
       <ToolbarButton
         active={editor.isActive("italic")}
         icon={<Italic size={16} />}
         onClick={() => editor.chain().focus().toggleItalic().run()}
+      />
+
+      {/* Underline */}
+      <ToolbarButton
+        active={editor.isActive("underline")}
+        icon={<UnderlineIcon size={16} />}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
       />
 
       <ToolbarButton
@@ -76,6 +87,34 @@ export function EditorToolbar({ editor }: Props) {
             })
             .run()
         }
+      />
+
+      {/* Link */}
+      <ToolbarButton
+        active={editor.isActive("link")}
+        icon={<LinkIcon size={16} />}
+        onClick={() => {
+          const previousUrl = editor.getAttributes("link").href;
+
+          const url = window.prompt("Nhập URL", previousUrl || "https://");
+
+          if (!url) return;
+
+          editor
+            .chain()
+            .focus()
+            .extendMarkRange("link")
+            .setLink({ href: url })
+            .run();
+        }}
+      />
+
+      {/* Remove Link */}
+      <ToolbarButton
+        icon={<Unlink size={16} />}
+        onClick={() => {
+          editor.chain().focus().unsetLink().run();
+        }}
       />
 
       {/* Bullet List */}

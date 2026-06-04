@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useEditor as useTipTapEditor } from "@tiptap/react";
-
 import { editorExtensions } from "../extensions";
 
 type UseEditorParams = {
