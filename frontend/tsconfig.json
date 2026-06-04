@@ -16,6 +16,8 @@
       "@shared/*": ["src/shared/*"],
       "@features/*": ["src/features/*"],
       "@/*": ["src/*"]
-    }
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }
