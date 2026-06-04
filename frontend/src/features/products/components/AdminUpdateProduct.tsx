@@ -12,7 +12,6 @@ import { X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
-import { Textarea } from "@components/ui/textarea";
 import {
   Select,
   SelectContent,

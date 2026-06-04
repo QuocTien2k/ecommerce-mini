@@ -5,12 +5,12 @@ import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
 import {
   ArrowLeft,
+  FileText,
   Package,
   Package2,
   Palette,
   Pencil,
   Percent,
-  Ruler,
   Tag,
   User,
 } from "lucide-react";
@@ -22,6 +22,7 @@ import { useState } from "react";
 import AdminCreateVariant from "./components/AdminCreateVariant";
 import AdminUpdateVariant from "./components/AdminUpdateVariant";
 import { ATTRIBUTE_LABELS } from "@shared/types/variant-type";
+import TiptapContent from "@components/editor/TiptapContent";
 //import { AdminUpdateVariant } from "./components/AdminUpdateVariant";
 
 const AdminProductDetail = () => {
@@ -82,12 +83,15 @@ const AdminProductDetail = () => {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                <p className="text-muted-foreground leading-relaxed">
-                  {data.description}
-                </p>
+                <div className="flex items-center gap-2 text-base font-semibold text-primary">
+                  <FileText className="size-5" />
+                  Mô tả
+                </div>
 
+                <div className="max-h-100 overflow-y-auto pr-2">
+                  <TiptapContent content={data.description} />
+                </div>
                 <Separator />
-
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
                   {/* Danh mục */}
                   <div className="rounded-2xl border border-emerald-500 bg-emerald-50 p-5 shadow-sm">
@@ -143,7 +147,6 @@ const AdminProductDetail = () => {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">Trạng thái:</span>
                   <Badge
