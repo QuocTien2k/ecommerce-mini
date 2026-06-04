@@ -8,6 +8,9 @@ import {
   List,
   ListOrdered,
   Table,
+  Rows3,
+  Columns3,
+  Trash2,
   Eraser,
   Link as LinkIcon,
   Unlink,
@@ -16,13 +19,27 @@ import {
 import type { Editor } from "@tiptap/react";
 import { ToolbarButton } from "./ToolbarButton";
 import Underline from "@tiptap/extension-underline";
+import {
+  insertTable,
+  addRow,
+  deleteRow,
+  addColumn,
+  deleteColumn,
+  deleteTable,
+  clearFormatting,
+  removeLink,
+  setLink,
+} from "../utils/editorHelpers";
 
 type Props = {
   editor: Editor | null;
 };
 export const underlineExtension = Underline;
+
 export function EditorToolbar({ editor }: Props) {
   if (!editor) return null;
+
+  const isTableActive = editor.isActive("table");
 
   return (
     <div className="flex flex-wrap gap-1 border-b p-2">
@@ -100,21 +117,14 @@ export function EditorToolbar({ editor }: Props) {
 
           if (!url) return;
 
-          editor
-            .chain()
-            .focus()
-            .extendMarkRange("link")
-            .setLink({ href: url })
-            .run();
+          setLink(editor, url);
         }}
       />
 
       {/* Remove Link */}
       <ToolbarButton
         icon={<Unlink size={16} />}
-        onClick={() => {
-          editor.chain().focus().unsetLink().run();
-        }}
+        onClick={() => removeLink(editor)}
       />
 
       {/* Bullet List */}
@@ -131,12 +141,50 @@ export function EditorToolbar({ editor }: Props) {
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       />
 
+      {/* Insert Table */}
+      <ToolbarButton
+        icon={<Table size={16} />}
+        onClick={() => insertTable(editor)}
+      />
+
+      {isTableActive && (
+        <>
+          {/* Add Row */}
+          <ToolbarButton
+            icon={<Rows3 size={16} />}
+            onClick={() => addRow(editor)}
+          />
+
+          {/* Add Column */}
+          <ToolbarButton
+            icon={<Columns3 size={16} />}
+            onClick={() => addColumn(editor)}
+          />
+
+          {/* Delete Row */}
+          <ToolbarButton
+            icon={<Rows3 size={16} />}
+            onClick={() => deleteRow(editor)}
+          />
+
+          {/* Delete Column */}
+          <ToolbarButton
+            icon={<Columns3 size={16} />}
+            onClick={() => deleteColumn(editor)}
+          />
+
+          {/* Delete Table */}
+          <ToolbarButton
+            icon={<Trash2 size={16} />}
+            onClick={() => deleteTable(editor)}
+          />
+        </>
+      )}
+
       {/* Clear Format */}
       <ToolbarButton
         icon={<Eraser size={16} />}
-        onClick={() =>
-          editor.chain().focus().unsetAllMarks().clearNodes().run()
-        }
+        onClick={() => clearFormatting(editor)}
       />
     </div>
   );
