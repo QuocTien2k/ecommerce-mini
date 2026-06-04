@@ -1,5 +1,29 @@
 import type { Editor } from "@tiptap/react";
 
+export function toggleBold(editor: Editor) {
+  return editor.chain().focus().toggleBold().run();
+}
+
+export function toggleItalic(editor: Editor) {
+  return editor.chain().focus().toggleItalic().run();
+}
+
+export function toggleHeading(editor: Editor, level: 1 | 2 | 3) {
+  return editor.chain().focus().toggleHeading({ level }).run();
+}
+
+export function toggleUnderline(editor: Editor) {
+  return editor.chain().focus().toggleUnderline().run();
+}
+
+export function toggleBulletList(editor: Editor) {
+  return editor.chain().focus().toggleBulletList().run();
+}
+
+export function toggleOrderedList(editor: Editor) {
+  return editor.chain().focus().toggleOrderedList().run();
+}
+
 export function setLink(editor: Editor, href: string) {
   return editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
 }

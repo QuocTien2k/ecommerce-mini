@@ -1,3 +1,4 @@
+import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 
 export const baseExtensions = [
@@ -14,4 +15,5 @@ export const baseExtensions = [
 
     horizontalRule: false,
   }),
+  Underline,
 ];

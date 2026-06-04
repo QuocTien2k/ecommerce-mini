@@ -15,6 +15,7 @@ import {
   Link as LinkIcon,
   Unlink,
   UnderlineIcon,
+  Heading1,
 } from "lucide-react";
 import type { Editor } from "@tiptap/react";
 import { ToolbarButton } from "./ToolbarButton";
@@ -29,6 +30,12 @@ import {
   clearFormatting,
   removeLink,
   setLink,
+  toggleBold,
+  toggleItalic,
+  toggleBulletList,
+  toggleOrderedList,
+  toggleHeading,
+  toggleUnderline,
 } from "../utils/editorHelpers";
 
 type Props = {
@@ -57,53 +64,38 @@ export function EditorToolbar({ editor }: Props) {
       <ToolbarButton
         active={editor.isActive("bold")}
         icon={<Bold size={16} />}
-        onClick={() => editor.chain().focus().toggleBold().run()}
+        onClick={() => toggleBold(editor)}
       />
 
       {/* Italic */}
       <ToolbarButton
         active={editor.isActive("italic")}
         icon={<Italic size={16} />}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
+        onClick={() => toggleItalic(editor)}
       />
 
       {/* Underline */}
       <ToolbarButton
         active={editor.isActive("underline")}
         icon={<UnderlineIcon size={16} />}
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        onClick={() => toggleUnderline(editor)}
       />
 
+      {/* Heading */}
       <ToolbarButton
         active={editor.isActive("heading", {
           level: 2,
         })}
         icon={<Heading2 size={16} />}
-        onClick={() =>
-          editor
-            .chain()
-            .focus()
-            .toggleHeading({
-              level: 2,
-            })
-            .run()
-        }
+        onClick={() => toggleHeading(editor, 2)}
       />
 
       <ToolbarButton
         active={editor.isActive("heading", {
           level: 3,
         })}
-        icon={<Heading3 size={16} />}
-        onClick={() =>
-          editor
-            .chain()
-            .focus()
-            .toggleHeading({
-              level: 3,
-            })
-            .run()
-        }
+        icon={<Heading3 size={14} />}
+        onClick={() => toggleHeading(editor, 3)}
       />
 
       {/* Link */}
@@ -131,14 +123,14 @@ export function EditorToolbar({ editor }: Props) {
       <ToolbarButton
         active={editor.isActive("bulletList")}
         icon={<List size={16} />}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        onClick={() => toggleBulletList(editor)}
       />
 
       {/* Ordered Lists */}
       <ToolbarButton
         active={editor.isActive("orderedList")}
         icon={<ListOrdered size={16} />}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        onClick={() => toggleOrderedList(editor)}
       />
 
       {/* Insert Table */}
