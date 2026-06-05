@@ -68,11 +68,13 @@ const AdminProductFilter = ({
           <SelectContent position="popper">
             <SelectItem value="ALL">Tất cả danh mục</SelectItem>
 
-            {flatCategories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
-              </SelectItem>
-            ))}
+            {flatCategories
+              .filter((category) => category.level === 3)
+              .map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
@@ -116,7 +118,7 @@ const AdminProductFilter = ({
           </SelectTrigger>
 
           <SelectContent position="popper">
-            <SelectItem value="DEFAULT">Mặc định</SelectItem>
+            <SelectItem value="DEFAULT">Giá tiền</SelectItem>
 
             <SelectItem value="asc">Giá thấp đến cao</SelectItem>
 
