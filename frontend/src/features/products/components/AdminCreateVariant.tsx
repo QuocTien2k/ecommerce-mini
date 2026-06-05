@@ -124,9 +124,6 @@ const AdminCreateVariant = ({
         );
       }
     },
-    (errors) => {
-      console.log(errors);
-    },
   );
 
   //handle value input path

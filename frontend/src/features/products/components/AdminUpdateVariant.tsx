@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { useAdminUpdateVariantForm } from "../forms/use-admin-update-vairant-form";
 import { useAdminUpdateVariant } from "../hooks/useAdminUpdateProduct";
 import type { AdminVariantResponse } from "../types/admin-variant.type";
@@ -61,9 +60,9 @@ const AdminUpdateVariant = ({
     async (values: UpdateProductVariantFormOutput) => {
       if (loading) return;
 
-      console.log("submit data", values);
-      console.log("imageUrls", values.imageUrls);
-      console.log("isArray", Array.isArray(values.imageUrls));
+      // console.log("submit data", values);
+      // console.log("imageUrls", values.imageUrls);
+      // console.log("isArray", Array.isArray(values.imageUrls));
 
       sonnerToast.dismiss("update-variant-error");
 
