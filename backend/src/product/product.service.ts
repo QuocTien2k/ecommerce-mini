@@ -15,11 +15,13 @@ import {
 import { GetProductsQueryDto } from './dtos/get-product.dto';
 import { Prisma } from '@prisma/client';
 import { ProductVariantService } from 'src/product-variant/product-variant.service';
+import { CategoryService } from '@category/category.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     private prisma: PrismaService,
+    private categoryService: CategoryService,
     private productVariantService: ProductVariantService,
   ) {}
 
@@ -276,7 +278,22 @@ export class ProductService {
     };
 
     if (query.categoryId) {
-      where.categoryId = query.categoryId;
+      const categoryIds = await this.categoryService.getAllDescendantIds(
+        query.categoryId,
+      );
+
+      where.categoryId = {
+        in: categoryIds,
+      };
+    }
+
+    let breadcrumb: {
+      id: string;
+      name: string;
+      parentId: string | null;
+    }[] = [];
+    if (query.categoryId) {
+      breadcrumb = await this.categoryService.getAncestors(query.categoryId);
     }
 
     if (query.brandId) {
@@ -336,7 +353,12 @@ export class ProductService {
     }));
 
     // format response
-    return buildPaginatedResponse(mappedData, total, page, limit);
+    const response = buildPaginatedResponse(mappedData, total, page, limit);
+
+    return {
+      ...response,
+      breadcrumb,
+    };
   }
 
   //detail for user
