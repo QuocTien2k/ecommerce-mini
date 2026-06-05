@@ -47,7 +47,11 @@ export const CreateProductForm = ({
     [];
 
   const brandsQuery = useAdminBrandQuery();
-  const brands: AdminBrandItem[] = brandsQuery.data?.data?.data ?? [];
+  const brands: AdminBrandItem[] = (brandsQuery.data?.data?.data ?? []).filter(
+    (brand) => brand.isActive === true,
+  );
+
+  //console.log("Brand: ", brands);
 
   // preview slug
   const productName = form.watch("name");
