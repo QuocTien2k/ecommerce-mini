@@ -98,7 +98,7 @@ export class CategoryService {
 
   //get subtree
   async getAllDescendantIds(categoryId: string): Promise<string[]> {
-    const result: string[] = [];
+    const result: string[] = [categoryId];
 
     const traverse = async (parentId: string) => {
       const children = await this.prisma.category.findMany({
@@ -118,6 +118,41 @@ export class CategoryService {
     await traverse(categoryId);
 
     return result;
+  }
+
+  //breadcrum
+  async getAncestors(categoryId: string) {
+    const ancestors: Array<{
+      id: string;
+      name: string;
+      parentId: string | null;
+    }> = [];
+
+    let current = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+      },
+    });
+
+    while (current) {
+      ancestors.unshift(current);
+
+      if (!current.parentId) break;
+
+      current = await this.prisma.category.findUnique({
+        where: { id: current.parentId },
+        select: {
+          id: true,
+          name: true,
+          parentId: true,
+        },
+      });
+    }
+
+    return ancestors;
   }
 
   //check product in tree
