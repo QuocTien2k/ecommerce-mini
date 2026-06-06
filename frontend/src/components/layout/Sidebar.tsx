@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
 const Sidebar: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
   return (
     <aside
-      className={`min-h-screen bg-linear-to-b from-neutral-900 via-neutral-950 to-black 
+      className={`h-screen bg-linear-to-b from-neutral-900 via-neutral-950 to-black 
                   border-r border-white/10 text-white transition-all duration-500 ease-in-out
                   ${collapsed ? "w-24" : "w-64"} overflow-hidden`}
     >
