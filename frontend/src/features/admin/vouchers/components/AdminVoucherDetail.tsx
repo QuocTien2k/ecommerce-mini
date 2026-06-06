@@ -1,11 +1,9 @@
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Button } from "@components/ui/button";
-import { useAdminVoucherDetailQuery } from "@features/vouchers/hooks/admin/useAdminVoucherQuery";
-import {
-  VOUCHER_SCOPES,
-  VOUCHER_TYPES,
-} from "@features/vouchers/types/admin-voucher.type";
+
 import { X } from "lucide-react";
+import { useAdminVoucherDetailQuery } from "../hooks/useAdminVoucherQuery";
+import { VOUCHER_SCOPES, VOUCHER_TYPES } from "../types/admin-voucher.type";
 
 type AdminVoucherDetailModalProps = {
   open: boolean;

@@ -5,21 +5,22 @@ import { Checkbox } from "@components/ui/checkbox";
 import { FieldError } from "@components/ui/field-error";
 import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
-import { useAdminUpdateVoucherForm } from "@features/vouchers/forms/use-admin-update-voucher-form";
-import { useAdminUpdateVoucher } from "@features/vouchers/hooks/admin/useAdminUpdateVoucher";
-import type { UpdateVoucherFormOutput } from "@features/vouchers/schema/admin-voucher";
+import { useAdminUpdateVoucherForm } from "@features/admin/vouchers/forms/use-admin-update-voucher-form";
+
+import type { UpdateVoucherFormOutput } from "@features/admin/vouchers/schema/admin-voucher";
 import {
   VOUCHER_SCOPES,
   VOUCHER_TYPES,
   type AdminVoucher,
   type UpdateVoucherPayload,
-} from "@features/vouchers/types/admin-voucher.type";
+} from "@features/admin/vouchers/types/admin-voucher.type";
 import { getErrorMessage } from "@lib/error";
 import { sonnerToast } from "@lib/sonner-toast";
 import { cn } from "@lib/utils";
 import { format } from "date-fns";
 import { CircleCheckBig, CircleX, X } from "lucide-react";
 import { useEffect } from "react";
+import { useAdminUpdateVoucher } from "../hooks/useAdminUpdateVoucher";
 
 type UpdateVoucherFormProps = {
   open: boolean;

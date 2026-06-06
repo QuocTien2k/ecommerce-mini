@@ -13,11 +13,11 @@ import {
   DialogTrigger,
 } from "@components/ui/dialog";
 import { Input } from "@components/ui/input";
-import { useAdminProductsQuery } from "@features/products/hooks/useAdminProductQuery";
+import { useAdminProductsQuery } from "@features/admin/products/hooks/useAdminProductQuery";
 import type {
   AdminProductListItem,
   AdminProductListQueryParams,
-} from "@features/products/types/admin-product.type";
+} from "@features/admin/products/types/admin-product.type";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 

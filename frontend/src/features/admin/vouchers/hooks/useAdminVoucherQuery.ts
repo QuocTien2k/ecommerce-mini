@@ -1,6 +1,6 @@
-import { adminVoucherApi } from "@features/vouchers/api/adminVoucher.api";
-import type { GetAdminVouchersQuery } from "@features/vouchers/types/admin-voucher.type";
 import { useQuery } from "@tanstack/react-query";
+import type { GetAdminVouchersQuery } from "../types/admin-voucher.type";
+import { adminVoucherApi } from "../api/adminVoucher.api";
 
 export const ADMIN_VOUCHERS_QUERY_KEY = "admin-vouchers";
 export const ADMIN_VOUCHER_DETAIL_QUERY_KEY = "admin-voucher-detail";

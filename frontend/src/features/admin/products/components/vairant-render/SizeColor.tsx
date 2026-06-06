@@ -11,7 +11,7 @@ import {
 import {
   FASHION_SIZE_TYPES,
   type FashionSizeType,
-} from "@/features/products/types/product-variant-ui.type";
+} from "@/features/admin/products/types/product-variant-ui.type";
 
 type VariantFormValues = {
   attributes?: Record<string, string | number>;
