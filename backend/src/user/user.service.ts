@@ -165,7 +165,6 @@ export class UserService {
     });
 
     return {
-      message: 'Cập nhật avatar thành công',
       avatar: updatedUser.avatar,
     };
   }

@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { useState } from "react";
+import { UploadAvatar } from "@features/customer/account/components/UploadAvatar";
 
 const Header = () => {
   //check auth
@@ -110,22 +111,29 @@ const Header = () => {
                 </div>
               </DropdownMenuTrigger>
 
+              {/* Profile */}
               <DropdownMenuContent align="end" className="w-60 p-2">
                 <DropdownMenuItem className="px-3 py-2 cursor-pointer">
                   <User className="w-4 h-4" />
                   <span>Cập nhật thông tin</span>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                {/* Avatar */}
+                <DropdownMenuItem
+                  className="px-3 py-2 cursor-pointer"
+                  onClick={() => setOpenAvatar(true)}
+                >
                   <Camera className="w-4 h-4" />
                   <span>Cập nhật avatar</span>
                 </DropdownMenuItem>
 
+                {/* Password */}
                 <DropdownMenuItem className="px-3 py-2 cursor-pointer">
                   <KeyRound className="w-4 h-4" />
                   <span>Đổi mật khẩu</span>
                 </DropdownMenuItem>
 
+                {/* Favorite */}
                 <DropdownMenuItem className="px-3 py-2 cursor-pointer">
                   <Heart className="w-4 h-4" />
                   <span>Sản phẩm yêu thích</span>
@@ -163,6 +171,8 @@ const Header = () => {
           </div>
         )}
       </div>
+      {/* Modal */}
+      <UploadAvatar open={openAvatar} onClose={() => setOpenAvatar(false)} />
     </header>
   );
 };

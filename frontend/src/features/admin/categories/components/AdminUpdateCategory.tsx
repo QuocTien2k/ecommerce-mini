@@ -187,7 +187,7 @@ export const UpdateCategoryForm = ({
     }
   });
 
-  console.log("Chi tiết: ", detail);
+  //console.log("Chi tiết: ", detail);
 
   return (
     <div

@@ -16,6 +16,7 @@ import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
+import { ResponseMessage } from '@common/decorators/response-message.decorator';
 
 @Controller('user')
 export class UserController {
@@ -51,6 +52,7 @@ export class UserController {
   @Roles(Role.USER)
   @Patch('avatar')
   @UseInterceptors(FileInterceptor('file'))
+  @ResponseMessage('Cập nhật avatar thành công!')
   async uploadAvatar(
     @CurrentUser('sub') userId: string,
     @UploadedFile() file: Express.Multer.File,
