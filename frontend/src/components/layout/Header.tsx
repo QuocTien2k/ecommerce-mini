@@ -25,11 +25,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
+import { useState } from "react";
 
 const Header = () => {
   //check auth
   const user = useAppSelector((state) => state.user.user);
   const isAuthenticated = Boolean(user?.id);
+
+  //update
+  const [openProfile, setOpenProfile] = useState(false);
+  const [openAvatar, setOpenAvatar] = useState(false);
+  const [openPassword, setOpenPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
