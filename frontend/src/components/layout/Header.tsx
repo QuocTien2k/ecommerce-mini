@@ -1,4 +1,12 @@
-import { Bell, Search, ShoppingCart } from "lucide-react";
+import {
+  Bell,
+  Camera,
+  Heart,
+  KeyRound,
+  Search,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +18,13 @@ import { clearAuth } from "@features/auth/auth.slice";
 import { authApi } from "@features/auth/auth.api";
 import { clearUser } from "@features/admin/user/store/user.slice";
 import { AsyncButton } from "@components/common/async-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu";
 
 const Header = () => {
   //check auth
@@ -69,33 +84,66 @@ const Header = () => {
             </Button>
 
             {/* User */}
-            <Link to="/profile" className="flex items-center gap-2">
-              <Avatar className="h-9 w-9">
-                <AvatarImage
-                  src={user?.avatar || "/avatar_user.jpg"}
-                  alt={user?.fullname}
-                />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={user?.avatar || "/avatar_user.jpg"}
+                      alt={user?.fullname}
+                    />
 
-                <AvatarFallback>
-                  {user?.fullname?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
+                    <AvatarFallback>
+                      {user?.fullname?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
 
-              <span className="hidden md:block font-medium">
-                {user?.fullname}
-              </span>
-            </Link>
+                  <span className="hidden md:block font-medium">
+                    {user?.fullname}
+                  </span>
+                </div>
+              </DropdownMenuTrigger>
 
-            {/* Logout */}
-            <AsyncButton
-              loading={loading}
-              onClick={handleLogout}
-              loadingText="Đang thoát..."
-              variant="outline"
-              className="ml-2"
-            >
-              Đăng xuất
-            </AsyncButton>
+              <DropdownMenuContent align="end" className="w-60 p-2">
+                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                  <User className="w-4 h-4" />
+                  <span>Cập nhật thông tin</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                  <Camera className="w-4 h-4" />
+                  <span>Cập nhật avatar</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                  <KeyRound className="w-4 h-4" />
+                  <span>Đổi mật khẩu</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                  <Heart className="w-4 h-4" />
+                  <span>Sản phẩm yêu thích</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  asChild
+                  onSelect={(e) => e.preventDefault()}
+                  className="p-0"
+                >
+                  <AsyncButton
+                    loading={loading}
+                    onClick={handleLogout}
+                    loadingText="Đang thoát..."
+                    variant="destructive"
+                    className="w-full cursor-pointer"
+                  >
+                    Đăng xuất
+                  </AsyncButton>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           <div className="flex items-center gap-2">
