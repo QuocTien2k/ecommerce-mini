@@ -1,10 +1,10 @@
-import { adminVoucherApi } from "@features/vouchers/api/adminVoucher.api";
-import type { UpdateVoucherPayload } from "@features/vouchers/types/admin-voucher.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ADMIN_VOUCHER_DETAIL_QUERY_KEY,
   ADMIN_VOUCHERS_QUERY_KEY,
 } from "./useAdminVoucherQuery";
+import type { UpdateVoucherPayload } from "../../types/admin-voucher.type";
+import { adminVoucherApi } from "../../api/adminVoucher.api";
 
 export type UpdateVoucherFormValues = {
   id: string;

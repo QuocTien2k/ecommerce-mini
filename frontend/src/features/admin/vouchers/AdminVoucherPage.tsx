@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useAdminVoucherFilter } from "./hooks/admin/useAdminVoucherFilter";
-import { useAdminVouchersQuery } from "./hooks/admin/useAdminVoucherQuery";
+import { useAdminVouchersQuery } from "./hooks/useAdminVoucherQuery";
 import {
   VOUCHER_SCOPES,
   VOUCHER_TYPES,
@@ -10,7 +9,7 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
 import AppPagination from "@components/common/pagination";
-import AdminVoucherFilter from "./components/admin/AdminVoucherFilter";
+import AdminVoucherFilter from "./components/AdminVoucherFilter";
 import { cn } from "@lib/utils";
 import { Badge } from "@components/ui/badge";
 import { format } from "date-fns";
@@ -18,12 +17,13 @@ import { AsyncButton } from "@components/common/async-button";
 import { Eye, Trash2 } from "lucide-react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import CopyableText from "@components/common/copyable-text";
-import { AdminCreateVoucher } from "./components/admin/AdminCreateVoucher";
-import { AdminUpdateVoucher } from "./components/admin/AdminUpdateVoucher";
-import AdminVoucherDetailModal from "./components/admin/AdminVoucherDetail";
+import { AdminCreateVoucher } from "./components/AdminCreateVoucher";
+import { AdminUpdateVoucher } from "./components/AdminUpdateVoucher";
+import AdminVoucherDetailModal from "./components/AdminVoucherDetail";
 import { sonnerToast } from "@lib/sonner-toast";
-import { useAdminSoftDeleteVoucher } from "./hooks/admin/useAdminSofteDeleteVoucher";
+import { useAdminSoftDeleteVoucher } from "./hooks/useAdminSofteDeleteVoucher";
 import { ConfirmModal } from "@components/common/confirm";
+import { useAdminVoucherFilter } from "./hooks/useAdminVoucherFilter";
 
 type PendingAction = "update" | "delete" | null;
 

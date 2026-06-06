@@ -13,12 +13,12 @@ import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import { Role } from "@/types/role";
 import AdminDashboard from "@pages/admin/AdminDashboard";
-import AdminUserPage from "@features/user/AdminUserPage";
-import AdminCategoryPage from "@features/categories/AdminCategoryPage";
-import AdminProductPage from "@features/products/AdminProductPage";
-import AdminProductDetail from "@features/products/AdminProductDetail";
-import AdminBrandPage from "@features/brands/AdminBrandPage";
-import AdminVoucherPage from "@features/vouchers/AdminVoucherPage";
+import AdminUserPage from "@features/admin/user/AdminUserPage";
+import AdminCategoryPage from "@features/admin/categories/AdminCategoryPage";
+import AdminProductPage from "@features/admin/products/AdminProductPage";
+import AdminProductDetail from "@features/admin/products/AdminProductDetail";
+import AdminBrandPage from "@features/admin/brands/AdminBrandPage";
+import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
 
 const AppRoutes = () => {
   return (

@@ -9,8 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import type { FlatCategoryItem } from "@/features/categories/types/admin-category.type";
-import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
+import type { FlatCategoryItem } from "@features/admin/categories/types/admin-category.type";
+import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 
 type Props = {
   filters: {

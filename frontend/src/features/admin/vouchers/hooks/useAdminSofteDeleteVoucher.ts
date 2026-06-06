@@ -1,6 +1,6 @@
-import { adminVoucherApi } from "@features/vouchers/api/adminVoucher.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ADMIN_VOUCHERS_QUERY_KEY } from "./useAdminVoucherQuery";
+import { adminVoucherApi } from "@features/admin/vouchers/api/adminVoucher.api";
 
 export const useAdminSoftDeleteVoucher = () => {
   const queryClient = useQueryClient();

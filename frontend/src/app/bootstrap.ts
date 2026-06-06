@@ -6,8 +6,8 @@ import {
   setCredentials,
 } from "@features/auth/auth.slice";
 import { jwtDecode } from "jwt-decode";
-import { userApi } from "@features/user/api/user.api";
-import { clearUser, setUser } from "@features/user/store/user.slice";
+import { userApi } from "@features/admin/user/api/user.api";
+import { clearUser, setUser } from "@features/admin/user/store/user.slice";
 // import { userApi } from "@features/user/api/user.api";
 // import { setUser } from "@features/user/store/user.slice";
 

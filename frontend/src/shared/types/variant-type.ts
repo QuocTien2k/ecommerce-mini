@@ -1,7 +1,7 @@
 import {
   VARIANT_TYPES,
   type VariantType,
-} from "@features/categories/types/admin-category.type";
+} from "@features/admin/categories/types/admin-category.type";
 
 export const variantTypeLabels: Record<VariantType, string> = {
   NONE: "Không có variant",

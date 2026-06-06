@@ -13,21 +13,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
-import { useAdminCreateVoucherForm } from "@features/vouchers/forms/use-admin-create-voucher-form";
-import { useAdminCreateVoucher } from "@features/vouchers/hooks/admin/useAdminCreateVoucher";
-import type { CreateVoucherFormOutput } from "@features/vouchers/schema/admin-voucher";
+
+import { getErrorMessage } from "@lib/error";
+import { sonnerToast } from "@lib/sonner-toast";
+import { X } from "lucide-react";
+import { AdminProductSelector } from "./AdminProductSelector";
+import { useAdminCreateVoucherForm } from "../forms/use-admin-create-voucher-form";
+import { useAdminCreateVoucher } from "../hooks/useAdminCreateVoucher";
+import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/useAdminCategoryFlatQuery";
+import type { CreateVoucherFormOutput } from "../schema/admin-voucher";
 import {
   VOUCHER_SCOPES,
   VOUCHER_TYPES,
   type CreateVoucherPayload,
   type VoucherScope,
   type VoucherType,
-} from "@features/vouchers/types/admin-voucher.type";
-import { getErrorMessage } from "@lib/error";
-import { sonnerToast } from "@lib/sonner-toast";
-import { X } from "lucide-react";
-import { AdminProductSelector } from "./AdminProductSelector";
+} from "../types/admin-voucher.type";
 
 type CreateVoucherFormProps = {
   open: boolean;

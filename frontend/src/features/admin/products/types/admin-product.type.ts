@@ -1,4 +1,4 @@
-import type { VariantType } from "@features/categories/types/admin-category.type";
+import type { VariantType } from "@features/admin/categories/types/admin-category.type";
 import type { AdminVariantResponse } from "./admin-variant.type";
 
 type ProductBase = {

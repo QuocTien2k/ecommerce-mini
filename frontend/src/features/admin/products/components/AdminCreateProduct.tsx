@@ -1,6 +1,6 @@
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 
-import { useAdminFlatCategoriesQuery } from "@features/categories/hooks/useAdminCategoryFlatQuery";
+import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/useAdminCategoryFlatQuery";
 import { useAdminCreateProduct } from "../hooks/useAdminCreateProduct";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
@@ -21,8 +21,8 @@ import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import type { CreateProductFormOutput } from "../schemas/product.schema";
 import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
-import { useAdminBrandQuery } from "@features/brands/hooks/useAdminBrandQuery";
-import type { AdminBrandItem } from "@features/brands/types/admin-brand.type";
+import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQuery";
+import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { Editor } from "@components/editor/Editor";
 

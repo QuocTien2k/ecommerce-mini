@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+
+import { useDebounce } from "@/hooks/useDebounce";
 import type {
   GetAdminVouchersQuery,
   VoucherScope,
   VoucherStatus,
   VoucherType,
-} from "@features/vouchers/types/admin-voucher.type";
-import { useDebounce } from "@/hooks/useDebounce";
+} from "../../types/admin-voucher.type";
 
 export const useAdminVoucherFilter = () => {
   const [page, setPage] = useState(1);

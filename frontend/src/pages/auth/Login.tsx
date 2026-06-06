@@ -11,8 +11,8 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { useFlashMessage } from "@/hooks/flash-message";
-import { userApi } from "@features/user/api/user.api";
-import { setUser } from "@features/user/store/user.slice";
+import { userApi } from "@features/admin/user/api/user.api";
+import { setUser } from "@features/admin/user/store/user.slice";
 
 const Login = () => {
   const dispatch = useAppDispatch();

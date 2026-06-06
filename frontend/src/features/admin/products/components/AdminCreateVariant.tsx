@@ -10,7 +10,7 @@ import { getErrorMessage } from "@lib/error";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { AsyncButton } from "@components/common/async-button";
-import type { VariantType } from "@features/categories/types/admin-category.type";
+import type { VariantType } from "@features/admin/categories/types/admin-category.type";
 import { VariantFieldRenderer } from "./vairant-render/Variant-Field-Render";
 
 type CreateVariantFormProp = {
