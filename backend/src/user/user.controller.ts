@@ -31,6 +31,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
   @Patch('profile')
+  @ResponseMessage('Cập nhật thành công!')
   async updateProfile(
     @CurrentUser('sub') userId: string,
     @Body() body: UpdateProfileDto,
@@ -41,6 +42,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
   @Patch('password')
+  @ResponseMessage('Đổi mật khẩu thành công!')
   async updatePassword(
     @CurrentUser('sub') userId: string,
     @Body() body: ChangePasswordDto,
