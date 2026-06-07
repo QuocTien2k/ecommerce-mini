@@ -27,6 +27,7 @@ import {
 } from "@components/ui/dropdown-menu";
 import { useState } from "react";
 import { UploadAvatar } from "@features/customer/account/components/UploadAvatar";
+import { UpdateProfile } from "@features/customer/account/components/UpdateProfile";
 
 const Header = () => {
   //check auth
@@ -113,7 +114,10 @@ const Header = () => {
 
               {/* Profile */}
               <DropdownMenuContent align="end" className="w-60 p-2">
-                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                <DropdownMenuItem
+                  className="px-3 py-2 cursor-pointer"
+                  onClick={() => setOpenProfile(true)}
+                >
                   <User className="w-4 h-4" />
                   <span>Cập nhật thông tin</span>
                 </DropdownMenuItem>
@@ -173,6 +177,7 @@ const Header = () => {
       </div>
       {/* Modal */}
       <UploadAvatar open={openAvatar} onClose={() => setOpenAvatar(false)} />
+      <UpdateProfile open={openProfile} onClose={() => setOpenProfile(false)} />
     </header>
   );
 };
