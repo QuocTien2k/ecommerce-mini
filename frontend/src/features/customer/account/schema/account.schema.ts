@@ -1,5 +1,6 @@
 import z from "zod";
 
+//update profle
 export const updateProfileSchema = z.object({
   fullname: z
     .string()
@@ -26,3 +27,25 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;
+
+//Change password
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(6, "Mật khẩu cũ tối thiểu 6 ký tự"),
+
+    newPassword: z
+      .string()
+      .min(6, "Mật khẩu mới tối thiểu 6 ký tự")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/,
+        "Mật khẩu phải có chữ hoa, chữ thường và số",
+      ),
+
+    confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Mật khẩu không khớp",
+  });
+
+export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;

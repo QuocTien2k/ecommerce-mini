@@ -28,6 +28,7 @@ import {
 import { useState } from "react";
 import { UploadAvatar } from "@features/customer/account/components/UploadAvatar";
 import { UpdateProfile } from "@features/customer/account/components/UpdateProfile";
+import { ChangePassword } from "@features/customer/account/components/ChangePassword";
 
 const Header = () => {
   //check auth
@@ -132,7 +133,10 @@ const Header = () => {
                 </DropdownMenuItem>
 
                 {/* Password */}
-                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                <DropdownMenuItem
+                  className="px-3 py-2 cursor-pointer"
+                  onClick={() => setOpenPassword(true)}
+                >
                   <KeyRound className="w-4 h-4" />
                   <span>Đổi mật khẩu</span>
                 </DropdownMenuItem>
@@ -175,9 +179,14 @@ const Header = () => {
           </div>
         )}
       </div>
+
       {/* Modal */}
       <UploadAvatar open={openAvatar} onClose={() => setOpenAvatar(false)} />
       <UpdateProfile open={openProfile} onClose={() => setOpenProfile(false)} />
+      <ChangePassword
+        open={openPassword}
+        onClose={() => setOpenPassword(false)}
+      />
     </header>
   );
 };

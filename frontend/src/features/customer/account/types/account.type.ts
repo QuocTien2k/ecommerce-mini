@@ -15,3 +15,13 @@ export interface UpdateProfileResponse {
   email?: string;
   address?: string;
 }
+
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
+}
