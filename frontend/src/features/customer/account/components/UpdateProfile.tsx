@@ -2,8 +2,11 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useAppSelector } from "@app/hooks";
 import { useUpdateProfileMutation } from "../hooks/useUpdateProfile";
 import { useUpdateProfileForm } from "../form/use-update-profile";
-import { useAddressResolver } from "@/hooks/address/useAddressResolver";
-import { useEffect } from "react";
+import {
+  useAddressCodeResolver,
+  useAddressResolver,
+} from "@/hooks/address/useAddressResolver";
+import { useEffect, useMemo } from "react";
 import { buildAddress, parseAddress } from "@/utils/address.mapper";
 import type { UpdateProfileSchema } from "../schema/account.schema";
 import { sonnerToast } from "@lib/sonner-toast";
@@ -39,15 +42,23 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
 
   const address = watch("address");
 
+  const parsedAddress = useMemo(() => {
+    return parseAddress(user?.address ?? "");
+  }, [user?.address]);
+
   const { provinceName, wardName } = useAddressResolver({
     provinceCode: address.provinceCode,
     wardCode: address.wardCode,
   });
 
+  const { provinceCode, wardCode } = useAddressCodeResolver({
+    provinceName: parsedAddress.provinceName,
+    wardName: parsedAddress.wardName,
+  });
+
+  //reset form
   useEffect(() => {
     if (!open || !user) return;
-
-    const parsed = parseAddress(user.address);
 
     reset({
       fullname: user.fullname,
@@ -55,12 +66,12 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
       email: user.email,
 
       address: {
-        provinceCode: "",
-        wardCode: "",
-        detail: parsed.detail,
+        provinceCode,
+        wardCode,
+        detail: parsedAddress.detail,
       },
     });
-  }, [open, user, reset]);
+  }, [open, user, provinceCode, wardCode, parsedAddress.detail, reset]);
 
   const getErrorVisibility = (field: keyof UpdateProfileSchema) =>
     errors[field] && (dirtyFields[field] || isSubmitted);
