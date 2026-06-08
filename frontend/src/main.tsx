@@ -9,6 +9,7 @@ import { setupInterceptors } from "./shared/api/interceptors.ts";
 import { bootstrapAuth } from "@app/bootstrap.ts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@lib/react-query.ts";
+import SocketProvider from "./providers/SocketProvider.tsx";
 
 setupInterceptors();
 bootstrapAuth().finally(() => {
@@ -17,7 +18,9 @@ bootstrapAuth().finally(() => {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            <App />
+            <SocketProvider>
+              <App />
+            </SocketProvider>
           </BrowserRouter>
         </QueryClientProvider>
       </Provider>
