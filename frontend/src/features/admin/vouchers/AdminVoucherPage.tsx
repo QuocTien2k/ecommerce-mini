@@ -24,6 +24,7 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { useAdminSoftDeleteVoucher } from "./hooks/useAdminSofteDeleteVoucher";
 import { ConfirmModal } from "@components/common/confirm";
 import { useAdminVoucherFilter } from "./hooks/useAdminVoucherFilter";
+import { AssignVoucherDialog } from "./components/assign-voucher/AssignVoucherDialog";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -33,6 +34,7 @@ const AdminVoucherPage = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openAssign, setOpenAssign] = useState(false);
   const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(
     null,
   );
@@ -291,6 +293,18 @@ const AdminVoucherPage = () => {
                         </AsyncButton>
 
                         <AsyncButton
+                          size="sm"
+                          variant="outline"
+                          disabled={loading || isFetching || voucher.isDeleted}
+                          onClick={() => {
+                            setSelectedVoucher(voucher);
+                            setOpenAssign(true);
+                          }}
+                        >
+                          Gửi
+                        </AsyncButton>
+
+                        <AsyncButton
                           size="icon"
                           showLoadingText={false}
                           disabled={loading || isFetching || voucher.isDeleted}
@@ -373,6 +387,12 @@ const AdminVoucherPage = () => {
           setOpenUpdate(false);
           setSelectedVoucher(null);
         }}
+        voucher={selectedVoucher}
+      />
+
+      <AssignVoucherDialog
+        open={openAssign}
+        onOpenChange={setOpenAssign}
         voucher={selectedVoucher}
       />
 
