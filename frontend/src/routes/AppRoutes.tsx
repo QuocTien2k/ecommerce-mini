@@ -19,7 +19,7 @@ import AdminProductPage from "@features/admin/products/AdminProductPage";
 import AdminProductDetail from "@features/admin/products/AdminProductDetail";
 import AdminBrandPage from "@features/admin/brands/AdminBrandPage";
 import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
-import MyVouchers from "@features/customer/voucher/pages/MyVouchers";
+import MyVouchers from "@features/customer/voucher/MyVouchers";
 
 const AppRoutes = () => {
   return (
