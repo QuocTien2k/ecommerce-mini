@@ -193,3 +193,18 @@ export const updateVoucherSchema = z
 export type UpdateVoucherFormValues = z.input<typeof updateVoucherSchema>;
 
 export type UpdateVoucherFormOutput = z.output<typeof updateVoucherSchema>;
+
+//assign
+export const assignVoucherSchema = z.object({
+  userIds: z.array(z.string()).min(1, "Vui lòng chọn ít nhất một người dùng"),
+
+  usagePerUser: optionalPositiveNumber(
+    "Số lượt sử dụng không hợp lệ",
+    1,
+    "Số lượt sử dụng phải >= 1",
+  ),
+});
+
+export type AssignVoucherFormValues = z.input<typeof assignVoucherSchema>;
+
+export type AssignVoucherFormOutput = z.output<typeof assignVoucherSchema>;

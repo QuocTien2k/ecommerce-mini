@@ -4,6 +4,8 @@ import type { PaginatedResponse } from "@shared/types/pagination";
 import type {
   AdminVoucher,
   AdminVoucherDetail,
+  AssignVoucherPayload,
+  AssignVoucherResponse,
   CreateVoucherPayload,
   GetAdminVouchersQuery,
   UpdateVoucherPayload,
@@ -28,4 +30,10 @@ export const adminVoucherApi = {
 
   softDeleteVoucher: (voucherId: string): ApiResult<AdminVoucher> =>
     api.patch(`/voucher/soft/${voucherId}`),
+
+  assignVoucher: (
+    voucherId: string,
+    payload: AssignVoucherPayload,
+  ): ApiResult<AssignVoucherResponse> =>
+    api.post(`/voucher/${voucherId}/assign`, payload),
 };

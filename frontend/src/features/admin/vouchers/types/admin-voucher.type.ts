@@ -118,6 +118,18 @@ export interface UpdateVoucherPayload {
   minOrderValue?: number;
 }
 
+/* Assign Voucher */
+export interface AssignVoucherPayload {
+  userIds: string[];
+  usagePerUser?: number;
+}
+
+export interface AssignVoucherResponse {
+  assigned: number;
+  userIds: string[];
+  voucher: AdminVoucher;
+}
+
 /* Response */
 export interface GetAdminVouchersResponse {
   data: AdminVoucher[];
