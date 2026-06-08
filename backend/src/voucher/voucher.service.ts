@@ -168,6 +168,7 @@ export class VoucherService {
           voucherId,
           usagePerUser: usage,
           usedCount: 0,
+          remainingUsage: usage,
         }),
       );
 
