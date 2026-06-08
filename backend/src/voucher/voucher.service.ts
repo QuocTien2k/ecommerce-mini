@@ -202,6 +202,8 @@ export class VoucherService {
         message: `Bạn vừa nhận voucher ${result.voucher.code}`,
       });
     });
+
+    return result;
   }
 
   /* Case get list vouchers*/
@@ -490,7 +492,9 @@ export class VoucherService {
     });
 
     if (assigned) {
-      throw new BadRequestException('Voucher đã được assign, không thể xoá');
+      throw new BadRequestException(
+        'Không thể xoá voucher vì đã được cấp cho người dùng',
+      );
     }
 
     // đã bị xoá trước đó
