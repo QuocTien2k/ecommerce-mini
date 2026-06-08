@@ -25,6 +25,7 @@ import { useAdminSoftDeleteVoucher } from "./hooks/useAdminSofteDeleteVoucher";
 import { ConfirmModal } from "@components/common/confirm";
 import { useAdminVoucherFilter } from "./hooks/useAdminVoucherFilter";
 import { AssignVoucherDialog } from "./components/assign-voucher/AssignVoucherDialog";
+import { getErrorMessage } from "@lib/error";
 
 type PendingAction = "update" | "delete" | null;
 
@@ -61,6 +62,11 @@ const AdminVoucherPage = () => {
       const result = await run(() => softDeleteVoucher(voucherId));
 
       sonnerToast.success(result.message);
+    } catch (error) {
+      console.error("Error: ", error);
+      sonnerToast.error(getErrorMessage(error, "Xóa voucher thất bại"), {
+        id: "voucher-assign-error",
+      });
     } finally {
       setPendingId(null);
       setPendingAction(null);

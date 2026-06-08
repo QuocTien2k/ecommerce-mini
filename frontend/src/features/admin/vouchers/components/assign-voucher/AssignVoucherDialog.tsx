@@ -39,13 +39,13 @@ export const AssignVoucherDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      {/* <DialogTrigger asChild>
-        <Button>Gán voucher</Button>
-      </DialogTrigger> */}
+      <DialogTrigger asChild>
+        <Button>Gửi voucher</Button>
+      </DialogTrigger>
 
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Gán voucher "{voucher.code}"</DialogTitle>
+          <DialogTitle>Gửi voucher "{voucher.code}"</DialogTitle>
 
           <DialogDescription>
             Chọn người dùng nhận voucher này.
