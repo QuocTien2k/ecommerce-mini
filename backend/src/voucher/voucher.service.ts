@@ -145,10 +145,17 @@ export class VoucherService {
         where: { id: voucherId },
       });
 
-      if (!voucher) throw new NotFoundException('Voucher không tồn tại');
-      if (!voucher.isActive)
+      if (!voucher) {
+        throw new NotFoundException('Voucher không tồn tại');
+      }
+
+      if (!voucher.isActive) {
         throw new BadRequestException('Voucher chưa active');
-      if (voucher.isDeleted) throw new BadRequestException('Voucher đã bị xoá');
+      }
+
+      if (voucher.isDeleted) {
+        throw new BadRequestException('Voucher đã bị xoá');
+      }
 
       const now = new Date();
 
@@ -162,7 +169,56 @@ export class VoucherService {
 
       const usage = usagePerUser ?? 1;
 
-      const data: Prisma.UserVoucherCreateManyInput[] = userIds.map(
+      // lấy các user đã được cấp voucher trước đó
+      const existedUserVouchers = await tx.userVoucher.findMany({
+        where: {
+          voucherId,
+          userId: {
+            in: userIds,
+          },
+        },
+        select: {
+          userId: true,
+        },
+      });
+
+      const existedUserIds = new Set(
+        existedUserVouchers.map((item) => item.userId),
+      );
+
+      const newUserIds = userIds.filter((id) => !existedUserIds.has(id));
+
+      if (newUserIds.length === 0) {
+        throw new BadRequestException(
+          'Tất cả người dùng đã được cấp voucher này',
+        );
+      }
+
+      // kiểm tra quota còn lại
+      if (voucher.usageLimit != null) {
+        const allocatedUsage = await tx.userVoucher.aggregate({
+          where: {
+            voucherId,
+          },
+          _sum: {
+            usagePerUser: true,
+          },
+        });
+
+        const allocated = allocatedUsage._sum.usagePerUser ?? 0;
+
+        const requiredUsage = usage * newUserIds.length;
+
+        const remaining = voucher.usageLimit - allocated;
+
+        if (requiredUsage > remaining) {
+          throw new BadRequestException(
+            `Không đủ lượt cấp phát. Còn ${remaining} lượt sử dụng`,
+          );
+        }
+      }
+
+      const data: Prisma.UserVoucherCreateManyInput[] = newUserIds.map(
         (userId) => ({
           userId,
           voucherId,
@@ -174,10 +230,9 @@ export class VoucherService {
 
       const inserted = await tx.userVoucher.createMany({
         data,
-        skipDuplicates: true,
       });
 
-      const notifications = userIds.map((userId) => ({
+      const notifications = newUserIds.map((userId) => ({
         userId,
         title: 'Bạn vừa nhận voucher mới',
         message: `Voucher ${voucher.code} đã được cấp cho bạn`,
@@ -190,7 +245,7 @@ export class VoucherService {
 
       return {
         assigned: inserted.count,
-        userIds,
+        userIds: newUserIds,
         voucher,
       };
     });
