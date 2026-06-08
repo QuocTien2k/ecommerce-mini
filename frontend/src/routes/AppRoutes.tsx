@@ -19,6 +19,7 @@ import AdminProductPage from "@features/admin/products/AdminProductPage";
 import AdminProductDetail from "@features/admin/products/AdminProductDetail";
 import AdminBrandPage from "@features/admin/brands/AdminBrandPage";
 import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
+import MyVouchers from "@features/customer/voucher/pages/MyVouchers";
 
 const AppRoutes = () => {
   return (
@@ -43,6 +44,12 @@ const AppRoutes = () => {
       {/* Layout Website */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>
+            <Route path="my-vouchers" element={<MyVouchers />} />
+          </Route>
+        </Route>
       </Route>
 
       {/* Auth layout */}

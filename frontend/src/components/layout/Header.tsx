@@ -5,6 +5,7 @@ import {
   KeyRound,
   Search,
   ShoppingCart,
+  Ticket,
   User,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -114,7 +115,10 @@ const Header = () => {
               </DropdownMenuTrigger>
 
               {/* Profile */}
-              <DropdownMenuContent align="end" className="w-60 p-2">
+              <DropdownMenuContent
+                align="end"
+                className="w-60 p-2 max-h-80 overflow-y-auto"
+              >
                 <DropdownMenuItem
                   className="px-3 py-2 cursor-pointer"
                   onClick={() => setOpenProfile(true)}
@@ -145,6 +149,14 @@ const Header = () => {
                 <DropdownMenuItem className="px-3 py-2 cursor-pointer">
                   <Heart className="w-4 h-4" />
                   <span>Sản phẩm yêu thích</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="px-3 py-2 cursor-pointer"
+                  onClick={() => navigate("/my-vouchers")}
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>Voucher của tôi</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

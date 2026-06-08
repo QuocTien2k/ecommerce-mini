@@ -5,9 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { AssignVoucherForm } from "./AssignVoucherForm";
 import { useAdminAssignVoucherForm } from "../../forms/use-admin-assign-voucher";
 import type { AdminVoucher } from "../../types/admin-voucher.type";
@@ -39,10 +37,6 @@ export const AssignVoucherDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button>Gửi voucher</Button>
-      </DialogTrigger>
-
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Gửi voucher "{voucher.code}"</DialogTitle>
