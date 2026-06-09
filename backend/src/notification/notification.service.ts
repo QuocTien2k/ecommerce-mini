@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
+import { NotificationQueryDto } from './dtos/notification.dto';
 
 @Injectable()
 export class NotificationService {
   constructor(private readonly prisma: PrismaService) {}
 
   //lấy thông báo
-  async getMyNotifications(userId: string) {
+  async getMyNotifications(userId: string, query?: NotificationQueryDto) {
+    const { isRead, page = 1, limit = 5 } = query || {};
+
     return this.prisma.notification.findMany({
-      where: { userId },
+      where: {
+        userId,
+        ...(typeof isRead === 'boolean' ? { isRead } : {}),
+      },
       orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
   }
 

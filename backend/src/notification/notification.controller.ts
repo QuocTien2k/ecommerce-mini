@@ -1,10 +1,23 @@
-import { Controller, Get, Param, Patch, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
 import { RolesGuard } from '@auth/guards/roles.guard';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
+import { CurrentUser } from '@auth/decorators/current-user.decorator';
+import {
+  NotificationIdDto,
+  NotificationQueryDto,
+} from './dtos/notification.dto';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -14,23 +27,29 @@ export class NotificationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
   @ResponseMessage('Lấy danh sách thông báo thành công!')
-  getMyNotifications(@Req() req) {
-    return this.notificationService.getMyNotifications(req.user.id);
+  getMyNotifications(
+    @CurrentUser('sub') userId: string,
+    @Query() query: NotificationQueryDto,
+  ) {
+    return this.notificationService.getMyNotifications(userId, query);
   }
 
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
   @ResponseMessage('Đọc 1 thông báo thành công!')
-  markAsRead(@Param('id') id: string, @Req() req) {
-    return this.notificationService.markAsRead(id, req.user.id);
+  markAsRead(
+    @Param() { id }: NotificationIdDto,
+    @CurrentUser('sub') userId: string,
+  ) {
+    return this.notificationService.markAsRead(id, userId);
   }
 
   @Patch('read-all')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
   @ResponseMessage('Đọc hết tin thành công!')
-  markAll(@Req() req) {
-    return this.notificationService.markAllAsRead(req.user.id);
+  markAll(@CurrentUser('sub') userId: string) {
+    return this.notificationService.markAllAsRead(userId);
   }
 }
