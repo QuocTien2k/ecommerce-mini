@@ -1,4 +1,4 @@
-import { IsOptional, IsBooleanString, Min, IsInt } from 'class-validator';
+import { IsOptional, Min, IsInt } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { IsUUID } from 'class-validator';
 
@@ -23,4 +23,13 @@ export class NotificationQueryDto {
 export class NotificationIdDto {
   @IsUUID()
   id: string;
+}
+
+export class NotificationResponseDto {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: Date;
 }

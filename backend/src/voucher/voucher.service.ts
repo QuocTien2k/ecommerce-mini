@@ -19,6 +19,7 @@ import { ApplyVoucherDto } from './dtos/apply-voucher.dto';
 import { ApplyVoucherResult } from '@common/types/voucher.type';
 import { NotificationsGateway } from '@notification/notification.gateway';
 import { VoucherDetailAdminResponseDto } from './dtos/voucher-detail.dto';
+import { NotificationResponseDto } from '@notification/dtos/notification.dto';
 
 @Injectable()
 export class VoucherService {
@@ -239,24 +240,32 @@ export class VoucherService {
         voucherId,
       }));
 
-      await tx.notification.createMany({
-        data: notifications,
-      });
+      const createdNotifications = await Promise.all(
+        notifications.map((notification) =>
+          tx.notification.create({
+            data: notification,
+          }),
+        ),
+      );
 
       return {
         assigned: inserted.count,
-        userIds: newUserIds,
         voucher,
+        notifications: createdNotifications,
       };
     });
 
-    result.userIds.forEach((userId) => {
-      this.notificationsGateway.sendToUser(userId, {
+    result.notifications.forEach((notification) => {
+      const payload: NotificationResponseDto = {
+        id: notification.id,
         type: 'VOUCHER_ASSIGNED',
-        voucherId: result.voucher.id,
-        voucherCode: result.voucher.code,
-        message: `Bạn vừa nhận voucher ${result.voucher.code}`,
-      });
+        title: notification.title,
+        message: notification.message,
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+      };
+
+      this.notificationsGateway.sendToUser(notification.userId, payload);
     });
 
     return result;
