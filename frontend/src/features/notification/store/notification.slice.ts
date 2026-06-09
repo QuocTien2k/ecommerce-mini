@@ -11,6 +11,7 @@ export interface Notification {
 interface NotificationState {
   items: Notification[];
   unreadCount: number;
+  lastIncomingId?: string;
 }
 
 const initialState: NotificationState = {
@@ -32,6 +33,8 @@ const notificationSlice = createSlice({
       if (!action.payload.isRead) {
         state.unreadCount += 1;
       }
+      // trigger UI event
+      state.lastIncomingId = action.payload.id;
     },
 
     markAsRead(state, action: PayloadAction<string>) {

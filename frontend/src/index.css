@@ -161,6 +161,47 @@
   }
 }
 
+@layer utilities {
+  @keyframes bell-shake {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    15% {
+      transform: rotate(18deg) scale(1.05);
+    }
+
+    30% {
+      transform: rotate(-18deg) scale(1.05);
+    }
+
+    45% {
+      transform: rotate(14deg) scale(1.06);
+    }
+
+    60% {
+      transform: rotate(-14deg) scale(1.06);
+    }
+
+    75% {
+      transform: rotate(8deg) scale(1.03);
+    }
+
+    90% {
+      transform: rotate(-8deg) scale(1.02);
+    }
+
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+  }
+
+  .animate-bell-shake {
+    animation: bell-shake 0.55s cubic-bezier(0.36, 0, 0.66, 1.5);
+    transform-origin: top center;
+  }
+}
+
 @keyframes ring-rotate-1 {
   from {
     transform: rotateX(50deg) rotateZ(110deg);

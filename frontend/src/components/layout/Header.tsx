@@ -1,5 +1,4 @@
 import {
-  Bell,
   Camera,
   Heart,
   KeyRound,
@@ -30,6 +29,7 @@ import { useState } from "react";
 import { UploadAvatar } from "@features/customer/account/components/UploadAvatar";
 import { UpdateProfile } from "@features/customer/account/components/UpdateProfile";
 import { ChangePassword } from "@features/customer/account/components/ChangePassword";
+import { NotificationWidget } from "@features/notification/components/NotificationWidget";
 
 const Header = () => {
   //check auth
@@ -79,10 +79,7 @@ const Header = () => {
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
             {/* Notification */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="size-5" />
-              <span className="absolute right-1 top-1 flex h-2 w-2 rounded-full bg-red-500" />
-            </Button>
+            <NotificationWidget />
 
             {/* Cart */}
             <Button variant="ghost" size="icon" className="relative">

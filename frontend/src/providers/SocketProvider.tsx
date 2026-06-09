@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
-import { useAppSelector } from "@app/hooks";
+import { useAppDispatch, useAppSelector } from "@app/hooks";
+import { addNotification } from "@features/notification/store/notification.slice";
 
 type Props = {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ type Props = {
 
 export default function SocketProvider({ children }: Props) {
   const user = useAppSelector((state) => state.user.user);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!user?.id) return;
@@ -16,7 +18,21 @@ export default function SocketProvider({ children }: Props) {
 
     socket.emit("join", user.id);
 
+    socket.on("notification", (data) => {
+      //console.log("socket data:", data);
+      dispatch(
+        addNotification({
+          id: data.id,
+          title: data.title,
+          message: data.message,
+          isRead: false,
+          createdAt: data.createdAt,
+        }),
+      );
+    });
+
     return () => {
+      socket.off("notification");
       disconnectSocket();
     };
   }, [user?.id]);
