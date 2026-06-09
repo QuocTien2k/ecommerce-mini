@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NotificationBell } from "./NotificationBell";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { useAppDispatch } from "@app/hooks";
@@ -7,7 +7,23 @@ import { setUnreadCount } from "../store/notification.slice";
 
 export const NotificationWidget = () => {
   const [open, setOpen] = useState(false);
+  const widgetRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
+
+  //click outside => close
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (widgetRef.current && !widgetRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const { data: unreadData } = useUnreadNotificationCountQuery();
 
@@ -18,7 +34,7 @@ export const NotificationWidget = () => {
   }, [unreadData, dispatch]);
 
   return (
-    <div className="relative">
+    <div ref={widgetRef} className="relative">
       <div onClick={() => setOpen((v) => !v)}>
         <NotificationBell />
       </div>

@@ -8,7 +8,7 @@ import {
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import Loading from "@components/ui/loading";
 import { formatRelativeTime } from "@lib/format-date";
-import { AsyncButton } from "@components/common/async-button";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Props = {
   open: boolean;
@@ -65,7 +65,7 @@ export const NotificationDropdown = ({ open }: Props) => {
     }
   };
 
-  if (!open) return null;
+  //if (!open) return null;
 
   const apiItems = Array.isArray(data?.data) ? data.data : [];
 
@@ -84,61 +84,73 @@ export const NotificationDropdown = ({ open }: Props) => {
   );
 
   return (
-    <div className="absolute right-0 mt-2 w-96 rounded-lg border bg-white shadow-xl z-50">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b p-4">
-        <span className="text-lg font-semibold">Thông báo</span>
-
-        <button
-          disabled={isPending || unreadCount === 0}
-          onClick={handleMarkAllRead}
-          className="cursor-pointer text-sm font-medium text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -8 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="
+        absolute right-0 mt-2 w-96 rounded-lg border bg-white shadow-xl z-50
+      "
         >
-          {loading ? "Đang xử lý..." : "Đánh dấu tất cả đã đọc"}
-        </button>
-      </div>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b p-4">
+            <span className="text-lg font-semibold">Thông báo</span>
 
-      {/* Body */}
-      <div className="max-h-125 overflow-y-auto">
-        {loading ? (
-          <div className="py-6">
-            <Loading text="Đang tải thông báo..." size="md" />
-          </div>
-        ) : merged.length === 0 ? (
-          <div className="p-6 text-center text-sm text-gray-500">
-            Không có thông báo
-          </div>
-        ) : (
-          merged.map((n) => (
-            <div
-              key={n.id}
-              onClick={() => handleMarkAsRead(n.id, n.isRead)}
-              className={`p-4 border-b cursor-pointer transition-colors hover:bg-gray-50 ${readingId === n.id ? "pointer-events-none opacity-60" : ""}`}
+            <button
+              disabled={isPending || unreadCount === 0}
+              onClick={handleMarkAllRead}
+              className="cursor-pointer text-sm font-medium text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {/* Title */}
-              <div
-                className={`text-base ${
-                  n.isRead ? "font-medium" : "font-semibold"
-                }`}
-              >
-                {n.title}
-              </div>
+              {loading ? "Đang xử lý..." : "Đánh dấu tất cả đã đọc"}
+            </button>
+          </div>
 
-              {/* Message */}
-              {n.message && (
-                <div className="mt-1 text-sm leading-6 text-gray-600">
-                  {n.message}
+          {/* Body */}
+          <div className="max-h-125 overflow-y-auto">
+            {loading ? (
+              <div className="py-6">
+                <Loading text="Đang tải thông báo..." size="md" />
+              </div>
+            ) : merged.length === 0 ? (
+              <div className="p-6 text-center text-sm text-gray-500">
+                Không có thông báo
+              </div>
+            ) : (
+              merged.map((n) => (
+                <div
+                  key={n.id}
+                  onClick={() => handleMarkAsRead(n.id, n.isRead)}
+                  className={`p-4 border-b cursor-pointer transition-colors hover:bg-gray-50 ${readingId === n.id ? "pointer-events-none opacity-60" : ""}`}
+                >
+                  {/* Title */}
+                  <div
+                    className={`text-base ${
+                      n.isRead ? "font-medium" : "font-semibold"
+                    }`}
+                  >
+                    {n.title}
+                  </div>
+
+                  {/* Message */}
+                  {n.message && (
+                    <div className="mt-1 text-sm leading-6 text-gray-600">
+                      {n.message}
+                    </div>
+                  )}
+
+                  {/* Time */}
+                  <div className="mt-2 text-xs text-gray-400">
+                    {formatRelativeTime(n.createdAt)}
+                  </div>
                 </div>
-              )}
-
-              {/* Time */}
-              <div className="mt-2 text-xs text-gray-400">
-                {formatRelativeTime(n.createdAt)}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+              ))
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
