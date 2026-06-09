@@ -1,5 +1,5 @@
-import { IsOptional, IsBooleanString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsBooleanString, Min, IsInt } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { IsUUID } from 'class-validator';
 
 export class NotificationQueryDto {
@@ -8,9 +8,15 @@ export class NotificationQueryDto {
   isRead?: boolean;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   limit?: number;
 }
 
