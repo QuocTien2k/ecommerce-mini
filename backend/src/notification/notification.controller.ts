@@ -34,6 +34,14 @@ export class NotificationsController {
     return this.notificationService.getMyNotifications(userId, query);
   }
 
+  @Get('unread-count')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  @ResponseMessage('Lấy số thông báo chưa đọc thành công!')
+  getUnreadCount(@CurrentUser('sub') userId: string) {
+    return this.notificationService.getUnreadCount(userId);
+  }
+
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
