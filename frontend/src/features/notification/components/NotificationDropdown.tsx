@@ -19,6 +19,8 @@ export const NotificationDropdown = ({ open }: Props) => {
   });
   const { loading } = useScopedLoading();
 
+  //console.log("notification list:", data);
+
   const { mutate: markAsRead } = useMarkAsReadNotification();
 
   const socketNotifications = useAppSelector(
@@ -27,7 +29,7 @@ export const NotificationDropdown = ({ open }: Props) => {
 
   if (!open) return null;
 
-  const apiItems = data?.data?.data ?? [];
+  const apiItems = Array.isArray(data?.data) ? data.data : [];
 
   /**
    * MERGE STRATEGY:

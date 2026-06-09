@@ -197,7 +197,7 @@
   }
 
   .animate-bell-shake {
-    animation: bell-shake 0.55s cubic-bezier(0.36, 0, 0.66, 1.5);
+    animation: bell-shake 1.2s cubic-bezier(0.36, 0, 0.66, 1.5) infinite;
     transform-origin: top center;
   }
 }

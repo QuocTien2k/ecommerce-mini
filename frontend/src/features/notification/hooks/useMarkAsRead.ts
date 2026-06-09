@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationApi } from "../api/notification.api";
-import { NOTIFICATION_QUERY_KEY } from "./useNotifications";
+import {
+  NOTIFICATION_QUERY_KEY,
+  UNREAD_NOTIFICATION_COUNT_QUERY_KEY,
+} from "./useNotifications";
 
 interface MarkAsReadParams {
   id: string;
@@ -16,6 +19,10 @@ export const useMarkAsReadNotification = () => {
       queryClient.invalidateQueries({
         queryKey: [NOTIFICATION_QUERY_KEY],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: [UNREAD_NOTIFICATION_COUNT_QUERY_KEY],
+      });
     },
   });
 };
@@ -29,6 +36,10 @@ export const useMarkAllAsReadNotification = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [NOTIFICATION_QUERY_KEY],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [UNREAD_NOTIFICATION_COUNT_QUERY_KEY],
       });
     },
   });

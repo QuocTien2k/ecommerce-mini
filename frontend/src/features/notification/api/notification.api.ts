@@ -12,6 +12,9 @@ export const notificationApi = {
   ): ApiResult<PaginatedResponse<NotificationItem>> =>
     api.get("/notifications", { params }),
 
+  getUnreadCount: (): ApiResult<{ count: number }> =>
+    api.get("/notifications/unread-count"),
+
   markAsRead: (id: string): ApiResult<void> =>
     api.patch(`/notifications/${id}/read`),
 
