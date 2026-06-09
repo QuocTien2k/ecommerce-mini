@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useAppSelector } from "@app/hooks";
 import { useNotificationQuery } from "../hooks/useNotifications";
-import { useMarkAsReadNotification } from "../hooks/useMarkAsRead";
+import {
+  useMarkAllAsReadNotification,
+  useMarkAsReadNotification,
+} from "../hooks/useMarkAsRead";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import Loading from "@components/ui/loading";
 
@@ -23,6 +26,8 @@ export const NotificationDropdown = ({ open }: Props) => {
 
   const { mutate: markAsRead } = useMarkAsReadNotification();
 
+  const { mutate: markAllAsRead } = useMarkAllAsReadNotification();
+
   const socketNotifications = useAppSelector(
     (state) => state.notification.items,
   );
@@ -41,7 +46,16 @@ export const NotificationDropdown = ({ open }: Props) => {
 
   return (
     <div className="absolute right-0 mt-2 w-80 rounded-md border bg-white shadow-lg">
-      <div className="p-3 border-b text-sm font-medium">Thông báo</div>
+      <div className="flex items-center justify-between p-3 border-b">
+        <span className="text-sm font-medium">Thông báo</span>
+
+        <button
+          onClick={() => markAllAsRead()}
+          className="text-xs text-blue-600"
+        >
+          Đánh dấu tất cả đã đọc
+        </button>
+      </div>
 
       <div className="max-h-96 overflow-y-auto">
         {loading ? (
