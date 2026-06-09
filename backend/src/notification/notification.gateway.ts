@@ -19,17 +19,20 @@ export class NotificationsGateway
   server: Server;
 
   handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
+    console.log('[Socket] Client connected:', client.id);
   }
 
   handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
+    console.log('[Socket] Client disconnected:', client.id);
   }
 
   // Cho phép client join room theo userId
   @SubscribeMessage('join')
   handleJoin(client: Socket, userId: string) {
     client.join(`user:${userId}`);
+    console.log(
+      `[Socket] User ${userId} joined room user:${userId} (socket: ${client.id})`,
+    );
   }
 
   // Hàm dùng để emit từ server
