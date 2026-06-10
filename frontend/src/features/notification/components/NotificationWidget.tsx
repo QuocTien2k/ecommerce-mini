@@ -39,7 +39,7 @@ export const NotificationWidget = () => {
         <NotificationBell />
       </div>
 
-      <NotificationDropdown open={open} />
+      <NotificationDropdown open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };

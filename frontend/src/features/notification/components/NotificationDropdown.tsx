@@ -14,9 +14,10 @@ import type { NotificationItem } from "../types/notification.type";
 
 type Props = {
   open: boolean;
+  onClose: () => void;
 };
 
-export const NotificationDropdown = ({ open }: Props) => {
+export const NotificationDropdown = ({ open, onClose }: Props) => {
   const [markingAllRead, setMarkingAllRead] = useState(false);
   const [page] = useState(1);
   const [limit] = useState(5);
@@ -44,6 +45,8 @@ export const NotificationDropdown = ({ open }: Props) => {
     if (notification.path) {
       navigate(notification.path);
     }
+
+    onClose();
 
     if (!notification.isRead) {
       try {
