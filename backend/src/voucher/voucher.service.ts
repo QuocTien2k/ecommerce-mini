@@ -261,6 +261,7 @@ export class VoucherService {
         type: 'VOUCHER_ASSIGNED',
         title: notification.title,
         message: notification.message,
+        path: '/my-vouchers',
         isRead: notification.isRead,
         createdAt: notification.createdAt,
       };

@@ -30,6 +30,7 @@ export class NotificationResponseDto {
   type: string;
   title: string;
   message: string;
+  path?: string;
   isRead: boolean;
   createdAt: Date;
 }
