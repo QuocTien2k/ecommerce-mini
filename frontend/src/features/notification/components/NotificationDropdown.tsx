@@ -9,6 +9,8 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import Loading from "@components/ui/loading";
 import { formatRelativeTime } from "@lib/format-date";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import type { NotificationItem } from "../types/notification.type";
 
 type Props = {
   open: boolean;
@@ -16,9 +18,9 @@ type Props = {
 
 export const NotificationDropdown = ({ open }: Props) => {
   const [markingAllRead, setMarkingAllRead] = useState(false);
-  const [readingId, setReadingId] = useState<string | null>(null);
   const [page] = useState(1);
   const [limit] = useState(5);
+  const navigate = useNavigate();
 
   const { data } = useNotificationQuery({
     page,
@@ -38,17 +40,19 @@ export const NotificationDropdown = ({ open }: Props) => {
   );
 
   //đọc 1 tin
-  const handleMarkAsRead = async (id: string, isRead: boolean) => {
-    if (isRead || readingId === id) return;
+  const handleNotificationClick = async (notification: NotificationItem) => {
+    if (notification.path) {
+      navigate(notification.path);
+    }
 
-    try {
-      setReadingId(id);
-
-      await markAsRead({ id });
-    } catch (error) {
-      console.error("Mark notification read error:", error);
-    } finally {
-      setReadingId(null);
+    if (!notification.isRead) {
+      try {
+        await markAsRead({
+          id: notification.id,
+        });
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -122,8 +126,8 @@ export const NotificationDropdown = ({ open }: Props) => {
               merged.map((n) => (
                 <div
                   key={n.id}
-                  onClick={() => handleMarkAsRead(n.id, n.isRead)}
-                  className={`p-4 border-b cursor-pointer transition-colors hover:bg-gray-50 ${readingId === n.id ? "pointer-events-none opacity-60" : ""}`}
+                  onClick={() => handleNotificationClick(n)}
+                  className="p-4 border-b cursor-pointer transition-colors hover:bg-gray-50"
                 >
                   {/* Title */}
                   <div

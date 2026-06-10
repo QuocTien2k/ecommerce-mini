@@ -3,6 +3,7 @@ export interface NotificationItem {
   title: string;
   message: string;
   type?: string;
+  path?: string;
   isRead: boolean;
   createdAt?: string;
 }
