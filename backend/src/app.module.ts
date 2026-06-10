@@ -17,6 +17,7 @@ import { VoucherModule } from './voucher/voucher.module';
 import { PaymentModule } from './payment/payment.module';
 import { RatingModule } from './rating/rating.module';
 import { BrandModule } from './brand/brand.module';
+import { PublicModule } from './public/public.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BrandModule } from './brand/brand.module';
     PaymentModule,
     RatingModule,
     BrandModule,
+    PublicModule,
   ],
   controllers: [AppController],
   providers: [AppService],

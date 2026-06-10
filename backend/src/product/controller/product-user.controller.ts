@@ -6,13 +6,13 @@ import { ProductService } from '@product/product.service';
 export class ProductControllerUser {
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
-  async findAll(@Query() query: GetProductsQueryDto) {
-    return await this.productService.findAllForUser(query);
-  }
+  // @Get()
+  // async findAll(@Query() query: GetProductsQueryDto) {
+  //   return await this.productService.findAllForUser(query);
+  // }
 
-  @Get(':slug')
-  async findOneForUser(@Param('slug') slug: string) {
-    return this.productService.findOneForUser(slug);
-  }
+  // @Get(':slug')
+  // async findOneForUser(@Param('slug') slug: string) {
+  //   return this.productService.findOneForUser(slug);
+  // }
 }

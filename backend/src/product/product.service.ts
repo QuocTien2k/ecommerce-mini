@@ -264,7 +264,7 @@ export class ProductService {
   }
 
   //lists product for user
-  async findAllForUser(query: GetProductsQueryDto) {
+  async findAllProducts(query: GetProductsQueryDto) {
     // pagination (default limit = 10)
     const { page, limit, skip } = getPagination({
       ...query,
@@ -362,7 +362,7 @@ export class ProductService {
   }
 
   //detail for user
-  async findOneForUser(slug: string) {
+  async findProductDetail(slug: string) {
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
@@ -410,6 +410,36 @@ export class ProductService {
 
       variants: mappedVariants,
     };
+  }
+
+  //latest products for home page
+  async getHomeProducts() {
+    const products = await this.prisma.product.findMany({
+      where: {
+        isActive: true,
+        deletedAt: null,
+      },
+      take: 8,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        price: true,
+        discountPrice: true,
+        discountPct: true,
+        ratingAvg: true,
+        ratingCount: true,
+      },
+    });
+
+    return products.map((item) => ({
+      ...item,
+      price: item.price.toString(),
+      discountPrice: item.discountPrice?.toString() ?? null,
+    }));
   }
 
   //lists product for admin

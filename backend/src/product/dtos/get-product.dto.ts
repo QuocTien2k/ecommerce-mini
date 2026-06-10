@@ -35,29 +35,29 @@ export class GetProductsQueryDto {
   isActive?: boolean;
 }
 
-export class ProductListItemDto {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
+// export class ProductListItemDto {
+//   id: string;
+//   name: string;
+//   slug: string;
+//   description?: string;
 
-  price: string;
-  discountPrice?: string | null;
-  discountPct?: number | null;
+//   price: string;
+//   discountPrice?: string | null;
+//   discountPct?: number | null;
 
-  ratingAvg: number;
-  ratingCount: number;
+//   ratingAvg: number;
+//   ratingCount: number;
 
-  isActive: boolean;
+//   isActive: boolean;
 
-  categoryId: string;
-  brandId: string;
-  brand?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+//   categoryId: string;
+//   brandId: string;
+//   brand?: {
+//     id: string;
+//     name: string;
+//     slug: string;
+//   };
 
-  createdAt: Date;
-  updatedAt: Date;
-}
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
