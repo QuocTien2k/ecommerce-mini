@@ -237,6 +237,7 @@ export class VoucherService {
         userId,
         title: 'Bạn vừa nhận voucher mới',
         message: `Voucher ${voucher.code} đã được cấp cho bạn`,
+        path: '/my-vouchers',
         voucherId,
       }));
 

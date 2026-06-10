@@ -6,6 +6,7 @@ model Notification {
 
   title     String
   message   String
+  path      String?
 
   isRead    Boolean  @default(false)
 
