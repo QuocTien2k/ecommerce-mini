@@ -487,6 +487,7 @@ export class ProductService {
           name: true,
           slug: true,
           description: true,
+          thumbnail: true,
 
           price: true,
           discountPrice: true,
