@@ -198,7 +198,6 @@ export class BrandService {
           id: true,
           name: true,
           slug: true,
-          image: true,
         },
       }),
       this.prisma.brand.count({ where }),

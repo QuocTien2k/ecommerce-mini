@@ -552,11 +552,11 @@ export class CategoryService {
     });
   }
 
-  //list public level 2
+  //list public level 3
   async getPublicCategoryTree(): Promise<CategoryTreeNode[]> {
     return this.getCategoryTreeWithLevel({
       isActive: true,
-      maxLevel: 2,
+      maxLevel: 3,
     });
   }
 
