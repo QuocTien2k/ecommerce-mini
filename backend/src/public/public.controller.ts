@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PublicService } from './public.service';
+import { GetProductsQueryDto } from '@product/dtos/get-product.dto';
 
 @Controller()
 export class PublicController {
@@ -8,5 +9,15 @@ export class PublicController {
   @Get('home')
   async getHomeData() {
     return this.publicService.getHomeData();
+  }
+
+  @Get('products')
+  async getProducts(@Query() query: GetProductsQueryDto) {
+    return this.publicService.getProducts(query);
+  }
+
+  @Get('product/:slug')
+  async getproductDetail(@Param('slug') slug: string) {
+    return this.publicService.getProductDetail(slug);
   }
 }

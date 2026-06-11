@@ -4,8 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { ProductVariantModule } from 'src/product-variant/product-variant.module';
 import { CategoryModule } from 'src/category/category.module';
-import { ProductControllerAdmin } from './controller/product-admin.controller';
-import { ProductControllerUser } from './controller/product-user.controller';
+import { ProductControllerAdmin } from './product-admin.controller';
 import { BrandModule } from 'src/brand/brand.module';
 
 @Module({
@@ -16,7 +15,7 @@ import { BrandModule } from 'src/brand/brand.module';
     CategoryModule,
     BrandModule,
   ],
-  controllers: [ProductControllerAdmin, ProductControllerUser],
+  controllers: [ProductControllerAdmin],
   providers: [ProductService],
   exports: [ProductService],
 })
