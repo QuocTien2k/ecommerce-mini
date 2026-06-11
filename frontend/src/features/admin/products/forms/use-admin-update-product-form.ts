@@ -13,6 +13,7 @@ export const useAdminUpdateProductForm = () => {
     defaultValues: {
       name: "",
       description: "",
+      thumbnail: "",
       price: 0,
 
       // undefined = giữ nguyên discount

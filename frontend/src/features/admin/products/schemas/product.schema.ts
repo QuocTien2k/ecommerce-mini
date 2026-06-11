@@ -10,6 +10,8 @@ const productBaseSchema = z.object({
 
   description: z.string().optional(),
 
+  thumbnail: z.string().trim().url("Thumbnail phải là URL hợp lệ"),
+
   price: z.coerce
     .number({
       error: "Vui lòng nhập giá sản phẩm",

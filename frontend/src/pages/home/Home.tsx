@@ -1,5 +1,11 @@
+import { PublicCategory } from "@/domains/category/PublicCategory";
+
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <>
+      <PublicCategory />
+    </>
+  );
 };
 
 export default Home;

@@ -13,6 +13,7 @@ export const useAdminCreateProductForm = () => {
     defaultValues: {
       name: "",
       description: "",
+      thumbnail: "",
       price: 0,
       discountPct: undefined,
       isActive: true,

@@ -7,6 +7,7 @@ type ProductBase = {
   name: string;
   slug: string;
   description: string | null;
+  thumbnail: string | null;
 
   price: string;
   discountPrice: string | null;
@@ -82,6 +83,8 @@ export type AdminCreateProductPayload = {
 
   description?: string;
 
+  thumbnail: string;
+
   price: number;
 
   discountPct?: number;
@@ -97,6 +100,8 @@ export type AdminUpdateProductPayload = {
   name?: string;
 
   description?: string;
+
+  thumbnail?: string;
 
   price?: number;
 
