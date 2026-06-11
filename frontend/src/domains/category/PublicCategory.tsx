@@ -2,6 +2,8 @@ import { useState } from "react";
 import { usePublicCategoriesQuery } from "./hooks/usePublicCategory";
 import { CategoryStrip } from "./components/CategoryStrip";
 import type { PublicCategoryTreeItem } from "./types/public-category.type";
+import { usePublicProductsQuery } from "../product/hooks/usePublicProduct";
+import { ProductGrid } from "../product/components/ProductGrid";
 
 export const PublicCategory = () => {
   const { data = [], isLoading } = usePublicCategoriesQuery();
@@ -21,13 +23,22 @@ export const PublicCategory = () => {
     });
   };
 
+  const activeCategoryId =
+    selectedPath.length > 0 ? selectedPath[selectedPath.length - 1].id : null;
+
   const currentLevelCategories =
     selectedPath.length === 0
       ? data
       : selectedPath[selectedPath.length - 1].children;
 
+  const { data: products, isLoading: isProductsLoading } =
+    usePublicProductsQuery({
+      categoryId: activeCategoryId ?? undefined,
+    });
+
+  //console.log("Data: ", products);
+
   if (isLoading) return <div>Loading categories...</div>;
-  if (!data) return null;
 
   return (
     <div className="w-full">
@@ -36,6 +47,13 @@ export const PublicCategory = () => {
         activeCategoryId={selectedPath[selectedPath.length - 1]?.id ?? null}
         onSelectCategory={handleSelect}
       />
+
+      {/* PRODUCTS LAYER */}
+      <div className="mt-4">
+        {isProductsLoading && <div>Loading products...</div>}
+
+        <ProductGrid products={products?.data.data ?? []} />
+      </div>
     </div>
   );
 };
