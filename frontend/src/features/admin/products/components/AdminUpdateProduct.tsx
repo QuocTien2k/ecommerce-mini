@@ -3,12 +3,12 @@ import { useAdminUpdateProductForm } from "../forms/use-admin-update-product-for
 import type { AdminProductListItem } from "../types/admin-product.type";
 import { useAdminUpdateProduct } from "../hooks/useAdminUpdateProduct";
 import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/useAdminCategoryFlatQuery";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { UpdateProductFormOutput } from "../schemas/product.schema";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
-import { X } from "lucide-react";
+import { Trash2, Undo2, X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
@@ -21,7 +21,7 @@ import {
 } from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
@@ -41,6 +41,7 @@ const AdminUpdateProduct = ({
   product,
 }: AdminUpdateProductProps) => {
   const form = useAdminUpdateProductForm();
+  const [removeThumbnail, setRemoveThumbnail] = useState(false);
 
   const { loading, run } = useScopedLoading();
 
@@ -62,14 +63,29 @@ const AdminUpdateProduct = ({
   // watch
   const productName = form.watch("name");
   const discountValue = form.watch("discountPct");
+  const thumbnailPreview = useWatch({
+    control: form.control,
+    name: "thumbnail",
+  });
+
+  const previewUrl =
+    (removeThumbnail ? product?.thumbnail : thumbnailPreview) ?? undefined;
+
+  const toggleThumbnail = () => {
+    setRemoveThumbnail((prev) => !prev);
+  };
 
   // reset form when product changes
   useEffect(() => {
     if (!product || !open || !categoriesReady) return;
     //console.log("PRODUCT CATEGORY:", product.categoryId);
+
+    setRemoveThumbnail(false);
+
     form.reset({
       name: product.name,
       description: product.description || "",
+      thumbnail: product.thumbnail || "",
 
       price: Number(product.price),
 
@@ -103,6 +119,7 @@ const AdminUpdateProduct = ({
               name: values.name || undefined,
 
               description: values.description || undefined,
+              thumbnail: values.thumbnail || undefined,
 
               price: values.price,
 
@@ -134,6 +151,8 @@ const AdminUpdateProduct = ({
       }
     },
   );
+
+  console.log("Data: ", product);
 
   if (!open || !product) return null;
 
@@ -218,6 +237,59 @@ const AdminUpdateProduct = ({
                 <p className="text-sm text-red-500">
                   {form.formState.errors.description.message}
                 </p>
+              )}
+            </div>
+
+            {/* thumbnail */}
+            <div className="space-y-2 md:col-span-2">
+              <Label>Thumbnail</Label>
+
+              <Input
+                placeholder="https://example.com/image.jpg"
+                {...form.register("thumbnail")}
+              />
+
+              {form.formState.errors.thumbnail && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.thumbnail.message}
+                </p>
+              )}
+
+              {thumbnailPreview?.startsWith("http") && (
+                <div className="relative w-fit rounded-lg border bg-muted/20 p-2">
+                  <img
+                    src={previewUrl}
+                    alt="Thumbnail preview"
+                    className={`h-32 w-32 object-contain transition-opacity ${
+                      removeThumbnail ? "opacity-40" : ""
+                    }`}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant={removeThumbnail ? "secondary" : "destructive"}
+                    className="absolute right-1 top-1 z-20 h-7 w-7"
+                    onClick={toggleThumbnail}
+                  >
+                    {removeThumbnail ? (
+                      <Undo2 className="h-3.5 w-3.5" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+
+                  {removeThumbnail && (
+                    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50">
+                      <span className="text-xs font-medium text-white">
+                        Sẽ được thay thế
+                      </span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
