@@ -4,6 +4,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   Length,
   Matches,
@@ -25,6 +26,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  thumbnail?: string;
 
   @IsOptional()
   @Type(() => Number)

@@ -100,7 +100,7 @@ export class ProductService {
             name: dto.name,
             slug,
             description: dto.description,
-
+            thumbnail: dto.thumbnail,
             price: dto.price.toString(),
             discountPrice: discountPrice?.toString(),
             discountPct: dto.discountPct ?? null,
@@ -188,7 +188,7 @@ export class ProductService {
     const data: any = {
       name: dto.name ?? existing.name,
       description: dto.description ?? existing.description,
-
+      thumbnail: dto.thumbnail ?? existing.thumbnail,
       price: price.toString(),
       discountPrice: discountPrice?.toString() ?? null,
       discountPct: pct,

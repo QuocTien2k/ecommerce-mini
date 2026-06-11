@@ -9,6 +9,7 @@ import {
   IsUUID,
   Length,
   Matches,
+  IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -29,6 +30,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsUrl()
+  thumbnail?: string;
 
   @Type(() => Number)
   @IsInt()
