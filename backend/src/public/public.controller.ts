@@ -11,6 +11,11 @@ export class PublicController {
     return this.publicService.getHomeData();
   }
 
+  @Get('categories')
+  async getCategories() {
+    return this.publicService.getCategories();
+  }
+
   @Get('products')
   async getProducts(@Query() query: GetProductsQueryDto) {
     return this.publicService.getProducts(query);

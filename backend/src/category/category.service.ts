@@ -342,6 +342,7 @@ export class CategoryService {
     });
   }
 
+  //build category tree and calculate nesting level recursively
   async getCategoryTreeWithLevel(options?: {
     isActive?: boolean;
     includeDeleted?: boolean;
@@ -390,10 +391,13 @@ export class CategoryService {
     for (const cat of categories) {
       const node = map.get(cat.id)!;
 
-      if (cat.parentId && map.has(cat.parentId)) {
-        map.get(cat.parentId)!.children.push(node);
-      } else {
+      if (!cat.parentId) {
         roots.push(node);
+        continue;
+      }
+
+      if (map.has(cat.parentId)) {
+        map.get(cat.parentId)!.children.push(node);
       }
     }
 
