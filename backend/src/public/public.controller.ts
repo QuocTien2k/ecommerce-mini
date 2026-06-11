@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PublicService } from './public.service';
 import { GetProductsQueryDto } from '@product/dtos/get-product.dto';
+import { GetPublicBrandDto } from 'src/brand/dtos/get-brand.dto';
 
 @Controller()
 export class PublicController {
@@ -14,6 +15,11 @@ export class PublicController {
   @Get('categories')
   async getCategories() {
     return this.publicService.getCategories();
+  }
+
+  @Get('brands')
+  async getBrands(@Query() query: GetPublicBrandDto) {
+    return this.publicService.getBrands(query);
   }
 
   @Get('products')

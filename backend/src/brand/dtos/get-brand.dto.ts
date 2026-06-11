@@ -8,12 +8,22 @@ import {
 
 import { Transform, Type } from 'class-transformer';
 
-export class GetBrandDto {
+export class GetBrandQueryBase {
   @IsOptional()
   @IsString()
-  @Length(1, 100)
   name?: string;
 
+  @IsOptional()
+  @IsDateString()
+  fromDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  toDate?: string;
+}
+
+//cho admin
+export class GetBrandDto extends GetBrandQueryBase {
   @IsOptional()
   @Transform(({ value }) => {
     if (value === 'true') return true;
@@ -24,13 +34,16 @@ export class GetBrandDto {
   isActive?: boolean;
 
   @IsOptional()
-  @IsDateString()
-  fromDate?: string;
+  @Type(() => Number)
+  page?: number;
 
   @IsOptional()
-  @IsDateString()
-  toDate?: string;
+  @Type(() => Number)
+  limit?: number;
+}
 
+//public
+export class GetPublicBrandDto extends GetBrandQueryBase {
   @IsOptional()
   @Type(() => Number)
   page?: number;

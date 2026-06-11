@@ -12,7 +12,11 @@ import {
   buildPaginatedResponse,
   getPagination,
 } from '@common/utils/pagination';
-import { GetBrandDto } from './dtos/get-brand.dto';
+import {
+  GetBrandDto,
+  GetBrandQueryBase,
+  GetPublicBrandDto,
+} from './dtos/get-brand.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -126,9 +130,7 @@ export class BrandService {
     });
   }
 
-  async findAll(query: GetBrandDto) {
-    const { page, limit, skip } = getPagination(query);
-
+  private buildBrandWhere(query: GetBrandQueryBase) {
     const where: Prisma.BrandWhereInput = {};
 
     if (query.name) {
@@ -138,20 +140,24 @@ export class BrandService {
       };
     }
 
-    if (query.isActive !== undefined) {
-      where.isActive = query.isActive;
-    }
-
     if (query.fromDate || query.toDate) {
       where.createdAt = {
-        ...(query.fromDate && {
-          gte: new Date(query.fromDate),
-        }),
-
-        ...(query.toDate && {
-          lte: new Date(query.toDate),
-        }),
+        ...(query.fromDate && { gte: new Date(query.fromDate) }),
+        ...(query.toDate && { lte: new Date(query.toDate) }),
       };
+    }
+
+    return where;
+  }
+
+  //list for admin
+  async findAll(query: GetBrandDto) {
+    const { page, limit, skip } = getPagination(query);
+
+    const where = this.buildBrandWhere(query);
+
+    if (query.isActive !== undefined) {
+      where.isActive = query.isActive;
     }
 
     const [brands, total] = await this.prisma.$transaction([
@@ -168,6 +174,34 @@ export class BrandService {
       this.prisma.brand.count({
         where,
       }),
+    ]);
+
+    return buildPaginatedResponse(brands, total, page, limit);
+  }
+
+  //list public
+  async findAllPublic(query: GetPublicBrandDto) {
+    const { page, limit, skip } = getPagination(query);
+
+    const where = {
+      ...this.buildBrandWhere(query),
+      isActive: true,
+    };
+
+    const [brands, total] = await this.prisma.$transaction([
+      this.prisma.brand.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          image: true,
+        },
+      }),
+      this.prisma.brand.count({ where }),
     ]);
 
     return buildPaginatedResponse(brands, total, page, limit);
