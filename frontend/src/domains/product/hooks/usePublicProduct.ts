@@ -7,10 +7,16 @@ export const PUBLIC_PRODUCTS_QUERY_KEY = "public-products";
 export const usePublicProductsQuery = (
   params?: PublicProductListQueryParams,
 ) => {
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   return useQuery({
     queryKey: [PUBLIC_PRODUCTS_QUERY_KEY, params],
 
-    queryFn: () => publicProductApi.getList(params),
+    queryFn: async () => {
+      await sleep(2000);
+      return publicProductApi.getList(params);
+    },
 
     placeholderData: (prev) => prev,
   });

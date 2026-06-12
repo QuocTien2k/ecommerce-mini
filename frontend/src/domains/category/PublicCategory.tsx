@@ -4,6 +4,7 @@ import { CategoryStrip } from "./components/CategoryStrip";
 import type { PublicCategoryTreeItem } from "./types/public-category.type";
 import { usePublicProductsQuery } from "../product/hooks/usePublicProduct";
 import { ProductGrid } from "../product/components/ProductGrid";
+import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 
 export const PublicCategory = () => {
   const { data = [], isLoading } = usePublicCategoriesQuery();
@@ -38,7 +39,7 @@ export const PublicCategory = () => {
 
   //console.log("Data: ", products);
 
-  if (isLoading) return <div>Loading categories...</div>;
+  if (isLoading) return <div>Đang tải ...</div>;
 
   return (
     <div className="w-full">
@@ -50,9 +51,9 @@ export const PublicCategory = () => {
 
       {/* PRODUCTS LAYER */}
       <div className="mt-4">
-        {isProductsLoading && <div>Loading products...</div>}
-
-        <ProductGrid products={products?.data.data ?? []} />
+        <QueryStateWrapper isLoading={isProductsLoading}>
+          <ProductGrid products={products?.data.data ?? []} />
+        </QueryStateWrapper>
       </div>
     </div>
   );
