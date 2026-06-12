@@ -9,7 +9,7 @@ import { X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -25,6 +25,7 @@ import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQu
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { Editor } from "@components/editor/Editor";
+import { useEffect, useState } from "react";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -35,6 +36,7 @@ export const CreateProductForm = ({
   open,
   onClose,
 }: CreateProductFormProps) => {
+  const [thumbnailError, setThumbnailError] = useState(false);
   const form = useAdminCreateProductForm();
 
   const { loading, run } = useScopedLoading();
@@ -52,6 +54,16 @@ export const CreateProductForm = ({
   );
 
   //console.log("Brand: ", brands);
+
+  const thumbnailPreview = useWatch({
+    control: form.control,
+    name: "thumbnail",
+  });
+
+  // Reset image error when thumbnail URL changes
+  useEffect(() => {
+    setThumbnailError(false);
+  }, [thumbnailPreview]);
 
   // preview slug
   const productName = form.watch("name");
@@ -74,6 +86,7 @@ export const CreateProductForm = ({
           createProductMutation.mutateAsync({
             name: values.name,
             description: values.description || undefined,
+            thumbnail: values.thumbnail,
             price: values.price,
             discountPct: values.discountPct || undefined,
             isActive: values.isActive,
@@ -169,6 +182,39 @@ export const CreateProductForm = ({
               {form.formState.errors.description && (
                 <p className="text-sm text-red-500">
                   {form.formState.errors.description.message}{" "}
+                </p>
+              )}
+            </div>
+
+            {/* thumbnail */}
+            <div className="space-y-2 md:col-span-2">
+              <Label>Thumbnail</Label>
+
+              <Input
+                placeholder="https://example.com/image.jpg"
+                {...form.register("thumbnail")}
+              />
+
+              {form.formState.errors.thumbnail && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors.thumbnail.message}
+                </p>
+              )}
+
+              {thumbnailPreview?.startsWith("http") && !thumbnailError && (
+                <div className="w-fit rounded-lg border bg-muted/20 p-2">
+                  <img
+                    src={thumbnailPreview}
+                    alt="Thumbnail preview"
+                    className="h-32 w-32 object-contain"
+                    onError={() => setThumbnailError(true)}
+                  />
+                </div>
+              )}
+
+              {thumbnailError && (
+                <p className="text-sm text-red-500">
+                  Không thể tải ảnh từ URL này
                 </p>
               )}
             </div>

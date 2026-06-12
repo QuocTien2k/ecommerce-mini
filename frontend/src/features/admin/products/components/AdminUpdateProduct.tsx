@@ -152,7 +152,7 @@ const AdminUpdateProduct = ({
     },
   );
 
-  console.log("Data: ", product);
+  //console.log("Data: ", product);
 
   if (!open || !product) return null;
 
