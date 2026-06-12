@@ -5,6 +5,7 @@ import type { PublicCategoryTreeItem } from "./types/public-category.type";
 import { usePublicProductsQuery } from "../product/hooks/usePublicProduct";
 import { ProductGrid } from "../product/components/ProductGrid";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
+import { ProductNotFound } from "@components/product/ProductNotFound";
 
 export const PublicCategory = () => {
   const { data = [], isLoading } = usePublicCategoriesQuery();
@@ -52,7 +53,11 @@ export const PublicCategory = () => {
       {/* PRODUCTS LAYER */}
       <div className="mt-4">
         <QueryStateWrapper isLoading={isProductsLoading}>
-          <ProductGrid products={products?.data.data ?? []} />
+          {products?.data.data.length ? (
+            <ProductGrid products={products.data.data} />
+          ) : (
+            <ProductNotFound />
+          )}
         </QueryStateWrapper>
       </div>
     </div>
