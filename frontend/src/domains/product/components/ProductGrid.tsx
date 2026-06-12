@@ -1,4 +1,5 @@
 import type { PublicProductListItem } from "../types/public-product.type";
+import { ProductCard } from "./ProductCard";
 
 type Props = {
   products: PublicProductListItem[];
@@ -6,17 +7,15 @@ type Props = {
 
 export const ProductGrid = ({ products }: Props) => {
   if (!products.length) {
-    return <div className="text-sm text-gray-500">No products</div>;
+    return <div className="text-sm text-gray-500">Không có sản phẩm</div>;
   }
 
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {products.map((p) => (
-        <div key={p.id} className="border rounded p-3">
-          <div className="font-medium text-sm">{p.name}</div>
+  console.log("Data trả về: ", products[0]);
 
-          <div className="text-sm text-gray-700">{p.price}</div>
-        </div>
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );

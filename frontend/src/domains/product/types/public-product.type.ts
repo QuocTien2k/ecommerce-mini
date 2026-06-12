@@ -19,6 +19,7 @@ export type PublicProductListItem = {
   name: string;
   slug: string;
   description: string | null;
+  thumbnail: string;
 
   price: string;
   discountPrice: string | null;
