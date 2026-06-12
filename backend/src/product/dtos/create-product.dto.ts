@@ -34,7 +34,7 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   @IsUrl()
-  thumbnail?: string;
+  thumbnail: string;
 
   @Type(() => Number)
   @IsInt()
