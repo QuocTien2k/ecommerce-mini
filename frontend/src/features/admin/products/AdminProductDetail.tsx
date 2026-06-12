@@ -23,6 +23,7 @@ import AdminCreateVariant from "./components/AdminCreateVariant";
 import AdminUpdateVariant from "./components/AdminUpdateVariant";
 import { ATTRIBUTE_LABELS } from "@shared/types/variant-type";
 import TiptapContent from "@components/editor/TiptapContent";
+import { FALLBACK_IMAGE } from "@shared/constants/image";
 //import { AdminUpdateVariant } from "./components/AdminUpdateVariant";
 
 const AdminProductDetail = () => {
@@ -44,7 +45,7 @@ const AdminProductDetail = () => {
     return "text-green-600";
   };
 
-  //console.log("Data trả về: ", data?.brand?.name);
+  //console.log("Data trả về: ", data?.thumbnail);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -83,6 +84,21 @@ const AdminProductDetail = () => {
               </CardHeader>
 
               <CardContent className="space-y-6">
+                {data.thumbnail && (
+                  <div className="flex justify-center">
+                    <div className="rounded-lg border bg-muted/20 p-2">
+                      <img
+                        src={data.thumbnail || FALLBACK_IMAGE}
+                        alt={data.name}
+                        className="h-48 w-48 object-contain"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = FALLBACK_IMAGE;
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 text-base font-semibold text-primary">
                   <FileText className="size-5" />
                   Mô tả
