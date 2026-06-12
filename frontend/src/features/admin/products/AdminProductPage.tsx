@@ -25,6 +25,7 @@ import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQu
 import { useAdminStatusMutation } from "./hooks/useAdminStatusMutation";
 import { getErrorMessage } from "@lib/error";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
+import { FALLBACK_IMAGE } from "@shared/constants/image";
 
 type PendingAction = "update" | "delete" | "restore" | null;
 
@@ -91,6 +92,8 @@ const AdminProductPage = () => {
     }
   };
 
+  console.log("Data trả về: ", products);
+
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
@@ -125,6 +128,8 @@ const AdminProductPage = () => {
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr className="text-left hover:bg-muted/40 transition-colors">
+                <th className="px-4 py-3 font-medium">Ảnh</th>
+
                 <th className="px-4 py-3 font-medium">Tên sản phẩm</th>
 
                 <th className="px-4 py-3 font-medium">Danh mục</th>
@@ -157,6 +162,21 @@ const AdminProductPage = () => {
                     key={product.id}
                     className="border-t hover:bg-muted/30 transition-colors"
                   >
+                    {/* THUMBNAIL */}
+                    <td className="px-4 py-3">
+                      <div className="w-14 h-14 rounded-md overflow-hidden border bg-muted">
+                        <img
+                          src={product.thumbnail || FALLBACK_IMAGE}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_IMAGE;
+                          }}
+                        />
+                      </div>
+                    </td>
+
                     {/* NAME */}
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1">
@@ -316,7 +336,7 @@ const AdminProductPage = () => {
               {/* EMPTY */}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="text-center py-10">
+                  <td colSpan={10} className="text-center py-10">
                     <span className="text-sm text-muted-foreground">
                       Không tìm thấy sản phẩm
                     </span>
