@@ -17,11 +17,11 @@ export function ProductCard({ product }: Props) {
       to={`/products/${slug}`}
       className="group block overflow-hidden rounded-xl border bg-background transition-all hover:shadow-md"
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative h-52 items-center justify-center overflow-hidden p-4">
         <img
           src={thumbnail}
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="mx-auto size-45 object-contain transition-transform duration-300 group-hover:scale-105"
         />
 
         {discountPct != null && discountPct > 0 && (
