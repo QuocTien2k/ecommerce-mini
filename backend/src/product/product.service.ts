@@ -322,6 +322,7 @@ export class ProductService {
           name: true,
           slug: true,
           description: true,
+          thumbnail: true,
 
           price: true,
           discountPrice: true,
@@ -397,6 +398,7 @@ export class ProductService {
       name: product.name,
       slug: product.slug,
       description: product.description,
+      thumbnail: product.thumbnail,
 
       price: product.price.toString(),
       discountPrice: product.discountPrice?.toString() ?? null,
@@ -427,6 +429,7 @@ export class ProductService {
         id: true,
         name: true,
         slug: true,
+        thumbnail: true,
         price: true,
         discountPrice: true,
         discountPct: true,
