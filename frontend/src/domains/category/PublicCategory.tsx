@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePublicCategoriesQuery } from "./hooks/usePublicCategory";
-import { CategoryStrip } from "./components/CategoryStrip";
+import { CategoryTree } from "./components/CategoryTree";
 import type { PublicCategoryTreeItem } from "./types/public-category.type";
 import { usePublicProductsQuery } from "../product/hooks/usePublicProduct";
 import { ProductGrid } from "../product/components/ProductGrid";
@@ -16,22 +16,14 @@ export const PublicCategory = () => {
 
   const handleSelect = (category: PublicCategoryTreeItem) => {
     setSelectedPath((prev) => {
-      const index = prev.findIndex((c) => c.id === category.id);
+      const levelIndex = category.level - 1;
 
-      // nếu click lại cùng node → truncate
-      if (index !== -1) return prev.slice(0, index + 1);
-
-      return [...prev, category];
+      return [...prev.slice(0, levelIndex), category];
     });
   };
 
   const activeCategoryId =
     selectedPath.length > 0 ? selectedPath[selectedPath.length - 1].id : null;
-
-  const currentLevelCategories =
-    selectedPath.length === 0
-      ? data
-      : selectedPath[selectedPath.length - 1].children;
 
   const { data: products, isLoading: isProductsLoading } =
     usePublicProductsQuery({
@@ -44,9 +36,9 @@ export const PublicCategory = () => {
 
   return (
     <div className="w-full">
-      <CategoryStrip
-        categories={currentLevelCategories}
-        activeCategoryId={selectedPath[selectedPath.length - 1]?.id ?? null}
+      <CategoryTree
+        categories={data}
+        selectedPath={selectedPath}
         onSelectCategory={handleSelect}
       />
 
