@@ -26,9 +26,9 @@ export const CategoryTreeNode = ({
         type="button"
         onClick={() => onSelectCategory(category)}
         className={cn(
-          "flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
-          "hover:bg-muted",
-          isSelected && "bg-muted font-medium",
+          "cursor-pointer flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors",
+          "hover:text-primary",
+          isSelected && "font-semibold text-primary",
         )}
       >
         <span>{category.name}</span>

@@ -14,6 +14,9 @@ export const CategoryTree = ({
 }: CategoryTreeProps) => {
   return (
     <div className="rounded-lg border bg-white">
+      <div className="border-b px-4 py-3">
+        <h2 className="font-medium">Danh mục</h2>
+      </div>
       <div className="p-2">
         {categories.map((category) => (
           <CategoryTreeNode

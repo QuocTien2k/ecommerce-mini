@@ -35,15 +35,17 @@ export const PublicCategory = () => {
   if (isLoading) return <div>Đang tải ...</div>;
 
   return (
-    <div className="w-full">
-      <CategoryTree
-        categories={data}
-        selectedPath={selectedPath}
-        onSelectCategory={handleSelect}
-      />
+    <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+      <div>
+        <CategoryTree
+          categories={data}
+          selectedPath={selectedPath}
+          onSelectCategory={handleSelect}
+        />
+      </div>
 
       {/* PRODUCTS LAYER */}
-      <div className="mt-4">
+      <div>
         <QueryStateWrapper isLoading={isProductsLoading}>
           {products?.data.data.length ? (
             <ProductGrid products={products.data.data} />
