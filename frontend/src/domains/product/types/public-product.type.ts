@@ -45,3 +45,5 @@ export type PublicProductListResponse =
   PaginatedResponse<PublicProductListItem> & {
     breadcrumb: CategoryBreadcrumb[];
   };
+
+export type PublicHomeProductsResponse = PublicProductListItem[];
