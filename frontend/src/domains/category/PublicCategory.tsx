@@ -45,14 +45,20 @@ export const PublicCategory = () => {
       </div>
 
       {/* PRODUCTS LAYER */}
-      <div>
-        <QueryStateWrapper isLoading={isProductsLoading}>
-          {products?.data.data.length ? (
-            <ProductGrid products={products.data.data} />
-          ) : (
-            <ProductNotFound />
-          )}
-        </QueryStateWrapper>
+      <div className="rounded-lg border bg-white">
+        <div className="border-b px-4 py-3">
+          <h2 className="font-medium">Sản phẩm</h2>
+        </div>
+
+        <div className="p-4">
+          <QueryStateWrapper isLoading={isProductsLoading}>
+            {products?.data.data.length ? (
+              <ProductGrid products={products.data.data} />
+            ) : (
+              <ProductNotFound />
+            )}
+          </QueryStateWrapper>
+        </div>
       </div>
     </div>
   );
