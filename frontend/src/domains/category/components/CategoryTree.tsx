@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { PublicCategoryTreeItem } from "../types/public-category.type";
 import { CategoryTreeNode } from "./CategoryTreeNode";
 
@@ -12,6 +13,7 @@ export const CategoryTree = ({
   selectedPath,
   onSelectCategory,
 }: CategoryTreeProps) => {
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   return (
     <div className="rounded-lg border bg-white">
       <div className="border-b px-4 py-3">
@@ -23,6 +25,8 @@ export const CategoryTree = ({
             key={category.id}
             category={category}
             selectedPath={selectedPath}
+            expandedIds={expandedIds}
+            setExpandedIds={setExpandedIds}
             onSelectCategory={onSelectCategory}
           />
         ))}
