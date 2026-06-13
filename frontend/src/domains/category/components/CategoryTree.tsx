@@ -19,7 +19,7 @@ export const CategoryTree = ({
       <div className="border-b px-4 py-3">
         <h2 className="font-medium">Danh mục</h2>
       </div>
-      <div className="p-2">
+      <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-2">
         {categories.map((category) => (
           <CategoryTreeNode
             key={category.id}

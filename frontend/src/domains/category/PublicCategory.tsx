@@ -36,7 +36,7 @@ export const PublicCategory = () => {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-      <div>
+      <div className="sticky top-4 self-start">
         <CategoryTree
           categories={data}
           selectedPath={selectedPath}
