@@ -32,23 +32,21 @@ export function ProductCard({ product }: Props) {
       </div>
 
       <div className="space-y-2 p-3">
-        <h3 className="line-clamp-2 min-h-10 text-sm font-medium">{name}</h3>
+        <h3 className="line-clamp-2 h-10 text-sm font-medium">{name}</h3>
 
-        <div>
-          {hasDiscount ? (
-            <>
-              <div className="font-semibold text-red-600">
-                {formatCurrency(discountPrice)}
-              </div>
+        {hasDiscount ? (
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-red-600">
+              {formatCurrency(discountPrice)}
+            </span>
 
-              <div className="text-xs text-muted-foreground line-through">
-                {formatCurrency(price)}
-              </div>
-            </>
-          ) : (
-            <div className="font-semibold">{formatCurrency(price)}</div>
-          )}
-        </div>
+            <span className="text-xs line-through text-slate-400">
+              {formatCurrency(price)}
+            </span>
+          </div>
+        ) : (
+          <div className="font-semibold">{formatCurrency(price)}</div>
+        )}
       </div>
     </Link>
   );
