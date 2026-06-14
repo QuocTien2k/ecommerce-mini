@@ -1,6 +1,11 @@
 import { getBrandImage } from "@shared/types/brand-mapper";
 import { usePublicBrandsQuery } from "./hooks/usePublicBrand";
 import BrandCard from "./components/BrandCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@components/ui/carousel";
 
 const PublicBrand = () => {
   const { data, isLoading } = usePublicBrandsQuery();
@@ -19,16 +24,27 @@ const PublicBrand = () => {
     <section className="space-y-6">
       <h2 className="text-2xl font-bold">Thương hiệu nổi bật</h2>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        {brands.map((brand) => (
-          <BrandCard
-            key={brand.id}
-            name={brand.name}
-            slug={brand.slug}
-            image={getBrandImage(brand.slug)}
-          />
-        ))}
-      </div>
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+      >
+        <CarouselContent>
+          {brands.map((brand) => (
+            <CarouselItem
+              key={brand.id}
+              className="basis-1/2 md:basis-1/3 lg:basis-1/6"
+            >
+              <BrandCard
+                name={brand.name}
+                slug={brand.slug}
+                image={getBrandImage(brand.slug)}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </section>
   );
 };
