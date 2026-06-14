@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Length,
   Matches,
 } from 'class-validator';
@@ -20,6 +21,11 @@ export class CreateBrandDto {
     message: 'Slug không hợp lệ',
   })
   slug?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsUrl()
+  thumbnail: string;
 
   @IsOptional()
   @IsBoolean()

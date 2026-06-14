@@ -2,8 +2,8 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  IsUrl,
   Length,
-  Matches,
 } from 'class-validator';
 
 export class UpdateBrandDto {
@@ -11,6 +11,11 @@ export class UpdateBrandDto {
   @IsString()
   @Length(2, 100)
   name?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  thumbnail?: string;
 
   @IsOptional()
   @IsBoolean()
