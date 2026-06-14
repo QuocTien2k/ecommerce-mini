@@ -35,6 +35,7 @@ export class BrandService {
           data: {
             name: dto.name,
             slug,
+            thumbnail: dto.thumbnail,
             isActive: dto.isActive ?? true,
           },
         });
@@ -68,6 +69,7 @@ export class BrandService {
       where: { id },
       data: {
         name: dto.name ?? undefined,
+        thumbnail: dto.thumbnail ?? undefined,
         isActive: dto.isActive,
       },
     });
@@ -198,6 +200,7 @@ export class BrandService {
           id: true,
           name: true,
           slug: true,
+          thumbnail: true,
         },
       }),
       this.prisma.brand.count({ where }),
