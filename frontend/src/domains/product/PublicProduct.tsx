@@ -9,7 +9,7 @@ export const PublicProduct = () => {
 
   const products = data?.data ?? [];
 
-  console.log("Data trả về: ", data);
+  //console.log("Data trả về: ", data);
 
   return (
     <section className="space-y-4">
