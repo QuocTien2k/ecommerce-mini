@@ -11,6 +11,7 @@ export interface AdminBrandItem {
   id: string;
   name: string;
   slug: string;
+  thumbnail: string | null;
   description?: string | null;
   isActive: boolean;
   deletedAt: string | null;
@@ -21,10 +22,12 @@ export interface AdminBrandItem {
 export interface CreateBrandPayload {
   name: string;
   slug?: string;
+  thumbnail: string;
   isActive?: boolean;
 }
 export interface UpdateBrandPayload {
   name?: string;
+  thumbnail?: string;
   isActive?: boolean;
 }
 

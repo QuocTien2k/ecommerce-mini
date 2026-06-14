@@ -13,6 +13,7 @@ export const useUpdateBrandForm = (
 
     defaultValues: {
       name: defaultValues?.name ?? "",
+      thumbnail: defaultValues?.thumbnail ?? "",
       isActive: defaultValues?.isActive ?? true,
     },
 

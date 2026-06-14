@@ -11,6 +11,7 @@ export const useCreateBrandForm = () => {
 
     defaultValues: {
       name: "",
+      thumbnail: "",
       isActive: true,
     },
 
