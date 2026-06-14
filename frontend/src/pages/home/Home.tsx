@@ -5,7 +5,7 @@ import { PublicProduct } from "@/domains/product/PublicProduct";
 const Home = () => {
   return (
     <>
-      <div className="space-y-12">
+      <div className="space-y-16">
         <PublicCategory />
         <PublicProduct />
         <PublicBrand />

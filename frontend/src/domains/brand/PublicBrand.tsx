@@ -6,6 +6,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@components/ui/carousel";
+import { SectionTitle } from "@components/ui/section-title";
 
 const PublicBrand = () => {
   const { data, isLoading } = usePublicBrandsQuery();
@@ -22,7 +23,10 @@ const PublicBrand = () => {
 
   return (
     <section className="space-y-6">
-      <h2 className="text-2xl font-bold">Thương hiệu nổi bật</h2>
+      <SectionTitle
+        title="Thương hiệu nổi bật"
+        description="Các thương hiệu được khách hàng quan tâm nhiều nhất"
+      />
 
       <Carousel
         opts={{
