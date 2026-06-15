@@ -1,6 +1,6 @@
 import { SearchInput } from "./SearchInput";
-import { CategorySelect } from "./ProductCategoryFilter";
-import { BrandSelect } from "./BrandSelect";
+import { ProductCategoryFilter } from "./category/ProductCategoryFilter";
+import { ProductBrandFilter } from "./brand/ProductBrandFilter";
 import { PriceSortSelect } from "./PriceSortSelect";
 
 interface ProductFilterProps {
@@ -25,17 +25,29 @@ export const ProductFilters = ({ filters, actions }: ProductFilterProps) => {
       <div className="space-y-4">
         <SearchInput value={filters.search} onChange={actions.setSearch} />
 
-        <CategorySelect
-          value={filters.categoryId}
-          onChange={actions.setCategoryId}
-        />
+        {/* Category */}
+        <section className="border-t pt-4">
+          <ProductCategoryFilter
+            value={filters.categoryId}
+            onChange={actions.setCategoryId}
+          />
+        </section>
 
-        <BrandSelect value={filters.brandId} onChange={actions.setBrandId} />
+        {/* Brand */}
+        <section className="border-t pt-4">
+          <ProductBrandFilter
+            value={filters.brandId}
+            onChange={actions.setBrandId}
+          />
+        </section>
 
-        <PriceSortSelect
-          value={filters.priceSort}
-          onChange={actions.setPriceSort}
-        />
+        {/* Price */}
+        <section className="border-t pt-4">
+          <PriceSortSelect
+            value={filters.priceSort}
+            onChange={actions.setPriceSort}
+          />
+        </section>
 
         {/* <RatingSelect /> */}
       </div>

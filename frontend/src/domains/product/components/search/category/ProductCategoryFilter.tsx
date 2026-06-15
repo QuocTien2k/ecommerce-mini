@@ -2,19 +2,22 @@ import { usePublicCategoriesQuery } from "@/domains/category/hooks/usePublicCate
 import type { PublicCategoryTreeItem } from "@/domains/category/types/public-category.type";
 import { ProductCategoryFilterNode } from "./ProductCategoryFilterNode";
 
-interface CategorySelectProps {
+interface ProductCategoryFilterProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export const CategorySelect = ({ value, onChange }: CategorySelectProps) => {
+export const ProductCategoryFilter = ({
+  value,
+  onChange,
+}: ProductCategoryFilterProps) => {
   const { data = [] } = usePublicCategoriesQuery();
 
   //console.log("Data trả về: ", data);
 
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium">Danh mục</h3>
+      <h2 className="text-lg font-semibold">Danh mục</h2>
 
       <button
         type="button"
