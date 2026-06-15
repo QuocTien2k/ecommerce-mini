@@ -4,6 +4,7 @@ import { usePublicProductsQuery } from "../hooks/usePublicProduct";
 import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
 import AppPagination from "@components/common/pagination";
 import { ProductNotFound } from "@components/product/ProductNotFound";
+import { ProductFilterBar } from "./search/ProductFilterBar";
 
 export const ProductCatalog = () => {
   const {
@@ -33,12 +34,7 @@ export const ProductCatalog = () => {
           Danh sách sản phẩm hiện có trong cửa hàng
         </p>
 
-        {/* TODO:
-            Search
-            Category Filter
-            Brand Filter
-            Price Sort
-        */}
+        <ProductFilterBar filters={filters} actions={filterActions} />
       </div>
 
       {/* PRODUCTS */}
