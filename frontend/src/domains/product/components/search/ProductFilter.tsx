@@ -1,5 +1,5 @@
 import { SearchInput } from "./SearchInput";
-import { CategorySelect } from "./CategorySelect";
+import { CategorySelect } from "./ProductCategoryFilter";
 import { BrandSelect } from "./BrandSelect";
 import { PriceSortSelect } from "./PriceSortSelect";
 
