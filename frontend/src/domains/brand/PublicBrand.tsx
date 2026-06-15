@@ -6,8 +6,17 @@ import {
   CarouselItem,
 } from "@components/ui/carousel";
 import { SectionTitle } from "@components/ui/section-title";
+import { useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
 
 const PublicBrand = () => {
+  const autoplay = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnMouseEnter: true,
+      stopOnInteraction: false,
+    }),
+  );
   const { data, isLoading } = usePublicBrandsQuery();
 
   const brands = data?.data ?? [];
@@ -29,9 +38,11 @@ const PublicBrand = () => {
       />
 
       <Carousel
+        plugins={[autoplay.current]}
         opts={{
           align: "start",
           loop: true,
+          slidesToScroll: 1,
         }}
       >
         <CarouselContent>

@@ -8,7 +8,10 @@ interface BrandCardProps {
 
 const BrandCard = ({ name, thumbnail }: BrandCardProps) => {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border bg-white p-4 transition-shadow hover:shadow-md">
+    <div
+      className="flex flex-col items-center gap-3 rounded-xl border bg-white p-4 transition-all
+    duration-300 hover:-translate-y-1 hover:shadow-lg"
+    >
       <div className="flex h-16 w-full items-center justify-center">
         <img
           src={thumbnail || FALLBACK_IMAGE}
