@@ -10,6 +10,8 @@ import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
+import { useEffect, useState } from "react";
+import { useWatch } from "react-hook-form";
 
 type CreateBrandFormProps = {
   open: boolean;
@@ -17,6 +19,7 @@ type CreateBrandFormProps = {
 };
 
 const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
+  const [thumbnailError, setThumbnailError] = useState(false);
   const form = useCreateBrandForm();
   const { loading, run } = useScopedLoading();
 
@@ -24,6 +27,15 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
   const brandName = form.watch("name");
 
   const isActive = form.watch("isActive");
+
+  const thumbnailPreview = useWatch({
+    control: form.control,
+    name: "thumbnail",
+  });
+
+  useEffect(() => {
+    setThumbnailError(false);
+  }, [thumbnailPreview]);
 
   const handleClose = () => {
     form.reset();
@@ -43,6 +55,7 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
         () =>
           createBrand.mutateAsync({
             name: values.name,
+            thumbnail: values.thumbnail,
             isActive: values.isActive,
           }),
         {
@@ -65,23 +78,11 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
 
   return (
     <div
-      className="
-        fixed inset-0 z-50
-        flex items-center justify-center
-        backdrop-blur-sm
-        p-4
-      "
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
       onClick={handleClose}
     >
       <div
-        className="
-          w-full max-w-2xl
-          rounded-2xl
-          border border-white/10
-          bg-white
-          p-6
-          shadow-2xl
-        "
+        className="w-full max-w-2xl rounded-2xl border border-white/10 bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 flex items-center justify-between">
@@ -115,6 +116,39 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
             )}
           </div>
 
+          {/* thumbnail */}
+          <div className="space-y-2 md:col-span-2">
+            <Label>Thumbnail</Label>
+
+            <Input
+              placeholder="https://example.com/image.jpg"
+              {...form.register("thumbnail")}
+            />
+
+            {form.formState.errors.thumbnail && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.thumbnail.message}
+              </p>
+            )}
+
+            {thumbnailPreview?.startsWith("http") && !thumbnailError && (
+              <div className="w-fit rounded-lg border bg-muted/20 p-2">
+                <img
+                  src={thumbnailPreview}
+                  alt="Thumbnail preview"
+                  className="h-32 w-32 object-contain"
+                  onError={() => setThumbnailError(true)}
+                />
+              </div>
+            )}
+
+            {thumbnailError && (
+              <p className="text-sm text-red-500">
+                Không thể tải ảnh từ URL này
+              </p>
+            )}
+          </div>
+
           {/* {Hoạt động} */}
           <div className="flex items-center gap-3">
             <Checkbox
@@ -122,13 +156,7 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
               onCheckedChange={(checked) =>
                 form.setValue("isActive", Boolean(checked))
               }
-              className="
-    border-emerald-500
-    data-[state=checked]:bg-emerald-500
-    data-[state=checked]:border-emerald-500
-    data-[state=checked]:text-white
-    cursor-pointer
-  "
+              className="border-emerald-500 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 data-[state=checked]:text-white cursor-pointer"
             />
 
             <Label>Hiển thị thương hiệu</Label>

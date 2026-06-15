@@ -19,6 +19,7 @@ import AdminUpdateBrand from "./components/AdminUpdateBrand";
 import { useAdminBrandAction } from "./hooks/useAdminStatusMutation";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
+import { FALLBACK_IMAGE } from "@shared/constants/image";
 
 type PendingAction = "update" | "softDelete" | "restore" | null;
 
@@ -81,6 +82,8 @@ const AdminBrandPage = () => {
   const meta = data?.data?.meta;
   const totalPages = meta?.totalPages ?? 1;
 
+  console.log("Brand tra ve: ", brands);
+
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
@@ -112,6 +115,8 @@ const AdminBrandPage = () => {
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr className="text-left hover:bg-muted/40 transition-colors">
+                <th className="px-4 py-3 font-medium">Ảnh</th>
+
                 <th className="px-4 py-3 font-medium">Tên thương hiệu</th>
 
                 <th className="px-4 py-3 font-medium">Slug</th>
@@ -135,6 +140,20 @@ const AdminBrandPage = () => {
                     key={brand.id}
                     className="border-t hover:bg-muted/30 transition-colors"
                   >
+                    {/* THUMBNAIL */}
+                    <td className="px-4 py-3">
+                      <div className="w-24 h-12 rounded-md overflow-hidden border bg-muted">
+                        <img
+                          src={brand.thumbnail || FALLBACK_IMAGE}
+                          alt={brand.name}
+                          className="w-full h-full object-contain p-1"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_IMAGE;
+                          }}
+                        />
+                      </div>
+                    </td>
                     {/* NAME */}
                     <td className="px-4 py-3">
                       <CopyableText
@@ -231,7 +250,7 @@ const AdminBrandPage = () => {
               {/* EMPTY */}
               {brands.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-10">
+                  <td colSpan={6} className="text-center py-10">
                     <span className="text-sm text-muted-foreground">
                       Không tìm thấy thương hiệu
                     </span>

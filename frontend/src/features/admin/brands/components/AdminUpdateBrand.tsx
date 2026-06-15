@@ -4,13 +4,14 @@ import type { AdminBrandItem } from "../types/admin-brand.type";
 import { useAdminUpdateBrand } from "../hooks/useAdminUpdateBrand";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@components/ui/button";
-import { X } from "lucide-react";
+import { Trash2, Undo2, X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
+import { useWatch } from "react-hook-form";
 
 type UpdateBrandFormProps = {
   open: boolean;
@@ -19,15 +20,29 @@ type UpdateBrandFormProps = {
 };
 
 const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
+  const [removeThumbnail, setRemoveThumbnail] = useState(false);
+
   const form = useUpdateBrandForm();
 
   const { loading, run } = useScopedLoading();
   const updateMutation = useAdminUpdateBrand();
   const isActive = form.watch("isActive");
+  const thumbnailPreview = useWatch({
+    control: form.control,
+    name: "thumbnail",
+  });
+
+  const previewUrl =
+    (removeThumbnail ? brand?.thumbnail : thumbnailPreview) ?? undefined;
+
+  const toggleThumbnail = () => {
+    setRemoveThumbnail((prev) => !prev);
+  };
 
   const handleClose = () => {
     form.reset({
       name: brand?.name ?? "",
+      thumbnail: brand?.thumbnail ?? "",
       isActive: brand?.isActive ?? true,
     });
 
@@ -38,9 +53,11 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
     if (brand && open) {
       form.reset({
         name: brand.name,
+        thumbnail: brand.thumbnail || "",
         isActive: brand.isActive,
       });
     }
+    setRemoveThumbnail(false);
   }, [brand, open, form]);
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -53,6 +70,7 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
             id: brand.id,
             payload: {
               name: values.name,
+              thumbnail: values.thumbnail,
               isActive: values.isActive,
             },
           }),
@@ -111,6 +129,59 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
             )}
           </div>
 
+          {/* thumbnail */}
+          <div className="space-y-2 md:col-span-2">
+            <Label>Thumbnail</Label>
+
+            <Input
+              placeholder="https://example.com/image.jpg"
+              {...form.register("thumbnail")}
+            />
+
+            {form.formState.errors.thumbnail && (
+              <p className="text-sm text-red-500">
+                {form.formState.errors.thumbnail.message}
+              </p>
+            )}
+
+            {thumbnailPreview?.startsWith("http") && (
+              <div className="relative w-fit rounded-lg border bg-muted/20 p-2">
+                <img
+                  src={previewUrl}
+                  alt="Thumbnail preview"
+                  className={`h-32 w-32 object-contain transition-opacity ${
+                    removeThumbnail ? "opacity-40" : ""
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={removeThumbnail ? "secondary" : "destructive"}
+                  className="absolute right-1 top-1 z-20 h-7 w-7"
+                  onClick={toggleThumbnail}
+                >
+                  {removeThumbnail ? (
+                    <Undo2 className="h-3.5 w-3.5" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+
+                {removeThumbnail && (
+                  <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50">
+                    <span className="text-xs font-medium text-white">
+                      Sẽ được thay thế
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* {Hoạt động} */}
           <div className="flex items-center gap-3">
             <Checkbox
@@ -118,13 +189,7 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
               onCheckedChange={(checked) =>
                 form.setValue("isActive", Boolean(checked))
               }
-              className="
-    border-emerald-500
-    data-[state=checked]:bg-emerald-500
-    data-[state=checked]:border-emerald-500
-    data-[state=checked]:text-white
-    cursor-pointer
-  "
+              className="border-emerald-500 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 data-[state=checked]:text-white cursor-pointer"
             />
 
             <Label>Hiển thị thương hiệu</Label>
