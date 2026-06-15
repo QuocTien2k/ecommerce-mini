@@ -3,6 +3,8 @@ import { ProductGrid } from "./components/ProductGrid";
 import { ProductNotFound } from "@components/product/ProductNotFound";
 import { usePublicHomeProductsQuery } from "./hooks/usePublicProduct";
 import { SectionTitle } from "@components/ui/section-title";
+import { Button } from "@components/ui/button";
+import { Link } from "react-router-dom";
 
 export const PublicProduct = () => {
   const { data, isLoading } = usePublicHomeProductsQuery();
@@ -26,6 +28,12 @@ export const PublicProduct = () => {
             <ProductNotFound />
           )}
         </QueryStateWrapper>
+
+        <div className="mt-6 flex justify-center">
+          <Button asChild className="h-12 px-10 text-base">
+            <Link to="/products">Xem tất cả</Link>
+          </Button>
+        </div>
       </div>
     </section>
   );

@@ -20,6 +20,7 @@ import AdminProductDetail from "@features/admin/products/AdminProductDetail";
 import AdminBrandPage from "@features/admin/brands/AdminBrandPage";
 import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
 import MyVouchers from "@features/customer/voucher/MyVouchers";
+import ProductPage from "@/domains/product/ProductPage";
 
 const AppRoutes = () => {
   return (
@@ -44,6 +45,7 @@ const AppRoutes = () => {
       {/* Layout Website */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/products" element={<ProductPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>
