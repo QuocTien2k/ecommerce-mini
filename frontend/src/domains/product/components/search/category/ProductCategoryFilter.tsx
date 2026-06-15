@@ -29,7 +29,7 @@ export const ProductCategoryFilter = ({
         Tất cả danh mục
       </button>
 
-      <div className="space-y-1">
+      <div className="space-y-1 max-h-80 overflow-y-auto pr-2">
         {data.map((category: PublicCategoryTreeItem) => (
           <ProductCategoryFilterNode
             key={category.id}

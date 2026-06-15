@@ -7,8 +7,10 @@ const MainLayout = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <Outlet />
+      <main className="flex-1 bg-muted/30">
+        <div className="container mx-auto px-4 py-6">
+          <Outlet />
+        </div>
       </main>
 
       <Footer />

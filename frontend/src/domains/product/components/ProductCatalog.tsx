@@ -10,7 +10,6 @@ import { ProductFilters } from "./search/ProductFilter";
 
 export const ProductCatalog = () => {
   const {
-    page,
     setPage,
 
     queryParams,
