@@ -24,7 +24,7 @@ export const PriceSortSelect = ({ value, onChange }: PriceSortSelectProps) => {
       </SelectTrigger>
 
       <SelectContent>
-        <SelectItem value="default">Mặc định</SelectItem>
+        <SelectItem value="default">Giá tiền</SelectItem>
 
         <SelectItem value="asc">Giá tăng dần</SelectItem>
 

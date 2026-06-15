@@ -4,7 +4,9 @@ import { usePublicProductsQuery } from "../hooks/usePublicProduct";
 import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
 import AppPagination from "@components/common/pagination";
 import { ProductNotFound } from "@components/product/ProductNotFound";
-import { ProductFilterBar } from "./search/ProductFilterBar";
+
+import { SectionTitle } from "@components/ui/section-title";
+import { ProductFilters } from "./search/ProductFilter";
 
 export const ProductCatalog = () => {
   const {
@@ -26,36 +28,42 @@ export const ProductCatalog = () => {
 
   return (
     <section className="space-y-6">
-      {/* FILTER AREA */}
-      <div className="rounded-lg border bg-white p-4">
-        <h2 className="text-lg font-semibold">Tất cả sản phẩm</h2>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Danh sách sản phẩm hiện có trong cửa hàng
-        </p>
-
-        <ProductFilterBar filters={filters} actions={filterActions} />
+      {/* Title */}
+      <div className="">
+        <SectionTitle
+          title="Tất cả sản phẩm"
+          description="Danh sách sản phẩm hiện có trong cửa hàng"
+        />
       </div>
 
-      {/* PRODUCTS */}
-      <div className="rounded-lg border bg-white p-4">
-        <QueryStateWrapper isLoading={isLoading}>
-          {products.length ? (
-            <div className="space-y-6">
-              <ProductGrid products={products} className="xl:grid-cols-4" />
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Filter */}
+        <aside className="lg:col-span-3">
+          <ProductFilters filters={filters} actions={filterActions} />
+        </aside>
 
-              {meta && meta.totalPages > 1 && (
-                <AppPagination
-                  page={meta.page}
-                  totalPages={meta.totalPages}
-                  onPageChange={setPage}
-                />
+        {/* PRODUCTS */}
+        <main className="lg:col-span-9">
+          <div className="rounded-lg border bg-white p-4">
+            <QueryStateWrapper isLoading={isLoading}>
+              {products.length ? (
+                <div className="space-y-6">
+                  <ProductGrid products={products} className="xl:grid-cols-4" />
+
+                  {meta && meta.totalPages > 1 && (
+                    <AppPagination
+                      page={meta.page}
+                      totalPages={meta.totalPages}
+                      onPageChange={setPage}
+                    />
+                  )}
+                </div>
+              ) : (
+                <ProductNotFound />
               )}
-            </div>
-          ) : (
-            <ProductNotFound />
-          )}
-        </QueryStateWrapper>
+            </QueryStateWrapper>
+          </div>
+        </main>
       </div>
     </section>
   );
