@@ -3,7 +3,7 @@ model Brand {
 
   name      String
   slug      String   @unique
-  thumbnail String?
+  thumbnail String
 
   isActive  Boolean  @default(true)
   deletedAt DateTime?
