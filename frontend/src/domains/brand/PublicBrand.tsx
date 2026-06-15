@@ -1,4 +1,3 @@
-import { getBrandImage } from "@shared/types/brand-mapper";
 import { usePublicBrandsQuery } from "./hooks/usePublicBrand";
 import BrandCard from "./components/BrandCard";
 import {
@@ -12,6 +11,7 @@ const PublicBrand = () => {
   const { data, isLoading } = usePublicBrandsQuery();
 
   const brands = data?.data ?? [];
+  //console.log("Brand: ", brands);
 
   if (isLoading) {
     return <div>Loading brands...</div>;
@@ -43,7 +43,7 @@ const PublicBrand = () => {
               <BrandCard
                 name={brand.name}
                 slug={brand.slug}
-                image={getBrandImage(brand.slug)}
+                thumbnail={brand.thumbnail}
               />
             </CarouselItem>
           ))}
