@@ -14,6 +14,7 @@ import { ATTRIBUTE_LABELS } from "@shared/types/variant-type";
 import { SectionTitle } from "@components/ui/section-title";
 import { QuantitySelector } from "@components/product/QuantitySelector";
 import { Separator } from "@components/ui/separator";
+import TiptapContent from "@components/editor/TiptapContent";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -97,8 +98,8 @@ const ProductDetail = () => {
       </div>
       <div className="container mx-auto py-6">
         <div className="grid gap-8 md:grid-cols-2">
-          {/* Left Side */}
-          <div className="overflow-hidden rounded-lg border">
+          {/* Left Side - Image*/}
+          <div className="overflow-hidden rounded-lg border bg-white">
             <div className="h-125 w-full">
               <img
                 src={selectedImage ?? product.thumbnail ?? FALLBACK_IMAGE}
@@ -131,7 +132,7 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Right Side */}
+          {/* Right Side - Info*/}
           <div className="space-y-4">
             <h1 className="text-2xl font-bold">{product.name}</h1>
 
@@ -254,6 +255,16 @@ ${
 
               <QuantitySelector value={quantity} onChange={setQuantity} />
             </div>
+          </div>
+        </div>
+
+        <Separator className="my-8" />
+        {/* Description */}
+        <div className="space-y-4">
+          <SectionTitle title="Mô tả sản phẩm" description="" />
+
+          <div className="max-w-full rounded-lg shadow-sm bg-background p-6 text-foreground">
+            <TiptapContent content={product.description} />
           </div>
         </div>
       </div>
