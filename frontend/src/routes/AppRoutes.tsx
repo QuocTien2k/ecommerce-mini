@@ -21,6 +21,7 @@ import AdminBrandPage from "@features/admin/brands/AdminBrandPage";
 import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
 import MyVouchers from "@features/customer/voucher/MyVouchers";
 import ProductPage from "@/domains/product/ProductPage";
+import ProductDetail from "@/domains/product/ProductDetail";
 
 const AppRoutes = () => {
   return (
@@ -46,6 +47,7 @@ const AppRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<ProductPage />} />
+        <Route path="/products/:slug" element={<ProductDetail />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>

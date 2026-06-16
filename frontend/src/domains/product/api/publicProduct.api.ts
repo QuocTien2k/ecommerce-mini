@@ -15,5 +15,5 @@ export const publicProductApi = {
   ): ApiResult<PublicProductListResponse> => api.get("/products", { params }),
 
   getDetail: (slug: string): ApiResult<PublicProductDetailResponse> =>
-    api.get(`/products/${slug}`),
+    api.get(`/product/${slug}`),
 };
