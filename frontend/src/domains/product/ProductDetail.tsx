@@ -12,6 +12,8 @@ import { FALLBACK_IMAGE } from "@shared/constants/image";
 import { formatCurrency } from "@lib/format-currency";
 import { ATTRIBUTE_LABELS } from "@shared/types/variant-type";
 import { SectionTitle } from "@components/ui/section-title";
+import { QuantitySelector } from "@components/product/QuantitySelector";
+import { Separator } from "@components/ui/separator";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -25,6 +27,8 @@ const ProductDetail = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
   >({});
+
+  const [quantity, setQuantity] = useState(1);
 
   const options = useMemo(() => {
     if (!product) {
@@ -128,28 +132,36 @@ const ProductDetail = () => {
           </div>
 
           {/* Right Side */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h1 className="text-2xl font-bold">{product.name}</h1>
 
             {/* Category */}
-            <div>
-              <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+            <div className="flex items-center gap-6">
+              <p className="text-lg font-semibold text-gray-900">Danh mục:</p>
+
+              <span className="text-lg text-gray-700">
                 {product.category.name}
               </span>
             </div>
+            <Separator />
 
             {/* Rating */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>⭐ {product.ratingAvg}</span>
-              <span>({product.ratingCount} đánh giá)</span>
+            <div className="flex items-center gap-6">
+              <p className="text-lg font-semibold text-gray-900">Đánh giá: </p>
+
+              <div className="flex items-center gap-2  text-gray-600">
+                <span>⭐ {product.ratingAvg}</span>
+                <span>({product.ratingCount} đánh giá)</span>
+              </div>
             </div>
+            <Separator />
 
             {/* Attributes */}
             {Object.entries(options.attributes).map(
               ([attributeKey, values]) => (
                 <div key={attributeKey}>
-                  <p className="mb-2 text-sm font-medium text-gray-700">
-                    {ATTRIBUTE_LABELS[attributeKey] ?? attributeKey}
+                  <p className="mb-2 text-lg font-semibold text-gray-900">
+                    {ATTRIBUTE_LABELS[attributeKey] ?? attributeKey}:
                   </p>
 
                   <div className="flex flex-wrap gap-3">
@@ -177,9 +189,12 @@ ${
               ),
             )}
 
+            <Separator />
             {/* Colors */}
             <div>
-              <p className="mb-2 text-sm font-medium text-gray-700">Màu sắc</p>
+              <p className="mb-3 text-lg font-semibold text-gray-900">
+                Màu sắc:
+              </p>
               <div className="flex flex-wrap gap-2">
                 {options.colors.map((color) => (
                   <button
@@ -192,45 +207,52 @@ ${
                   </button>
                 ))}
               </div>
-              <div className="mt-2 text-sm text-gray-600">
-                <span>Đang chọn: </span>
+              <div className="mt-3 text-sm">
+                <span className="font-medium text-gray-900">Đã chọn:</span>
 
-                {selectedColor && (
-                  <span className="font-medium">{selectedColor}</span>
-                )}
-
-                {Object.values(selectedAttributes).length > 0 && (
-                  <span>
-                    {" / "}
-                    {Object.values(selectedAttributes).join(" / ")}
-                  </span>
-                )}
+                <span className="text-gray-600">
+                  {" "}
+                  {selectedColor}
+                  {Object.values(selectedAttributes).length > 0 &&
+                    ` / ${Object.values(selectedAttributes).join(" / ")}`}
+                </span>
               </div>
             </div>
+            <Separator />
 
             {/* Price */}
-            <div className="bg-gray-50 p-4">
+            <div className="flex items-center gap-3">
+              <p className="text-lg font-semibold text-gray-900">Giá tiền:</p>
+
               {hasDiscount ? (
                 <>
-                  <div className="flex items-center gap-3">
-                    <p className="text-3xl font-bold text-red-600">
-                      {formatCurrency(product.discountPrice)}
-                    </p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {formatCurrency(product.discountPrice)}
+                  </p>
 
-                    <span className="rounded-md bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700">
-                      -{product.discountPct}%
-                    </span>
-                  </div>
+                  <span className="rounded-md bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700">
+                    -{product.discountPct}%
+                  </span>
 
-                  <p className="mt-1 text-sm text-gray-500 line-through">
+                  <p className="text-sm text-gray-500 line-through">
                     {formatCurrency(product.price)}
                   </p>
                 </>
               ) : (
-                <p className="text-3xl font-bold">
+                <p className="text-2xl font-bold">
                   {formatCurrency(product.price)}
                 </p>
               )}
+            </div>
+            <Separator />
+
+            {/* Quantity */}
+            <div className="flex items-center gap-6">
+              <span className="text-lg font-medium text-gray-500">
+                Số lượng
+              </span>
+
+              <QuantitySelector value={quantity} onChange={setQuantity} />
             </div>
           </div>
         </div>
