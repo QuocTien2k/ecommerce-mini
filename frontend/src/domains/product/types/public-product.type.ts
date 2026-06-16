@@ -47,3 +47,54 @@ export type PublicProductListResponse =
   };
 
 export type PublicHomeProductsResponse = PublicProductListItem[];
+
+/* Case detail */
+export type ProductVariantAttributes = Record<string, string>;
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface Creator {
+  id: string;
+  fullname: string;
+}
+
+export type PublicProductVariant = {
+  id: string;
+
+  color: string;
+
+  attributes: ProductVariantAttributes;
+
+  images: string[];
+
+  stock: number;
+};
+
+export type PublicProductDetailResponse = {
+  id: string;
+
+  name: string;
+  slug: string;
+
+  description: string | null;
+
+  thumbnail: string;
+
+  price: string;
+
+  discountPrice: string | null;
+  discountPct: number | null;
+
+  ratingAvg: number | null;
+  ratingCount: number;
+
+  category: Category;
+
+  creator: Creator;
+
+  variants: PublicProductVariant[];
+};
