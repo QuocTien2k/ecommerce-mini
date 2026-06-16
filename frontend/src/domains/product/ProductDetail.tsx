@@ -8,11 +8,14 @@ import {
 } from "./utils/buildVariantOptions";
 import { useEffect, useMemo, useState } from "react";
 import { ProductNotFound } from "@components/product/ProductNotFound";
+import { FALLBACK_IMAGE } from "@shared/constants/image";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
 
   const { data: product, isLoading } = usePublicProductDetail(slug ?? "");
+
+  const [selectedImage, setSelectedImage] = useState<string>();
 
   const [selectedColor, setSelectedColor] = useState<string>();
 
@@ -41,6 +44,16 @@ const ProductDetail = () => {
     );
   }, [product, selectedColor, selectedAttributes]);
 
+  //lấy tất cả ảnh
+  const allImages = useMemo(() => {
+    if (!product) return [];
+
+    return [
+      product.thumbnail,
+      ...product.variants.flatMap((variant) => variant.images),
+    ].filter((image, index, images) => images.indexOf(image) === index);
+  }, [product]);
+
   // Khởi tạo variant mặc định khi product thay đổi
   useEffect(() => {
     if (!product) return;
@@ -51,6 +64,13 @@ const ProductDetail = () => {
 
     setSelectedAttributes(defaultSelection.attributes);
   }, [product]);
+
+  //chọn image mặc định
+  useEffect(() => {
+    if (selectedVariant?.images?.length) {
+      setSelectedImage(selectedVariant.images[0]);
+    }
+  }, [selectedVariant]);
 
   if (!product) {
     return (
@@ -64,13 +84,41 @@ const ProductDetail = () => {
     <QueryStateWrapper isLoading={isLoading}>
       <div className="container mx-auto py-6">
         <div className="grid gap-8 md:grid-cols-2">
-          <div>
-            <img
-              src={selectedVariant?.images?.[0] ?? product.thumbnail}
-              alt={product.name}
-            />
+          {/* Left Side */}
+          <div className="overflow-hidden rounded-lg border">
+            <div className="h-125 w-full">
+              <img
+                src={selectedImage ?? product.thumbnail ?? FALLBACK_IMAGE}
+                alt={product.name}
+                className="h-full w-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_IMAGE;
+                }}
+              />
+            </div>
+
+            <div className="mt-4 flex gap-4 p-2">
+              {allImages.map((image) => (
+                <button
+                  key={image}
+                  onClick={() => setSelectedImage(image)}
+                  className={`overflow-hidden rounded border cursor-pointer ${
+                    selectedImage === image
+                      ? "border-primary"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={product.name}
+                    className="h-20 w-20 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
 
+          {/* Right Side */}
           <div>
             <h1 className="text-2xl font-bold">{product.name}</h1>
 
