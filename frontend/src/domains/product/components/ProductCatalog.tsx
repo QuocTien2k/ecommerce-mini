@@ -78,7 +78,7 @@ export const ProductCatalog = () => {
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Filter */}
         <aside className="lg:col-span-3">
-          <ProductFilters filters={filters} actions={filterActions} />
+          <ProductFilters value={filters} actions={filterActions} />
         </aside>
 
         {/* PRODUCTS */}

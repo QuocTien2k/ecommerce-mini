@@ -1,60 +1,97 @@
-import { useDebounce } from "@/hooks/useDebounce";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef } from "react";
 import type { PublicProductListQueryParams } from "../types/public-product.type";
 import { usePaginationScroll } from "@/hooks/usePaginationScroll";
+import { useSearchParams } from "react-router-dom";
 
 export const usePublicProductFilter = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { scrollToTop } = usePaginationScroll();
 
-  const [page, setPage] = useState(1);
+  const debounceRef = useRef<number | null>(null);
 
-  const [search, setSearch] = useState("");
+  const page = Number(searchParams.get("page") || 1);
+  const search = searchParams.get("search") || "";
+  const categoryId = searchParams.get("categoryId") || "";
+  const brandId = searchParams.get("brandId") || "";
+  const rawPriceSort = searchParams.get("priceSort");
 
-  const [categoryId, setCategoryId] = useState("");
+  const priceSort: "" | "asc" | "desc" =
+    rawPriceSort === "asc" || rawPriceSort === "desc" ? rawPriceSort : "";
 
-  const [brandId, setBrandId] = useState("");
+  const updateParams = (updates: Record<string, string | number | null>) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
 
-  const [priceSort, setPriceSort] = useState<"" | "asc" | "desc">("");
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === "" || value === null) {
+          next.delete(key);
+        } else {
+          next.set(key, String(value));
+        }
+      });
 
-  const debouncedSearch = useDebounce(search, 500);
-
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, categoryId, brandId, priceSort]);
+      return next;
+    });
+  };
 
   const goToPage = (p: number) => {
-    setPage(p);
+    updateParams({ page: p });
     scrollToTop();
   };
 
-  const queryParams = useMemo<PublicProductListQueryParams>(() => {
+  /**
+   * Debounced search setter (thay thế useDebounce hook)
+   */
+  const setSearch = (value: string) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      updateParams({
+        search: value.trim(),
+        page: 1,
+      });
+    }, 500);
+  };
+
+  const setCategoryId = (v: string) => {
+    updateParams({
+      categoryId: v,
+      page: 1,
+    });
+  };
+
+  const setBrandId = (v: string) => {
+    updateParams({
+      brandId: v,
+      page: 1,
+    });
+  };
+
+  const setPriceSort = (v: "asc" | "desc" | "") => {
+    updateParams({
+      priceSort: v,
+      page: 1,
+    });
+  };
+
+  const queryParams = useMemo(() => {
     const params: PublicProductListQueryParams = {
       page,
       limit: 12,
     };
 
-    if (debouncedSearch.trim()) {
-      params.search = debouncedSearch.trim();
-    }
-
-    if (categoryId) {
-      params.categoryId = categoryId;
-    }
-
-    if (brandId) {
-      params.brandId = brandId;
-    }
-
-    if (priceSort) {
-      params.priceSort = priceSort;
-    }
+    if (search.trim()) params.search = search.trim();
+    if (categoryId) params.categoryId = categoryId;
+    if (brandId) params.brandId = brandId;
+    if (priceSort) params.priceSort = priceSort;
 
     return params;
-  }, [page, debouncedSearch, categoryId, brandId, priceSort]);
+  }, [page, search, categoryId, brandId, priceSort]);
 
   return {
     page,
-    setPage,
     goToPage,
 
     filters: {

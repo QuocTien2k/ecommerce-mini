@@ -18,7 +18,17 @@ export const usePublicProductsQuery = (
   params?: PublicProductListQueryParams,
 ) => {
   return useQuery({
-    queryKey: [PUBLIC_PRODUCTS_QUERY_KEY, params],
+    queryKey: [
+      PUBLIC_PRODUCTS_QUERY_KEY,
+      {
+        page: params?.page,
+        limit: params?.limit,
+        search: params?.search,
+        categoryId: params?.categoryId,
+        brandId: params?.brandId,
+        priceSort: params?.priceSort ?? "",
+      },
+    ],
     queryFn: async () => {
       return publicProductApi.getList(params);
     },

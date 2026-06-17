@@ -4,31 +4,31 @@ import { ProductBrandFilter } from "./brand/ProductBrandFilter";
 import { PriceSortSelect } from "./PriceSortSelect";
 
 interface ProductFilterProps {
-  filters: {
+  value: {
     search: string;
     categoryId: string;
     brandId: string;
-    priceSort: "" | "asc" | "desc";
+    priceSort: "asc" | "desc" | "";
   };
 
   actions: {
-    setSearch: (value: string) => void;
-    setCategoryId: (value: string) => void;
-    setBrandId: (value: string) => void;
-    setPriceSort: (value: "" | "asc" | "desc") => void;
+    setSearch: (v: string) => void;
+    setCategoryId: (v: string) => void;
+    setBrandId: (v: string) => void;
+    setPriceSort: (v: "asc" | "desc" | "") => void;
   };
 }
 
-export const ProductFilters = ({ filters, actions }: ProductFilterProps) => {
+export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
   return (
     <div className="rounded-lg border bg-white p-4">
       <div className="space-y-4">
-        <SearchInput value={filters.search} onChange={actions.setSearch} />
+        <SearchInput value={value.search} onChange={actions.setSearch} />
 
         {/* Category */}
         <section className="border-t pt-4">
           <ProductCategoryFilter
-            value={filters.categoryId}
+            value={value.categoryId}
             onChange={actions.setCategoryId}
           />
         </section>
@@ -36,7 +36,7 @@ export const ProductFilters = ({ filters, actions }: ProductFilterProps) => {
         {/* Brand */}
         <section className="border-t pt-4">
           <ProductBrandFilter
-            value={filters.brandId}
+            value={value.brandId}
             onChange={actions.setBrandId}
           />
         </section>
@@ -44,7 +44,7 @@ export const ProductFilters = ({ filters, actions }: ProductFilterProps) => {
         {/* Price */}
         <section className="border-t pt-4">
           <PriceSortSelect
-            value={filters.priceSort}
+            value={value.priceSort}
             onChange={actions.setPriceSort}
           />
         </section>
