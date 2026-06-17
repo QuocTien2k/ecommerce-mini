@@ -4,7 +4,6 @@ import { usePublicProductsQuery } from "../hooks/usePublicProduct";
 import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
 import AppPagination from "@components/common/pagination";
 import { ProductNotFound } from "@components/product/ProductNotFound";
-
 import { SectionTitle } from "@components/ui/section-title";
 import { ProductFilters } from "./search/ProductFilter";
 import { useEffect, useState } from "react";
@@ -17,7 +16,7 @@ type BreadcrumbItem = {
 export const ProductCatalog = () => {
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const {
-    setPage,
+    goToPage,
 
     queryParams,
 
@@ -94,7 +93,7 @@ export const ProductCatalog = () => {
                     <AppPagination
                       page={meta.page}
                       totalPages={meta.totalPages}
-                      onPageChange={setPage}
+                      onPageChange={goToPage}
                     />
                   )}
                 </div>

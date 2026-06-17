@@ -1,8 +1,11 @@
 import { useDebounce } from "@/hooks/useDebounce";
 import { useEffect, useMemo, useState } from "react";
 import type { PublicProductListQueryParams } from "../types/public-product.type";
+import { usePaginationScroll } from "@/hooks/usePaginationScroll";
 
 export const usePublicProductFilter = () => {
+  const { scrollToTop } = usePaginationScroll();
+
   const [page, setPage] = useState(1);
 
   const [search, setSearch] = useState("");
@@ -18,6 +21,11 @@ export const usePublicProductFilter = () => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, categoryId, brandId, priceSort]);
+
+  const goToPage = (p: number) => {
+    setPage(p);
+    scrollToTop();
+  };
 
   const queryParams = useMemo<PublicProductListQueryParams>(() => {
     const params: PublicProductListQueryParams = {
@@ -47,6 +55,7 @@ export const usePublicProductFilter = () => {
   return {
     page,
     setPage,
+    goToPage,
 
     filters: {
       search,
