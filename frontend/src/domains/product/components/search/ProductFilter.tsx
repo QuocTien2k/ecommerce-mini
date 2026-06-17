@@ -1,7 +1,7 @@
 import { SearchInput } from "./SearchInput";
 import { ProductCategoryFilter } from "./category/ProductCategoryFilter";
 import { ProductBrandFilter } from "./brand/ProductBrandFilter";
-import { PriceSortSelect } from "./PriceSortSelect";
+import { PriceSortFilter } from "./PriceSortSelect";
 import { Button } from "@components/ui/button";
 
 interface ProductFilterProps {
@@ -65,7 +65,7 @@ export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
 
         {/* Price */}
         <section className="border-t pt-4">
-          <PriceSortSelect
+          <PriceSortFilter
             value={value.priceSort}
             onChange={actions.setPriceSort}
           />

@@ -1,35 +1,38 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-interface PriceSortSelectProps {
+interface PriceSortFilterProps {
   value: "" | "asc" | "desc";
   onChange: (value: "" | "asc" | "desc") => void;
 }
 
-export const PriceSortSelect = ({ value, onChange }: PriceSortSelectProps) => {
+export const PriceSortFilter = ({ value, onChange }: PriceSortFilterProps) => {
   return (
-    <Select
-      value={value || "default"}
-      onValueChange={(val) =>
-        onChange(val === "default" ? "" : (val as "asc" | "desc"))
-      }
-    >
-      <SelectTrigger>
-        <SelectValue placeholder="Sắp xếp giá" />
-      </SelectTrigger>
+    <div className="space-y-2">
+      <h2 className="text-lg font-semibold">Giá tiền</h2>
 
-      <SelectContent>
-        <SelectItem value="default">Giá tiền</SelectItem>
+      <RadioGroup
+        value={value || "default"}
+        onValueChange={(val) =>
+          onChange(val === "default" ? "" : (val as "asc" | "desc"))
+        }
+        className="space-y-3"
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="default" id="price-default" />
+          <Label htmlFor="price-default">Mặc định</Label>
+        </div>
 
-        <SelectItem value="asc">Giá tăng dần</SelectItem>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="asc" id="price-asc" />
+          <Label htmlFor="price-asc">Giá tăng dần</Label>
+        </div>
 
-        <SelectItem value="desc">Giá giảm dần</SelectItem>
-      </SelectContent>
-    </Select>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="desc" id="price-desc" />
+          <Label htmlFor="price-desc">Giá giảm dần</Label>
+        </div>
+      </RadioGroup>
+    </div>
   );
 };
