@@ -10,7 +10,6 @@ export const usePublicProductFilter = () => {
   const debounceRef = useRef<number | null>(null);
 
   const page = Number(searchParams.get("page") || 1);
-  const search = searchParams.get("search") || "";
   const categoryId = searchParams.get("categoryId") || "";
   const brandId = searchParams.get("brandId") || "";
   const rawPriceSort = searchParams.get("priceSort");
@@ -81,14 +80,12 @@ export const usePublicProductFilter = () => {
       page,
       limit: 12,
     };
-
-    if (search.trim()) params.search = search.trim();
     if (categoryId) params.categoryId = categoryId;
     if (brandId) params.brandId = brandId;
     if (priceSort) params.priceSort = priceSort;
 
     return params;
-  }, [page, search, categoryId, brandId, priceSort]);
+  }, [page, categoryId, brandId, priceSort]);
 
   const resetFilters = () => {
     if (debounceRef.current) {
@@ -103,7 +100,6 @@ export const usePublicProductFilter = () => {
     goToPage,
 
     filters: {
-      search,
       categoryId,
       brandId,
       priceSort,

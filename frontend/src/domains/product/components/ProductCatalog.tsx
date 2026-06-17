@@ -1,12 +1,12 @@
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { ProductGrid } from "./ProductGrid";
 import { usePublicProductsQuery } from "../hooks/usePublicProduct";
-import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
 import AppPagination from "@components/common/pagination";
 import { ProductNotFound } from "@components/product/ProductNotFound";
 import { SectionTitle } from "@components/ui/section-title";
 import { ProductFilters } from "./search/ProductFilter";
 import { useEffect, useState } from "react";
+import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
 
 type BreadcrumbItem = {
   name: string;

@@ -1,4 +1,3 @@
-import { SearchInput } from "./SearchInput";
 import { ProductCategoryFilter } from "./category/ProductCategoryFilter";
 import { ProductBrandFilter } from "./brand/ProductBrandFilter";
 import { PriceSortFilter } from "./PriceSortSelect";
@@ -6,7 +5,6 @@ import { Button } from "@components/ui/button";
 
 interface ProductFilterProps {
   value: {
-    search: string;
     categoryId: string;
     brandId: string;
     priceSort: "asc" | "desc" | "";
@@ -23,10 +21,7 @@ interface ProductFilterProps {
 
 export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
   const hasActiveFilters =
-    !!value.search ||
-    !!value.categoryId ||
-    !!value.brandId ||
-    !!value.priceSort;
+    !!value.categoryId || !!value.brandId || !!value.priceSort;
 
   return (
     <div className="rounded-lg border bg-white p-4">
@@ -43,9 +38,6 @@ export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
             Reset
           </Button>
         </div>
-
-        {/* Input */}
-        <SearchInput value={value.search} onChange={actions.setSearch} />
 
         {/* Category */}
         <section className="border-t pt-4">
