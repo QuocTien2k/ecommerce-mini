@@ -1,10 +1,12 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProductSearchPreviewQuery } from "../hooks/useProductSearch";
+import { formatCurrency } from "@lib/format-currency";
+import { ProductNotFound } from "@components/product/ProductNotFound";
+import { Spinner } from "@components/ui/spinner";
 
 export const ProductSearch = () => {
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ export const ProductSearch = () => {
     <div className="relative">
       <Search
         onClick={handleSearch}
-        className="absolute left-3 top-1/2 size-4 -translate-y-1/2 cursor-pointer text-muted-foreground"
+        className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 cursor-pointer text-muted-foreground"
       />
 
       <Input
@@ -60,50 +62,69 @@ export const ProductSearch = () => {
       />
 
       {showDropdown && (
-        <div className="absolute top-full z-50 mt-2 w-full rounded-lg border bg-white shadow-lg">
+        <div className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border bg-background shadow-xl">
           {isLoading ? (
-            <div className="p-3 text-sm text-muted-foreground">
-              Đang tìm kiếm...
+            <div className="flex items-center justify-center p-6">
+              <Spinner size="sm" label="Đang tìm kiếm..." />
             </div>
           ) : previewProducts.length > 0 ? (
             <>
-              {previewProducts.map((product) => (
-                <button
-                  key={product.id}
-                  type="button"
-                  className="flex w-full items-center gap-3 border-b p-3 text-left hover:bg-muted"
-                  onClick={() => handleProductClick(product.slug)}
-                >
-                  <img
-                    src={product.thumbnail}
-                    alt={product.name}
-                    className="size-12 rounded object-cover"
-                  />
+              <div className="divide-y">
+                {previewProducts.map((product) => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() => handleProductClick(product.slug)}
+                    className="
+                    group flex w-full items-center gap-4 cursor-pointer
+                    px-4 py-3.5 text-left
+                    transition-colors duration-150
+                    hover:bg-orange-50
+                  "
+                  >
+                    <img
+                      src={product.thumbnail}
+                      alt={product.name}
+                      className="h-14 w-14 shrink-0 rounded-md object-cover"
+                    />
 
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">
-                      {product.name}
-                    </p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium transition-colorsgroup-hover:text-orange-600">
+                        {product.name}
+                      </p>
 
-                    <p className="text-xs text-muted-foreground">
-                      {product.price}
-                    </p>
-                  </div>
-                </button>
-              ))}
+                      <div className="mt-1 flex items-center gap-2">
+                        {product.discountPrice ? (
+                          <>
+                            <span className="text-sm font-semibold text-red-500">
+                              {formatCurrency(product.discountPrice)}
+                            </span>
+
+                            <span className="text-xs text-muted-foreground line-through">
+                              {formatCurrency(product.price)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-sm font-semibold">
+                            {formatCurrency(product.price)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
               <button
                 type="button"
-                className="w-full p-3 text-center text-sm font-medium hover:bg-muted"
                 onClick={handleSearch}
+                className="cursor-pointer w-full border-t px-4 py-3 text-center text-sm font-medium transition-colors duration-150 hover:bg-orange-50"
               >
                 Xem tất cả kết quả
               </button>
             </>
           ) : (
-            <div className="p-3 text-sm text-muted-foreground">
-              Không tìm thấy sản phẩm
-            </div>
+            <ProductNotFound />
           )}
         </div>
       )}
