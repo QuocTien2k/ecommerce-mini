@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProductSearchPreviewQuery } from "../hooks/useProductSearch";
@@ -13,12 +13,37 @@ export const ProductSearch = () => {
   const [searchParams] = useSearchParams();
 
   const [keyword, setKeyword] = useState("");
-
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const search = searchParams.get("search") || "";
 
   useEffect(() => {
     setKeyword(search);
   }, [search]);
+
+  //path đổi đóng dropdown
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  //click ra ngoài đóng dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const debouncedKeyword = useDebounce(keyword, 500);
 
@@ -29,21 +54,25 @@ export const ProductSearch = () => {
   const handleSearch = () => {
     const value = keyword.trim();
 
+    setIsOpen(false);
+
     navigate(
       value ? `/products?search=${encodeURIComponent(value)}` : "/products",
     );
   };
 
-  const showDropdown = debouncedKeyword.trim().length >= 2;
+  const showDropdown = isOpen && debouncedKeyword.trim().length >= 2;
 
   const handleProductClick = (slug: string) => {
+    setKeyword("");
+    setIsOpen(false);
     navigate(`/products/${slug}`);
   };
 
   //console.log("Preview Products", previewProducts);
 
   return (
-    <div className="relative">
+    <div ref={wrapperRef} className="relative">
       <Search
         onClick={handleSearch}
         className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 cursor-pointer text-muted-foreground"
@@ -51,7 +80,10 @@ export const ProductSearch = () => {
 
       <Input
         value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
+        onChange={(e) => {
+          setKeyword(e.target.value);
+          setIsOpen(true);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             handleSearch();
