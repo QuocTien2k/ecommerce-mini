@@ -2,6 +2,7 @@ import { SearchInput } from "./SearchInput";
 import { ProductCategoryFilter } from "./category/ProductCategoryFilter";
 import { ProductBrandFilter } from "./brand/ProductBrandFilter";
 import { PriceSortSelect } from "./PriceSortSelect";
+import { Button } from "@components/ui/button";
 
 interface ProductFilterProps {
   value: {
@@ -16,13 +17,34 @@ interface ProductFilterProps {
     setCategoryId: (v: string) => void;
     setBrandId: (v: string) => void;
     setPriceSort: (v: "asc" | "desc" | "") => void;
+    resetFilters: () => void;
   };
 }
 
 export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
+  const hasActiveFilters =
+    !!value.search ||
+    !!value.categoryId ||
+    !!value.brandId ||
+    !!value.priceSort;
+
   return (
     <div className="rounded-lg border bg-white p-4">
       <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">Bộ lọc</h3>
+
+          <Button
+            type="button"
+            onClick={actions.resetFilters}
+            disabled={!hasActiveFilters}
+            variant="warning"
+          >
+            Reset
+          </Button>
+        </div>
+
+        {/* Input */}
         <SearchInput value={value.search} onChange={actions.setSearch} />
 
         {/* Category */}

@@ -90,6 +90,14 @@ export const usePublicProductFilter = () => {
     return params;
   }, [page, search, categoryId, brandId, priceSort]);
 
+  const resetFilters = () => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    setSearchParams({});
+  };
+
   return {
     page,
     goToPage,
@@ -106,6 +114,7 @@ export const usePublicProductFilter = () => {
       setCategoryId,
       setBrandId,
       setPriceSort,
+      resetFilters,
     },
 
     queryParams,
