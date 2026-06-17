@@ -2,15 +2,12 @@ import {
   Camera,
   Heart,
   KeyRound,
-  Search,
   ShoppingCart,
   Ticket,
   User,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@app/hooks";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
@@ -30,6 +27,7 @@ import { UploadAvatar } from "@features/customer/account/components/UploadAvatar
 import { UpdateProfile } from "@features/customer/account/components/UpdateProfile";
 import { ChangePassword } from "@features/customer/account/components/ChangePassword";
 import { NotificationWidget } from "@features/notification/components/NotificationWidget";
+import { ProductSearch } from "@/domains/product/components/ProductSearch";
 
 const Header = () => {
   //check auth
@@ -68,11 +66,7 @@ const Header = () => {
 
         {/* Search */}
         <div className="flex-1 max-w-xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-
-            <Input placeholder="Tìm kiếm sản phẩm..." className="pl-10" />
-          </div>
+          <ProductSearch />
         </div>
 
         {/* Right */}
