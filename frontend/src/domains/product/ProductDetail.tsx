@@ -15,6 +15,8 @@ import { SectionTitle } from "@components/ui/section-title";
 import { QuantitySelector } from "@components/product/QuantitySelector";
 import { Separator } from "@components/ui/separator";
 import TiptapContent from "@components/editor/TiptapContent";
+import { AsyncButton } from "@components/common/async-button";
+import { ShoppingCart } from "lucide-react";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -254,6 +256,17 @@ ${
               </span>
 
               <QuantitySelector value={quantity} onChange={setQuantity} />
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2">
+              <AsyncButton
+                size={"lg"}
+                className="h-12 px-6 text-lg font-semibold inline-flex items-center gap-2"
+              >
+                <ShoppingCart className="size-5" />
+                Thêm vào giỏ hàng
+              </AsyncButton>
             </div>
           </div>
         </div>
