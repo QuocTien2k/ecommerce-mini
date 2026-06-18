@@ -3,6 +3,8 @@ export interface AddToCartPayload {
   quantity: number;
 }
 
+export type CartItemAttributes = Record<string, string>;
+
 export interface CartItem {
   id: string;
 
@@ -14,7 +16,7 @@ export interface CartItem {
   image?: string;
 
   color?: string;
-  attributes?: Record<string, any>;
+  attributes?: CartItemAttributes;
 
   price: number;
   quantity: number;

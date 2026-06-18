@@ -1,6 +1,7 @@
 import { Trash2 } from "lucide-react";
 import type { CartItem } from "../types/customer-cart.type";
 import { useDeleteCartItem } from "../hooks/useDeleteCart";
+import { formatProductAttributes } from "@/utils/format-product-attributes";
 
 interface Props {
   item: CartItem;
@@ -8,6 +9,8 @@ interface Props {
 
 export const CartDropdownItem = ({ item }: Props) => {
   const { mutate: deleteItem } = useDeleteCartItem();
+
+  //console.log("Item attribute: ", item.attributes);
 
   return (
     <div className="flex gap-3">
@@ -27,9 +30,7 @@ export const CartDropdownItem = ({ item }: Props) => {
 
         {item.attributes && (
           <div className="text-muted-foreground line-clamp-1">
-            {Object.entries(item.attributes)
-              .map(([k, v]) => `${k}: ${v}`)
-              .join(", ")}
+            {formatProductAttributes(item.attributes)}
           </div>
         )}
 

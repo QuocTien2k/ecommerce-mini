@@ -13,7 +13,7 @@ export const CartDropdown = () => {
 
   const cart = cartResponse?.data;
 
-  console.log(cart);
+  //console.log(cart);
 
   return (
     <Popover>
