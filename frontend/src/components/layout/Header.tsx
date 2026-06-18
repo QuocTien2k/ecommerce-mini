@@ -1,11 +1,4 @@
-import {
-  Camera,
-  Heart,
-  KeyRound,
-  ShoppingCart,
-  Ticket,
-  User,
-} from "lucide-react";
+import { Camera, Heart, KeyRound, Ticket, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,6 +21,7 @@ import { UpdateProfile } from "@features/customer/account/components/UpdateProfi
 import { ChangePassword } from "@features/customer/account/components/ChangePassword";
 import { NotificationWidget } from "@features/notification/components/NotificationWidget";
 import { ProductSearch } from "@/domains/product/components/ProductSearch";
+import { CartDropdown } from "@features/customer/cart/components/CartDropdown";
 
 const Header = () => {
   //check auth
@@ -76,13 +70,7 @@ const Header = () => {
             <NotificationWidget />
 
             {/* Cart */}
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="size-5" />
-
-              <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                2
-              </span>
-            </Button>
+            <CartDropdown />
 
             {/* User */}
             <DropdownMenu>
