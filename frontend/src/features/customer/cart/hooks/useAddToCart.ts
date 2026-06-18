@@ -14,10 +14,17 @@ export const useAddToCart = () => {
       customerCartApi.addToCart(payload),
 
     onSuccess: (response) => {
-      queryClient.setQueryData<CartResponse>(
-        [CUSTOMER_CART_QUERY_KEY],
-        response.data,
-      );
+      // console.log(
+      //   "Before:",
+      //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
+      // );
+
+      queryClient.setQueryData([CUSTOMER_CART_QUERY_KEY], response);
+
+      // console.log(
+      //   "After:",
+      //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
+      // );
     },
   });
 };
