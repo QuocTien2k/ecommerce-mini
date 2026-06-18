@@ -6,6 +6,8 @@ import type {
 import { api } from "@shared/api/axios";
 
 export const customerCartApi = {
+  getCart: (): ApiResult<CartResponse> => api.get("/cart-items"),
+
   addToCart: (payload: AddToCartPayload): ApiResult<CartResponse> =>
-    api.post("/cart/add", payload),
+    api.post("/cart-items", payload),
 };

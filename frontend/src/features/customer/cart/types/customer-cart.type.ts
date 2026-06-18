@@ -10,13 +10,16 @@ export interface CartItem {
   variantId: string;
 
   productName: string;
-  productImage?: string;
+
+  image?: string;
+
+  color?: string;
+  attributes?: Record<string, any>;
 
   price: number;
   quantity: number;
-  itemTotal: number;
 
-  selectedAttributes?: Record<string, any>;
+  totalPrice: number;
 }
 
 export interface CartResponse {
