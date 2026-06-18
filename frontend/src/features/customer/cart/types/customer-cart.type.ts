@@ -29,3 +29,7 @@ export interface CartResponse {
   totalQuantity: number;
   totalPrice: number;
 }
+
+export interface UpdateCartItemPayload {
+  quantity: number;
+}
