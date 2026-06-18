@@ -17,11 +17,19 @@ import { Separator } from "@components/ui/separator";
 import TiptapContent from "@components/editor/TiptapContent";
 import { AsyncButton } from "@components/common/async-button";
 import { ShoppingCart } from "lucide-react";
+import { useAddToCart } from "@features/customer/cart/hooks/useAddToCart";
+import { useScopedLoading } from "@/hooks/use-scoped-loading";
+import { sonnerToast } from "@lib/sonner-toast";
+import { getErrorMessage } from "@lib/error";
+import { toast } from "sonner";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
 
   const { data: product, isLoading } = usePublicProductDetail(slug ?? "");
+  const { loading, run } = useScopedLoading();
+
+  const addToCartMutation = useAddToCart();
 
   const [selectedImage, setSelectedImage] = useState<string>();
 
@@ -90,7 +98,32 @@ const ProductDetail = () => {
     );
   }
 
-  console.log("Product: ", product.variants);
+  const isOutOfStock = (selectedVariant?.stock ?? 0) <= 0;
+
+  const handleAddToCart = async () => {
+    if (!selectedVariant || loading) return;
+
+    try {
+      await run(
+        () =>
+          addToCartMutation.mutateAsync({
+            variantId: selectedVariant.id,
+            quantity,
+          }),
+        {
+          minDuration: 500,
+        },
+      );
+
+      toast.success("Đã thêm sản phẩm vào giỏ hàng");
+    } catch (error) {
+      sonnerToast.error(
+        getErrorMessage(error, "Thêm sản phẩm vào giỏ hàng thất bại"),
+      );
+    }
+  };
+
+  //console.log("Product: ", product.variants);
 
   const hasDiscount = product.discountPrice != null;
 
@@ -257,17 +290,24 @@ ${
                 Số lượng
               </span>
 
-              <QuantitySelector value={quantity} onChange={setQuantity} />
+              <QuantitySelector
+                value={quantity}
+                onChange={setQuantity}
+                max={selectedVariant?.stock ?? 0}
+              />
             </div>
 
             {/* Actions */}
             <div className="pt-2">
               <AsyncButton
                 size={"lg"}
+                loading={loading}
+                disabled={loading || isOutOfStock}
+                onClick={handleAddToCart}
                 className="h-12 px-6 text-lg font-semibold inline-flex items-center gap-2"
               >
                 <ShoppingCart className="size-5" />
-                Thêm vào giỏ hàng
+                {isOutOfStock ? "Hết hàng" : "Thêm vào giỏ hàng"}
               </AsyncButton>
             </div>
           </div>
