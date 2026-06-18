@@ -90,6 +90,8 @@ const ProductDetail = () => {
     );
   }
 
+  console.log("Product: ", product.variants);
+
   const hasDiscount = product.discountPrice != null;
 
   return (
