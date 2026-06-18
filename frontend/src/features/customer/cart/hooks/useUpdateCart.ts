@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { customerCartApi } from "../api/customerCart.api";
-import type { CartResponse } from "../types/customer-cart.type";
 import { CUSTOMER_CART_QUERY_KEY } from "../constants/custom-cart.constant";
 
 export const useUpdateCartItem = () => {
@@ -19,10 +18,7 @@ export const useUpdateCartItem = () => {
       }),
 
     onSuccess: (response) => {
-      queryClient.setQueryData<CartResponse>(
-        [CUSTOMER_CART_QUERY_KEY],
-        response.data,
-      );
+      queryClient.setQueryData([CUSTOMER_CART_QUERY_KEY], response);
     },
   });
 };

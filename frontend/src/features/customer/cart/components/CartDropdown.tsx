@@ -9,11 +9,11 @@ import { useGetCart } from "../hooks/useGetCart";
 import { CartDropdownItem } from "./CartDropdownItem";
 
 export const CartDropdown = () => {
-  const { data } = useGetCart();
+  const { data: cartResponse } = useGetCart();
 
-  const cart = data?.data;
+  const cart = cartResponse?.data;
 
-  //console.log(cartResponse);
+  console.log(cart);
 
   return (
     <Popover>
