@@ -23,8 +23,14 @@ import { NotificationWidget } from "@features/notification/components/Notificati
 import { ProductSearch } from "@/domains/product/components/ProductSearch";
 import { CartDropdown } from "@features/customer/cart/components/CartDropdown";
 import { Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { MobileUserPanel } from "@features/customer/account/components/mobile/MobileUserPanel";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const Header = () => {
   //check auth
@@ -79,6 +85,10 @@ const Header = () => {
             </SheetTrigger>
 
             <SheetContent side="right" className="w-72 p-4">
+              <VisuallyHidden>
+                <SheetTitle>Menu</SheetTitle>
+              </VisuallyHidden>
+
               <MobileUserPanel
                 user={user}
                 isAuthenticated={isAuthenticated}
