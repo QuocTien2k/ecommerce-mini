@@ -5,6 +5,8 @@ import { formatProductAttributes } from "@/utils/format-product-attributes";
 import { formatCurrency } from "@lib/format-currency";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
+import { QuantitySelector } from "@components/product/QuantitySelector";
+import { useUpdateCartItem } from "../hooks/useUpdateCart";
 
 interface Props {
   item: CartItem;
@@ -12,9 +14,19 @@ interface Props {
 
 export const CartDropdownItem = ({ item }: Props) => {
   const { mutateAsync: deleteItem } = useDeleteCartItem();
-  const { loading, run } = useScopedLoading();
+  const { mutateAsync: updateItem } = useUpdateCartItem();
+  const { loading: deleting, run: runDelete } = useScopedLoading();
+  const { loading: updating, run: runUpdate } = useScopedLoading();
 
-  const handleDelete = () => run(() => deleteItem(item.id));
+  const handleDelete = () => runDelete(() => deleteItem(item.id));
+
+  const handleQuantityChange = (quantity: number) =>
+    runUpdate(() =>
+      updateItem({
+        cartItemId: item.id,
+        quantity,
+      }),
+    );
 
   //console.log("Item: ", item);
 
@@ -45,9 +57,14 @@ export const CartDropdownItem = ({ item }: Props) => {
         )}
 
         <div className="flex items-center justify-between pt-1">
-          <span className="text-xs text-muted-foreground">
-            {item.quantity} × {formatCurrency(item.price)}
-          </span>
+          <QuantitySelector
+            value={item.quantity}
+            onChange={handleQuantityChange}
+            min={1}
+            max={99}
+            size="sm"
+            disabled={updating}
+          />
 
           <span className="font-semibold text-sm">
             {formatCurrency(item.totalPrice)}
@@ -59,7 +76,7 @@ export const CartDropdownItem = ({ item }: Props) => {
       <AsyncButton
         variant="ghost"
         size="icon-lg"
-        loading={loading}
+        loading={deleting}
         showLoadingText={false}
         onClick={handleDelete}
         className="size-8 shrink-0 text-red-500 hover:text-red-600"

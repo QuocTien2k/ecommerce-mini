@@ -294,6 +294,7 @@ ${
                 value={quantity}
                 onChange={setQuantity}
                 max={selectedVariant?.stock ?? 0}
+                size="md"
               />
             </div>
 
