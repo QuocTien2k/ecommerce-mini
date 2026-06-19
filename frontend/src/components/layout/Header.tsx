@@ -57,12 +57,15 @@ const Header = () => {
     <header className="sticky top-0 z-50 border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4">
         {/* Logo */}
-        <Link to="/" className="shrink-0 text-2xl font-bold tracking-tight">
+        <Link
+          to="/"
+          className="shrink-0 text-base sm:text-lg md:text-2xl font-bold tracking-tight"
+        >
           TechStore
         </Link>
 
         {/* Search */}
-        <div className="flex-1 max-w-xl md:hidden">
+        <div className="flex-1 max-w-xl">
           <ProductSearch />
         </div>
 

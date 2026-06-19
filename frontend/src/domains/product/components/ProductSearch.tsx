@@ -72,7 +72,7 @@ export const ProductSearch = () => {
   //console.log("Preview Products", previewProducts);
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative w-full">
       <Search
         onClick={handleSearch}
         className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 cursor-pointer text-muted-foreground"
@@ -90,18 +90,18 @@ export const ProductSearch = () => {
           }
         }}
         placeholder="Tìm kiếm sản phẩm..."
-        className="pl-10"
+        className="pl-10 h-11 md:h-10"
       />
 
       {showDropdown && (
-        <div className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border bg-background shadow-xl">
+        <div className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border bg-background shadow-xl max-h-[70vh]">
           {isLoading ? (
             <div className="flex items-center justify-center p-6">
               <Spinner size="sm" label="Đang tìm kiếm..." />
             </div>
           ) : previewProducts.length > 0 ? (
             <>
-              <div className="divide-y">
+              <div className="divide-y overflow-y-auto max-h-[60vh]">
                 {previewProducts.map((product) => (
                   <button
                     key={product.id}
@@ -117,11 +117,11 @@ export const ProductSearch = () => {
                     <img
                       src={product.thumbnail}
                       alt={product.name}
-                      className="h-14 w-14 shrink-0 rounded-md object-cover"
+                      className="h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-md object-cover"
                     />
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium transition-colorsgroup-hover:text-orange-600">
+                      <p className="line-clamp-2 text-sm font-medium transition-colors group-hover:text-orange-600">
                         {product.name}
                       </p>
 
@@ -150,7 +150,8 @@ export const ProductSearch = () => {
               <button
                 type="button"
                 onClick={handleSearch}
-                className="cursor-pointer w-full border-t px-4 py-3 text-center text-sm font-medium transition-colors duration-150 hover:bg-orange-50"
+                className="w-full border-t px-4 py-4 text-center text-sm font-medium transition-colors duration-150
+                        hover:bg-orange-50 md:cursor-pointer"
               >
                 Xem tất cả kết quả
               </button>
