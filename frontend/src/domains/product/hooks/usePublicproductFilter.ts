@@ -13,6 +13,7 @@ export const usePublicProductFilter = () => {
   const categoryId = searchParams.get("categoryId") || "";
   const brandId = searchParams.get("brandId") || "";
   const rawPriceSort = searchParams.get("priceSort");
+  const search = searchParams.get("search") || "";
 
   const priceSort: "" | "asc" | "desc" =
     rawPriceSort === "asc" || rawPriceSort === "desc" ? rawPriceSort : "";
@@ -80,6 +81,7 @@ export const usePublicProductFilter = () => {
       page,
       limit: 12,
     };
+    if (search) params.search = search;
     if (categoryId) params.categoryId = categoryId;
     if (brandId) params.brandId = brandId;
     if (priceSort) params.priceSort = priceSort;
@@ -100,6 +102,7 @@ export const usePublicProductFilter = () => {
     goToPage,
 
     filters: {
+      search,
       categoryId,
       brandId,
       priceSort,

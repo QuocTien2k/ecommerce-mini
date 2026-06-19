@@ -6,7 +6,7 @@ import { ProductNotFound } from "@components/product/ProductNotFound";
 import { SectionTitle } from "@components/ui/section-title";
 import { ProductFilters } from "./search/ProductFilter";
 import { useEffect, useState } from "react";
-import { usePublicProductFilter } from "../hooks/usePublicproductFilter";
+import { usePublicProductFilter } from "../hooks/usePublicProductFilter";
 
 type BreadcrumbItem = {
   name: string;
