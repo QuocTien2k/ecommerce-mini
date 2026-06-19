@@ -7,6 +7,7 @@ import { getErrorMessage } from "@lib/error";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { AsyncButton } from "@components/common/async-button";
+import { createPortal } from "react-dom";
 
 type UploadAvatarProps = {
   open: boolean;
@@ -93,7 +94,7 @@ export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
       onClick={handleClose}
@@ -173,6 +174,7 @@ export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };

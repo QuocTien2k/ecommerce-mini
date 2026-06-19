@@ -18,6 +18,7 @@ import { Input } from "@components/ui/input";
 import { Controller } from "react-hook-form";
 import { ProvinceSelect } from "@components/address/ProvinceSelect";
 import { CommuneSelect } from "@components/address/CommuneSelect";
+import { createPortal } from "react-dom";
 
 type UpdateProfileProps = {
   open: boolean;
@@ -156,7 +157,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
       onClick={handleClose}
@@ -323,6 +324,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
