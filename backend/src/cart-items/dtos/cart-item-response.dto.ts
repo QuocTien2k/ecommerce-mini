@@ -8,6 +8,8 @@ export class CartItemResponseDto {
 
   image?: string;
 
+  stock: number;
+
   color?: string;
   attributes?: Record<string, any>;
 

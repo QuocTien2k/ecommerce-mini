@@ -22,6 +22,7 @@ type CartItemEntity = {
     images?: string[];
     color?: string;
     attributes?: any;
+    stock: number;
   };
 };
 
@@ -45,6 +46,8 @@ export const mapToCartItemDto = (
 
     price: DecimalUtil.toNumber(item.price),
     quantity: item.quantity,
+
+    stock: item.variant?.stock ?? 0,
 
     totalPrice: DecimalUtil.toNumber(itemTotal),
   };
