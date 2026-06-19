@@ -22,6 +22,9 @@ import { ChangePassword } from "@features/customer/account/components/ChangePass
 import { NotificationWidget } from "@features/notification/components/NotificationWidget";
 import { ProductSearch } from "@/domains/product/components/ProductSearch";
 import { CartDropdown } from "@features/customer/cart/components/CartDropdown";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { MobileUserPanel } from "@features/customer/account/components/mobile/MobileUserPanel";
 
 const Header = () => {
   //check auth
@@ -59,116 +62,142 @@ const Header = () => {
         </Link>
 
         {/* Search */}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 max-w-xl md:hidden">
           <ProductSearch />
         </div>
 
+        {/* Mobile Hamburger */}
+        <div className="flex md:hidden items-center gap-3">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-11 w-11">
+                <Menu className="w-7 h-7" strokeWidth={3.5} />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent side="right" className="w-72 p-4">
+              <MobileUserPanel
+                user={user}
+                isAuthenticated={isAuthenticated}
+                onOpenProfile={() => setOpenProfile(true)}
+                onOpenAvatar={() => setOpenAvatar(true)}
+                onOpenPassword={() => setOpenPassword(true)}
+                onLogout={handleLogout}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Right */}
-        {isAuthenticated ? (
-          <div className="flex items-center gap-4">
-            {/* Notification */}
-            <NotificationWidget />
+        <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-4">
+                {/* Notification */}
+                <NotificationWidget />
 
-            {/* Cart */}
-            <CartDropdown />
+                {/* Cart */}
+                <CartDropdown />
 
-            {/* User */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage
-                      src={user?.avatar || "/avatar_user.jpg"}
-                      alt={user?.fullname}
-                    />
+                {/* User */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={user?.avatar || "/avatar_user.jpg"}
+                          alt={user?.fullname}
+                        />
 
-                    <AvatarFallback>
-                      {user?.fullname?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
+                        <AvatarFallback>
+                          {user?.fullname?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
 
-                  <span className="hidden md:block font-medium">
-                    {user?.fullname}
-                  </span>
-                </div>
-              </DropdownMenuTrigger>
+                      <span className="hidden md:block font-medium">
+                        {user?.fullname}
+                      </span>
+                    </div>
+                  </DropdownMenuTrigger>
 
-              {/* Profile */}
-              <DropdownMenuContent
-                align="end"
-                className="w-60 p-2 max-h-80 overflow-y-auto"
-              >
-                <DropdownMenuItem
-                  className="px-3 py-2 cursor-pointer"
-                  onClick={() => setOpenProfile(true)}
-                >
-                  <User className="w-4 h-4" />
-                  <span>Cập nhật thông tin</span>
-                </DropdownMenuItem>
-
-                {/* Avatar */}
-                <DropdownMenuItem
-                  className="px-3 py-2 cursor-pointer"
-                  onClick={() => setOpenAvatar(true)}
-                >
-                  <Camera className="w-4 h-4" />
-                  <span>Cập nhật avatar</span>
-                </DropdownMenuItem>
-
-                {/* Password */}
-                <DropdownMenuItem
-                  className="px-3 py-2 cursor-pointer"
-                  onClick={() => setOpenPassword(true)}
-                >
-                  <KeyRound className="w-4 h-4" />
-                  <span>Đổi mật khẩu</span>
-                </DropdownMenuItem>
-
-                {/* Favorite */}
-                <DropdownMenuItem className="px-3 py-2 cursor-pointer">
-                  <Heart className="w-4 h-4" />
-                  <span>Sản phẩm yêu thích</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  className="px-3 py-2 cursor-pointer"
-                  onClick={() => navigate("/my-vouchers")}
-                >
-                  <Ticket className="w-4 h-4" />
-                  <span>Voucher của tôi</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  asChild
-                  onSelect={(e) => e.preventDefault()}
-                  className="p-0"
-                >
-                  <AsyncButton
-                    loading={loading}
-                    onClick={handleLogout}
-                    loadingText="Đang thoát..."
-                    variant="destructive"
-                    className="w-full cursor-pointer"
+                  {/* Profile */}
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-60 p-2 max-h-80 overflow-y-auto"
                   >
-                    Đăng xuất
-                  </AsyncButton>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button asChild variant="outline">
-              <Link to="/signup">Đăng ký</Link>
-            </Button>
+                    <DropdownMenuItem
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => setOpenProfile(true)}
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Cập nhật thông tin</span>
+                    </DropdownMenuItem>
 
-            <Button asChild>
-              <Link to="/login">Đăng nhập</Link>
-            </Button>
-          </div>
-        )}
+                    {/* Avatar */}
+                    <DropdownMenuItem
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => setOpenAvatar(true)}
+                    >
+                      <Camera className="w-4 h-4" />
+                      <span>Cập nhật avatar</span>
+                    </DropdownMenuItem>
+
+                    {/* Password */}
+                    <DropdownMenuItem
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => setOpenPassword(true)}
+                    >
+                      <KeyRound className="w-4 h-4" />
+                      <span>Đổi mật khẩu</span>
+                    </DropdownMenuItem>
+
+                    {/* Favorite */}
+                    <DropdownMenuItem className="px-3 py-2 cursor-pointer">
+                      <Heart className="w-4 h-4" />
+                      <span>Sản phẩm yêu thích</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => navigate("/my-vouchers")}
+                    >
+                      <Ticket className="w-4 h-4" />
+                      <span>Voucher của tôi</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                      asChild
+                      onSelect={(e) => e.preventDefault()}
+                      className="p-0"
+                    >
+                      <AsyncButton
+                        loading={loading}
+                        onClick={handleLogout}
+                        loadingText="Đang thoát..."
+                        variant="destructive"
+                        className="w-full cursor-pointer"
+                      >
+                        Đăng xuất
+                      </AsyncButton>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button asChild variant="outline">
+                <Link to="/signup">Đăng ký</Link>
+              </Button>
+
+              <Button asChild>
+                <Link to="/login">Đăng nhập</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal */}
