@@ -28,7 +28,7 @@ export const CartDropdownItem = ({ item }: Props) => {
       }),
     );
 
-  console.log("Item: ", item);
+  //console.log("Item: ", item);
 
   return (
     <div className="flex gap-3 py-3 border-b last:border-b-0">

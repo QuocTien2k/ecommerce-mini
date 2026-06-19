@@ -8,6 +8,7 @@ import { ShoppingCart } from "lucide-react";
 import { useGetCart } from "../hooks/useGetCart";
 import { CartDropdownItem } from "./CartDropdownItem";
 import { formatCurrency } from "@lib/format-currency";
+import { EmptyState } from "@components/cart/CartEmpty";
 
 export const CartDropdown = () => {
   const { data: cartResponse } = useGetCart();
@@ -32,9 +33,11 @@ export const CartDropdown = () => {
 
       <PopoverContent align="end" sideOffset={14} className="w-110 p-4">
         {!cart || cart.items.length === 0 ? (
-          <div className="text-sm text-muted-foreground text-center py-6">
-            Giỏ hàng trống
-          </div>
+          <EmptyState
+            icon={<ShoppingCart className="w-6 h-6" />}
+            title="Giỏ hàng trống"
+            description="Bạn chưa có sản phẩm nào trong giỏ hàng"
+          />
         ) : (
           <>
             <div className="space-y-3 max-h-90 overflow-auto">
