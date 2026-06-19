@@ -92,7 +92,7 @@ export class CartItemsService {
             productId: variant.productId,
             variantId,
             quantity,
-            price: variant.product.price,
+            price: variant.product.discountPrice ?? variant.product.price,
             productName: variant.product.name,
             productImage: variant.images?.[0] ?? undefined,
             selectedAttributes: variant.attributes ?? undefined,
