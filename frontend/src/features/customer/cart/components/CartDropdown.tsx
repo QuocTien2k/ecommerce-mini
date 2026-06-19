@@ -7,6 +7,7 @@ import {
 import { ShoppingCart } from "lucide-react";
 import { useGetCart } from "../hooks/useGetCart";
 import { CartDropdownItem } from "./CartDropdownItem";
+import { formatCurrency } from "@lib/format-currency";
 
 export const CartDropdown = () => {
   const { data: cartResponse } = useGetCart();
@@ -29,14 +30,14 @@ export const CartDropdown = () => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-96 p-4">
+      <PopoverContent align="end" sideOffset={14} className="w-110 p-4">
         {!cart || cart.items.length === 0 ? (
           <div className="text-sm text-muted-foreground text-center py-6">
             Giỏ hàng trống
           </div>
         ) : (
           <>
-            <div className="space-y-3 max-h-80 overflow-auto">
+            <div className="space-y-3 max-h-90 overflow-auto">
               {cart.items.map((item) => (
                 <CartDropdownItem key={item.id} item={item} />
               ))}
@@ -50,7 +51,7 @@ export const CartDropdown = () => {
 
               <div className="flex justify-between font-semibold">
                 <span>Tổng tiền</span>
-                <span>{cart.totalPrice.toLocaleString()}₫</span>
+                <span>{formatCurrency(cart.totalPrice)}</span>
               </div>
             </div>
           </>
