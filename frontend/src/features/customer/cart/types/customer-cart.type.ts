@@ -17,7 +17,7 @@ export interface CartItem {
 
   color?: string;
   attributes?: CartItemAttributes;
-
+  stock: number;
   price: number;
   quantity: number;
 
