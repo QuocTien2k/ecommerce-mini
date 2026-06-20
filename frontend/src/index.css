@@ -145,6 +145,7 @@
   }
   html {
     @apply font-sans;
+    scrollbar-gutter: stable both-edges;
   }
   .prose {
     --tw-prose-body: rgb(31 41 55); /* gray-800 */

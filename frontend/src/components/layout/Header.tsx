@@ -41,6 +41,7 @@ const Header = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [openAvatar, setOpenAvatar] = useState(false);
   const [openPassword, setOpenPassword] = useState(false);
+  const [openSheet, setOpenSheet] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -75,9 +76,14 @@ const Header = () => {
 
               {isAuthenticated && <CartButton />}
 
-              <Sheet>
+              <Sheet open={openSheet} onOpenChange={setOpenSheet}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                  <Button
+                    onClick={() => setOpenSheet(true)}
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10"
+                  >
                     <Menu className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>

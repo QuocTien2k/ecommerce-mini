@@ -22,7 +22,7 @@ export const CartPage = () => {
   }
 
   return (
-    <div className="container py-8">
+    <div className="container max-w-full py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Giỏ hàng</h1>
 
@@ -31,9 +31,9 @@ export const CartPage = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Items */}
-        <div className="rounded-lg border p-4">
+        <div className="rounded-lg border p-4 min-w-0 overflow-hidden">
           <div className="space-y-4">
             {cart.items.map((item) => (
               <CartItemCard key={item.id} item={item} />
