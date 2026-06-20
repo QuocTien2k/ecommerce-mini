@@ -32,16 +32,21 @@ import { MobileUserPanel } from "@features/customer/account/components/mobile/Mo
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { CartButton } from "@features/customer/cart/components/CartButton";
 
+type ActiveModal = null | "profile" | "avatar" | "password";
+
 const Header = () => {
   //check auth
   const user = useAppSelector((state) => state.user.user);
   const isAuthenticated = Boolean(user?.id);
 
-  //update
-  const [openProfile, setOpenProfile] = useState(false);
-  const [openAvatar, setOpenAvatar] = useState(false);
-  const [openPassword, setOpenPassword] = useState(false);
+  //modal
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [openSheet, setOpenSheet] = useState(false);
+
+  const openModal = (modal: Exclude<ActiveModal, null>) => {
+    setOpenSheet(false);
+    setActiveModal(modal);
+  };
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -96,9 +101,9 @@ const Header = () => {
                   <MobileUserPanel
                     user={user}
                     isAuthenticated={isAuthenticated}
-                    onOpenProfile={() => setOpenProfile(true)}
-                    onOpenAvatar={() => setOpenAvatar(true)}
-                    onOpenPassword={() => setOpenPassword(true)}
+                    onOpenProfile={() => openModal("profile")}
+                    onOpenAvatar={() => openModal("avatar")}
+                    onOpenPassword={() => openModal("password")}
                     onLogout={handleLogout}
                   />
                 </SheetContent>
@@ -158,7 +163,7 @@ const Header = () => {
                   >
                     <DropdownMenuItem
                       className="px-3 py-2 cursor-pointer"
-                      onClick={() => setOpenProfile(true)}
+                      onClick={() => openModal("profile")}
                     >
                       <User className="w-4 h-4" />
                       <span>Cập nhật thông tin</span>
@@ -166,7 +171,7 @@ const Header = () => {
 
                     <DropdownMenuItem
                       className="px-3 py-2 cursor-pointer"
-                      onClick={() => setOpenAvatar(true)}
+                      onClick={() => openModal("avatar")}
                     >
                       <Camera className="w-4 h-4" />
                       <span>Cập nhật avatar</span>
@@ -174,7 +179,7 @@ const Header = () => {
 
                     <DropdownMenuItem
                       className="px-3 py-2 cursor-pointer"
-                      onClick={() => setOpenPassword(true)}
+                      onClick={() => openModal("password")}
                     >
                       <KeyRound className="w-4 h-4" />
                       <span>Đổi mật khẩu</span>
@@ -229,13 +234,19 @@ const Header = () => {
       </div>
 
       {/* Modal */}
-      <UploadAvatar open={openAvatar} onClose={() => setOpenAvatar(false)} />
+      <UploadAvatar
+        open={activeModal === "avatar"}
+        onClose={() => setActiveModal(null)}
+      />
 
-      <UpdateProfile open={openProfile} onClose={() => setOpenProfile(false)} />
+      <UpdateProfile
+        open={activeModal === "profile"}
+        onClose={() => setActiveModal(null)}
+      />
 
       <ChangePassword
-        open={openPassword}
-        onClose={() => setOpenPassword(false)}
+        open={activeModal === "password"}
+        onClose={() => setActiveModal(null)}
       />
     </header>
   );

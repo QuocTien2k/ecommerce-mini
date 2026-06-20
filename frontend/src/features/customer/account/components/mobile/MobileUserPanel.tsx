@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import type { AdminUser } from "@features/admin/user/types/adminUser.type";
+import { Camera, Heart, KeyRound, Ticket, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 type Props = {
@@ -52,44 +53,49 @@ export const MobileUserPanel = ({
       <div className="flex flex-col gap-1">
         <Button
           variant="ghost"
-          className="justify-start"
+          className="justify-start gap-2 h-11"
           onClick={onOpenProfile}
         >
+          <User className="h-4 w-4" />
           Cập nhật thông tin
         </Button>
 
         <Button
           variant="ghost"
-          className="justify-start"
+          className="justify-start gap-2 h-11"
           onClick={onOpenAvatar}
         >
+          <Camera className="h-4 w-4" />
           Cập nhật avatar
         </Button>
 
         <Button
           variant="ghost"
-          className="justify-start"
+          className="justify-start gap-2 h-11"
           onClick={onOpenPassword}
         >
+          <KeyRound className="h-4 w-4" />
           Đổi mật khẩu
         </Button>
       </div>
 
       {/* Shop actions */}
-      <div className="flex flex-col gap-1 pt-2 border-t">
+      <div className="flex flex-col gap-1 border-t pt-2">
         <Button
           variant="ghost"
-          className="justify-start"
+          className="justify-start gap-2 h-11"
           onClick={() => navigate("/favorites")}
         >
+          <Heart className="h-4 w-4" />
           Sản phẩm yêu thích
         </Button>
 
         <Button
           variant="ghost"
-          className="justify-start"
+          className="justify-start gap-2 h-11"
           onClick={() => navigate("/my-vouchers")}
         >
+          <Ticket className="h-4 w-4" />
           Voucher của tôi
         </Button>
       </div>

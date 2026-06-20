@@ -15,8 +15,6 @@ type UploadAvatarProps = {
 };
 
 export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
-  if (!open) return null;
-
   const user = useAppSelector((state) => state.user.user);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +57,7 @@ export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
   };
 
   const handleClose = () => {
+    console.log("close modal");
     if (loading) return;
 
     setSelectedFile(null);
@@ -94,85 +93,91 @@ export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
     }
   };
 
+  if (!open) return null;
+
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 overflow-y-auto backdrop-blur-sm p-4"
       onClick={handleClose}
     >
-      <div
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-6 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Cập nhật avatar</h2>
-
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={handleClose}
-            disabled={loading}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void handleSubmit();
-          }}
-          className="space-y-6"
+      <div className="min-h-full flex items-center justify-center">
+        <div
+          className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-6 shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex flex-col items-center gap-4">
-            <img
-              src={displayedAvatar}
-              alt="Avatar"
-              className="h-32 w-32 rounded-full object-cover border"
-            />
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Cập nhật avatar</h2>
 
             <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading}
-            >
-              Chọn ảnh mới
-            </Button>
-
-            {selectedFile && (
-              <p className="text-sm text-muted-foreground">
-                {selectedFile.name}
-              </p>
-            )}
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
+              variant="destructive"
+              size="icon"
               onClick={handleClose}
               disabled={loading}
             >
-              Hủy
+              <X className="h-4 w-4" />
             </Button>
-
-            <AsyncButton
-              type="submit"
-              loading={loading}
-              disabled={!selectedFile}
-            >
-              Cập nhật avatar
-            </AsyncButton>
           </div>
-        </form>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleSubmit();
+            }}
+            className="space-y-6"
+          >
+            <div className="flex flex-col items-center gap-4">
+              <img
+                src={displayedAvatar}
+                alt="Avatar"
+                className="h-24 w-24 md:h-32 md:w-32 rounded-full object-cover border"
+              />
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+              >
+                Chọn ảnh mới
+              </Button>
+
+              {selectedFile && (
+                <p className="max-w-full truncate text-sm text-muted-foreground">
+                  {selectedFile.name}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
+                Hủy
+              </Button>
+
+              <AsyncButton
+                type="submit"
+                loading={loading}
+                disabled={!selectedFile}
+                className="w-full sm:w-auto"
+              >
+                Cập nhật avatar
+              </AsyncButton>
+            </div>
+          </form>
+        </div>
       </div>
     </div>,
     document.body,
