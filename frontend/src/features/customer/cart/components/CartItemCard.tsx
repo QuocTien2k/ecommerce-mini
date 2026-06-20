@@ -35,8 +35,10 @@ export const CartItemCard = ({ item, compact = false }: Props) => {
   return (
     <div
       className={cn(
-        "flex gap-4",
-        compact ? "py-3 border-b last:border-b-0" : "p-4 rounded-lg border",
+        "flex gap-3 sm:gap-4",
+        compact
+          ? "py-3 border-b last:border-b-0"
+          : "p-3 sm:p-4 rounded-lg border",
       )}
     >
       {/* Image */}
@@ -45,7 +47,7 @@ export const CartItemCard = ({ item, compact = false }: Props) => {
         alt={item.productName}
         className={cn(
           "rounded-md object-cover border shrink-0",
-          compact ? "size-16" : "size-24",
+          compact ? "size-16" : "size-20 sm:size-24",
         )}
       />
 
@@ -74,8 +76,8 @@ export const CartItemCard = ({ item, compact = false }: Props) => {
 
         <div
           className={cn(
-            "flex items-center justify-between",
-            compact ? "pt-2" : "mt-4",
+            "flex flex-col gap-2 mt-3 sm:mt-4 sm:flex-row sm:items-center sm:justify-between",
+            compact && "pt-2 mt-0",
           )}
         >
           <QuantitySelector
@@ -88,7 +90,10 @@ export const CartItemCard = ({ item, compact = false }: Props) => {
           />
 
           <span
-            className={cn("font-semibold", compact ? "text-sm" : "text-base")}
+            className={cn(
+              "font-semibold self-end sm:self-auto",
+              compact ? "text-sm" : "text-base",
+            )}
           >
             {formatCurrency(item.totalPrice)}
           </span>
