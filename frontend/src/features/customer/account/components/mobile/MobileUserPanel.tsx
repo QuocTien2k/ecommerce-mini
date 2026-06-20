@@ -25,12 +25,20 @@ export const MobileUserPanel = ({
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col gap-2">
-        <Button asChild>
+      <div className="space-y-4 pt-8">
+        <div>
+          <h3 className="font-semibold">Chào mừng đến với TechStore</h3>
+
+          <p className="text-sm text-muted-foreground">
+            Đăng nhập để quản lý đơn hàng và giỏ hàng của bạn
+          </p>
+        </div>
+
+        <Button asChild size="lg" className="w-full">
           <Link to="/login">Đăng nhập</Link>
         </Button>
 
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" size="lg" className="w-full">
           <Link to="/signup">Đăng ký</Link>
         </Button>
       </div>
