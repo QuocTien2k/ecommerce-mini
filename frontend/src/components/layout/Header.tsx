@@ -61,58 +61,73 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background">
-      <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="shrink-0 text-base sm:text-lg md:text-2xl font-bold tracking-tight"
-        >
-          TechStore
-        </Link>
+      {/* Mobile */}
+      <div className="md:hidden border-b">
+        <div className="container mx-auto px-4 py-2">
+          {/* Top row */}
+          <div className="flex h-12 items-center justify-between">
+            <Link to="/" className="text-lg font-bold tracking-tight shrink-0">
+              TechStore
+            </Link>
 
-        {/* Search */}
-        <div className="flex-1 max-w-xl">
-          <ProductSearch />
+            <div className="flex items-center gap-1">
+              {isAuthenticated && <NotificationWidget />}
+
+              {isAuthenticated && <CartButton />}
+
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+
+                <SheetContent side="right" className="w-72 p-4">
+                  <VisuallyHidden>
+                    <SheetTitle>Menu</SheetTitle>
+                  </VisuallyHidden>
+
+                  <MobileUserPanel
+                    user={user}
+                    isAuthenticated={isAuthenticated}
+                    onOpenProfile={() => setOpenProfile(true)}
+                    onOpenAvatar={() => setOpenAvatar(true)}
+                    onOpenPassword={() => setOpenPassword(true)}
+                    onLogout={handleLogout}
+                  />
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="mt-2">
+            <ProductSearch />
+          </div>
         </div>
+      </div>
 
-        {/* Mobile Hamburger */}
-        <div className="flex md:hidden items-center gap-3">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-11 w-11">
-                <Menu className="w-7 h-7" strokeWidth={3.5} />
-              </Button>
-            </SheetTrigger>
+      {/* Desktop */}
+      <div className="hidden md:block">
+        <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4">
+          {/* Logo */}
+          <Link to="/" className="shrink-0 text-2xl font-bold tracking-tight">
+            TechStore
+          </Link>
 
-            <SheetContent side="right" className="w-72 p-4">
-              <VisuallyHidden>
-                <SheetTitle>Menu</SheetTitle>
-              </VisuallyHidden>
+          {/* Search */}
+          <div className="flex-1 max-w-xl">
+            <ProductSearch />
+          </div>
 
-              <MobileUserPanel
-                user={user}
-                isAuthenticated={isAuthenticated}
-                onOpenProfile={() => setOpenProfile(true)}
-                onOpenAvatar={() => setOpenAvatar(true)}
-                onOpenPassword={() => setOpenPassword(true)}
-                onLogout={handleLogout}
-              />
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        {/* Right */}
-        <div className="hidden md:flex items-center gap-4">
-          {isAuthenticated ? (
-            <>
-              <div className="flex items-center gap-4">
-                {/* Notification */}
+          {/* Right */}
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
                 <NotificationWidget />
 
-                {/* Cart */}
                 <CartButton />
 
-                {/* User */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <div className="flex items-center gap-2 cursor-pointer">
@@ -127,13 +142,10 @@ const Header = () => {
                         </AvatarFallback>
                       </Avatar>
 
-                      <span className="hidden md:block font-medium">
-                        {user?.fullname}
-                      </span>
+                      <span className="font-medium">{user?.fullname}</span>
                     </div>
                   </DropdownMenuTrigger>
 
-                  {/* Profile */}
                   <DropdownMenuContent
                     align="end"
                     className="w-60 p-2 max-h-80 overflow-y-auto"
@@ -146,7 +158,6 @@ const Header = () => {
                       <span>Cập nhật thông tin</span>
                     </DropdownMenuItem>
 
-                    {/* Avatar */}
                     <DropdownMenuItem
                       className="px-3 py-2 cursor-pointer"
                       onClick={() => setOpenAvatar(true)}
@@ -155,7 +166,6 @@ const Header = () => {
                       <span>Cập nhật avatar</span>
                     </DropdownMenuItem>
 
-                    {/* Password */}
                     <DropdownMenuItem
                       className="px-3 py-2 cursor-pointer"
                       onClick={() => setOpenPassword(true)}
@@ -164,7 +174,6 @@ const Header = () => {
                       <span>Đổi mật khẩu</span>
                     </DropdownMenuItem>
 
-                    {/* Favorite */}
                     <DropdownMenuItem className="px-3 py-2 cursor-pointer">
                       <Heart className="w-4 h-4" />
                       <span>Sản phẩm yêu thích</span>
@@ -197,25 +206,27 @@ const Header = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild variant="outline">
-                <Link to="/signup">Đăng ký</Link>
-              </Button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button asChild variant="outline">
+                  <Link to="/signup">Đăng ký</Link>
+                </Button>
 
-              <Button asChild>
-                <Link to="/login">Đăng nhập</Link>
-              </Button>
-            </div>
-          )}
+                <Button asChild>
+                  <Link to="/login">Đăng nhập</Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Modal */}
       <UploadAvatar open={openAvatar} onClose={() => setOpenAvatar(false)} />
+
       <UpdateProfile open={openProfile} onClose={() => setOpenProfile(false)} />
+
       <ChangePassword
         open={openPassword}
         onClose={() => setOpenPassword(false)}
