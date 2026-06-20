@@ -163,7 +163,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-6 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-4 sm:p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 flex items-center justify-between">
@@ -185,7 +185,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
             <Input
               placeholder="Họ và tên"
               {...register("fullname")}
-              className="h-11"
+              className="h-10 sm:h-11"
             />
 
             <p
@@ -204,7 +204,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
             <Input
               placeholder="Số điện thoại"
               {...register("phone")}
-              className="h-11"
+              className="h-10 sm:h-11"
             />
 
             <p
@@ -223,7 +223,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
             <Input
               placeholder="Email"
               {...register("email")}
-              className="h-11"
+              className="h-10 sm:h-11"
             />
 
             <p
@@ -295,7 +295,7 @@ export const UpdateProfile = ({ open, onClose }: UpdateProfileProps) => {
               <Input
                 placeholder="Địa chỉ chi tiết"
                 {...register("address.detail")}
-                className="h-11"
+                className="h-10 sm:h-11"
               />
 
               <p

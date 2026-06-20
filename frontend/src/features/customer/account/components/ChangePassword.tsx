@@ -73,10 +73,10 @@ export const ChangePassword = ({ open, onClose }: ChangePasswordProps) => {
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-6 shadow-2xl"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-white p-4 sm:p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-4 sm:mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Cập nhật mật khẩu</h2>
 
           <Button
@@ -98,14 +98,19 @@ export const ChangePassword = ({ open, onClose }: ChangePasswordProps) => {
               type="password"
               placeholder="Nhập mật khẩu hiện tại"
               disabled={loading}
+              className="h-10 sm:h-11"
               {...register("oldPassword")}
             />
 
-            {getErrorVisibility("oldPassword") && (
-              <p className="mt-1 text-sm text-destructive">
-                {errors.oldPassword?.message}
-              </p>
-            )}
+            <p
+              className={`overflow-hidden text-sm text-destructive transition-all duration-200 ${
+                getErrorVisibility("oldPassword")
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              {errors.oldPassword?.message}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -116,14 +121,19 @@ export const ChangePassword = ({ open, onClose }: ChangePasswordProps) => {
               type="password"
               placeholder="Nhập mật khẩu mới"
               disabled={loading}
+              className="h-10 sm:h-11"
               {...register("newPassword")}
             />
 
-            {getErrorVisibility("newPassword") && (
-              <p className="mt-1 text-sm text-destructive">
-                {errors.newPassword?.message}
-              </p>
-            )}
+            <p
+              className={`overflow-hidden text-sm text-destructive transition-all duration-200 ${
+                getErrorVisibility("newPassword")
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              {errors.newPassword?.message}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -134,27 +144,38 @@ export const ChangePassword = ({ open, onClose }: ChangePasswordProps) => {
               type="password"
               placeholder="Nhập lại mật khẩu mới"
               disabled={loading}
+              className="h-10 sm:h-11"
               {...register("confirmPassword")}
             />
 
-            {getErrorVisibility("confirmPassword") && (
-              <p className="mt-1 text-sm text-destructive">
-                {errors.confirmPassword?.message}
-              </p>
-            )}
+            <p
+              className={`overflow-hidden text-sm text-destructive transition-all duration-200 ${
+                getErrorVisibility("confirmPassword")
+                  ? "max-h-10 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              {errors.confirmPassword?.message}
+            </p>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               disabled={loading}
+              className="w-full sm:w-auto"
             >
               Hủy
             </Button>
 
-            <AsyncButton type="submit" loading={loading} disabled={loading}>
+            <AsyncButton
+              type="submit"
+              loading={loading}
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
               Cập nhật mật khẩu
             </AsyncButton>
           </div>

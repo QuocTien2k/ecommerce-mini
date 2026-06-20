@@ -57,7 +57,6 @@ export const UploadAvatar = ({ open, onClose }: UploadAvatarProps) => {
   };
 
   const handleClose = () => {
-    console.log("close modal");
     if (loading) return;
 
     setSelectedFile(null);
