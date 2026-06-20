@@ -7,12 +7,14 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { QuantitySelector } from "@components/product/QuantitySelector";
 import { useUpdateCartItem } from "../hooks/useUpdateCart";
+import { cn } from "@lib/utils";
 
 interface Props {
   item: CartItem;
+  compact?: boolean;
 }
 
-export const CartDropdownItem = ({ item }: Props) => {
+export const CartItemCard = ({ item, compact = false }: Props) => {
   const { mutateAsync: deleteItem } = useDeleteCartItem();
   const { mutateAsync: updateItem } = useUpdateCartItem();
   const { loading: deleting, run: runDelete } = useScopedLoading();
@@ -31,32 +33,51 @@ export const CartDropdownItem = ({ item }: Props) => {
   //console.log("Item: ", item);
 
   return (
-    <div className="flex gap-3 py-3 border-b last:border-b-0">
-      {/* image */}
+    <div
+      className={cn(
+        "flex gap-4",
+        compact ? "py-3 border-b last:border-b-0" : "p-4 rounded-lg border",
+      )}
+    >
+      {/* Image */}
       <img
         src={item.image}
-        className="size-16 rounded-md object-cover border"
+        alt={item.productName}
+        className={cn(
+          "rounded-md object-cover border shrink-0",
+          compact ? "size-16" : "size-24",
+        )}
       />
 
-      {/* info */}
-      <div className="flex-1 space-y-2">
-        <div className="font-medium text-sm line-clamp-2 leading-5">
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div
+          className={cn(
+            "font-medium leading-5",
+            compact ? "text-sm line-clamp-2" : "text-base",
+          )}
+        >
           {item.productName}
         </div>
 
         {item.color && (
-          <div className="text-xs text-muted-foreground">
+          <div className="mt-1 text-xs text-muted-foreground">
             Color: {item.color}
           </div>
         )}
 
         {item.attributes && (
-          <div className="text-muted-foreground line-clamp-1">
+          <div className="mt-1 text-xs text-muted-foreground">
             {formatProductAttributes(item.attributes)}
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-1">
+        <div
+          className={cn(
+            "flex items-center justify-between",
+            compact ? "pt-2" : "mt-4",
+          )}
+        >
           <QuantitySelector
             value={item.quantity}
             onChange={handleQuantityChange}
@@ -66,20 +87,25 @@ export const CartDropdownItem = ({ item }: Props) => {
             disabled={updating}
           />
 
-          <span className="font-semibold text-sm">
+          <span
+            className={cn("font-semibold", compact ? "text-sm" : "text-base")}
+          >
             {formatCurrency(item.totalPrice)}
           </span>
         </div>
       </div>
 
-      {/* actions */}
+      {/* Actions */}
       <AsyncButton
         variant="ghost"
         size="icon-lg"
         loading={deleting}
         showLoadingText={false}
         onClick={handleDelete}
-        className="size-8 shrink-0 text-red-500 hover:text-red-600"
+        className={cn(
+          "shrink-0 text-red-500 hover:text-red-600",
+          compact ? "size-8" : "size-10",
+        )}
       >
         <Trash2 className="size-4" />
       </AsyncButton>

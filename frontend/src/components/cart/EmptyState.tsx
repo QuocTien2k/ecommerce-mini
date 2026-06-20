@@ -1,3 +1,6 @@
+import { Button } from "@components/ui/button";
+import { Link } from "react-router-dom";
+
 interface EmptyStateProps {
   title: string;
   description?: string;
@@ -21,7 +24,13 @@ export const EmptyState = ({
         <p className=" text-muted-foreground mt-1">{description}</p>
       )}
 
-      {action && <div className="mt-4">{action}</div>}
+      <div className="mt-4">
+        {action ?? (
+          <Button asChild>
+            <Link to="/products">Tiếp tục mua sắm</Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

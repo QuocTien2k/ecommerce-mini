@@ -22,6 +22,7 @@ import AdminVoucherPage from "@features/admin/vouchers/AdminVoucherPage";
 import MyVouchers from "@features/customer/voucher/MyVouchers";
 import ProductPage from "@/domains/product/ProductPage";
 import ProductDetail from "@/domains/product/ProductDetail";
+import { CartPage } from "@features/customer/cart/CartPage";
 
 const AppRoutes = () => {
   return (
@@ -52,6 +53,7 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>
             <Route path="my-vouchers" element={<MyVouchers />} />
+            <Route path="cart" element={<CartPage />} />
           </Route>
         </Route>
       </Route>

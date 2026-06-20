@@ -21,7 +21,6 @@ import { UpdateProfile } from "@features/customer/account/components/UpdateProfi
 import { ChangePassword } from "@features/customer/account/components/ChangePassword";
 import { NotificationWidget } from "@features/notification/components/NotificationWidget";
 import { ProductSearch } from "@/domains/product/components/ProductSearch";
-import { CartDropdown } from "@features/customer/cart/components/CartDropdown";
 import { Menu } from "lucide-react";
 import {
   Sheet,
@@ -31,6 +30,7 @@ import {
 } from "@/components/ui/sheet";
 import { MobileUserPanel } from "@features/customer/account/components/mobile/MobileUserPanel";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { CartButton } from "@features/customer/cart/components/CartButton";
 
 const Header = () => {
   //check auth
@@ -110,7 +110,7 @@ const Header = () => {
                 <NotificationWidget />
 
                 {/* Cart */}
-                <CartDropdown />
+                <CartButton />
 
                 {/* User */}
                 <DropdownMenu>
