@@ -139,7 +139,7 @@ const Header = () => {
 
                 <CartButton />
 
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <div className="flex items-center gap-2 cursor-pointer">
                       <Avatar className="h-9 w-9">
