@@ -3,7 +3,10 @@ import { publicProductApi } from "../api/publicProduct.api";
 
 export const PRODUCT_SEARCH_PREVIEW_QUERY_KEY = "product-search-preview";
 
-export const useProductSearchPreviewQuery = (keyword: string) => {
+export const useProductSearchPreviewQuery = (
+  keyword: string,
+  enabled = true,
+) => {
   //console.log("Preview Query:", keyword);
   return useQuery({
     queryKey: [PRODUCT_SEARCH_PREVIEW_QUERY_KEY, keyword],
@@ -15,6 +18,6 @@ export const useProductSearchPreviewQuery = (keyword: string) => {
         limit: 5,
       }),
 
-    enabled: keyword.trim().length >= 2,
+    enabled: enabled && keyword.trim().length >= 2,
   });
 };

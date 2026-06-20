@@ -7,6 +7,7 @@ import { useProductSearchPreviewQuery } from "../hooks/useProductSearch";
 import { formatCurrency } from "@lib/format-currency";
 import { ProductNotFound } from "@components/product/ProductNotFound";
 import { Spinner } from "@components/ui/spinner";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export const ProductSearch = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ export const ProductSearch = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const search = searchParams.get("search") || "";
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
     setKeyword(search);
@@ -47,7 +50,10 @@ export const ProductSearch = () => {
 
   const debouncedKeyword = useDebounce(keyword, 500);
 
-  const { data, isLoading } = useProductSearchPreviewQuery(debouncedKeyword);
+  const { data, isLoading } = useProductSearchPreviewQuery(
+    debouncedKeyword,
+    isDesktop,
+  );
 
   const previewProducts = data?.data.data ?? [];
 
@@ -61,7 +67,8 @@ export const ProductSearch = () => {
     );
   };
 
-  const showDropdown = isOpen && debouncedKeyword.trim().length >= 2;
+  const showDropdown =
+    isDesktop && isOpen && debouncedKeyword.trim().length >= 2;
 
   const handleProductClick = (slug: string) => {
     setKeyword("");
