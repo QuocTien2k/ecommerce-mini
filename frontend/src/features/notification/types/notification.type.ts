@@ -5,7 +5,7 @@ export interface NotificationItem {
   type?: string;
   path?: string;
   isRead: boolean;
-  createdAt?: string;
+  createdAt: string;
 }
 
 export interface NotificationQueryParams {
