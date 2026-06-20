@@ -1,6 +1,7 @@
 import { NotificationContent } from "./NotificationContent";
-import { Sheet, SheetContent } from "@components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@components/ui/sheet";
 import { useNotifications } from "../hooks/useNotificationCenter";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface Props {
   open: boolean;
@@ -19,7 +20,11 @@ const NotificationSheet = ({ open, onOpenChange }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[80vh] p-0">
+      <SheetContent side="bottom" className="h-[80vh] p-0 [&>button]:hidden">
+        <VisuallyHidden>
+          <SheetTitle>Thông báo</SheetTitle>
+        </VisuallyHidden>
+
         <NotificationContent
           loading={loading}
           merged={merged}

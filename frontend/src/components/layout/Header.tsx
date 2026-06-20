@@ -72,7 +72,7 @@ const Header = () => {
             </Link>
 
             <div className="flex items-center gap-1">
-              {isAuthenticated && <NotificationWidget />}
+              {isAuthenticated && <NotificationWidget mobile={true} />}
 
               {isAuthenticated && <CartButton />}
 

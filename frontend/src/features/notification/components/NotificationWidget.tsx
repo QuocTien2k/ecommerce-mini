@@ -4,8 +4,13 @@ import { NotificationDropdown } from "./NotificationDropdown";
 import { useAppDispatch } from "@app/hooks";
 import { useUnreadNotificationCountQuery } from "../hooks/useNotifications";
 import { setUnreadCount } from "../store/notification.slice";
+import NotificationSheet from "./NotificationSheet";
 
-export const NotificationWidget = () => {
+interface Props {
+  mobile?: boolean;
+}
+
+export const NotificationWidget = ({ mobile = false }: Props) => {
   const [open, setOpen] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
@@ -35,11 +40,15 @@ export const NotificationWidget = () => {
 
   return (
     <div ref={widgetRef} className="relative">
-      <div onClick={() => setOpen((v) => !v)}>
+      <div onClick={() => setOpen(true)}>
         <NotificationBell />
       </div>
 
-      <NotificationDropdown open={open} onClose={() => setOpen(false)} />
+      {!mobile && (
+        <NotificationDropdown open={open} onClose={() => setOpen(false)} />
+      )}
+
+      {mobile && <NotificationSheet open={open} onOpenChange={setOpen} />}
     </div>
   );
 };
