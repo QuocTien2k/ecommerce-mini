@@ -1,4 +1,6 @@
+import { Button } from "@components/ui/button";
 import { formatCurrency } from "@lib/format-currency";
+import { Link } from "react-router-dom";
 
 interface Props {
   totalQuantity: number;
@@ -21,6 +23,15 @@ export const CartSummary = ({ totalQuantity, totalPrice }: Props) => {
           <span>{formatCurrency(totalPrice)}</span>
         </div>
       </div>
+
+      <Button
+        asChild
+        className="w-full mt-4"
+        size="lg"
+        disabled={!totalQuantity}
+      >
+        <Link to="/checkout">Tiến hành thanh toán</Link>
+      </Button>
     </div>
   );
 };
