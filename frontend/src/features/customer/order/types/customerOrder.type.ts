@@ -83,7 +83,7 @@ export interface OrderDetail {
 
 /*Case create */
 export interface CreateOrderResponse {
-  orderId: string;
+  order: OrderDetail;
   payment: OrderPaymentResponse;
 }
 
