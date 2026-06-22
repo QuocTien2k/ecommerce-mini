@@ -10,6 +10,8 @@ import OrderSummary from "./components/OrderSummary";
 import { useOrderForm } from "./forms/order-customer-info";
 import { useEffect } from "react";
 import { PaymentMethodSelector } from "./components/PaymentMethod";
+import { useCreateVnpayPayment } from "../payment/hooks/useCreateVnpay";
+import { useNavigate } from "react-router-dom";
 
 const OrderPage = () => {
   //Cart
@@ -29,26 +31,34 @@ const OrderPage = () => {
   }, [user, form]);
 
   const createOrderMutation = useCreateOrder();
+  const createVnpayPayment = useCreateVnpayPayment();
+  const navigate = useNavigate();
 
-  const handleCreateOrder = form.handleSubmit((values) => {
+  const handleCreateOrder = form.handleSubmit(async (values) => {
     if (!cart || cart.items.length === 0) return;
 
-    createOrderMutation.mutate({
+    const res = await createOrderMutation.mutateAsync({
       receiverName: user?.fullname ?? "",
-
       receiverPhone: values.receiverPhone,
       receiverAddress: values.receiverAddress,
-
       paymentMethod: values.paymentMethod,
       note: "",
       voucherCode: null,
-
       items: cart.items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
         quantity: item.quantity,
       })),
     });
+
+    const order = res.data.order;
+
+    if (values.paymentMethod === "VNPAY") {
+      createVnpayPayment.mutate(order.id);
+      return;
+    }
+
+    navigate("/order-success");
   });
 
   if (!isAuthenticated) {

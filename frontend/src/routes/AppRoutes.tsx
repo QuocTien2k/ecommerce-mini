@@ -24,6 +24,7 @@ import ProductPage from "@/domains/product/ProductPage";
 import ProductDetail from "@/domains/product/ProductDetail";
 import { CartPage } from "@features/customer/cart/CartPage";
 import OrderPage from "@features/customer/order/OrderPage";
+import { PaymentReturn } from "@pages/payment/paymentReturn";
 
 const AppRoutes = () => {
   return (
@@ -56,6 +57,7 @@ const AppRoutes = () => {
             <Route path="my-vouchers" element={<MyVouchers />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="/checkout" element={<OrderPage />} />
+            <Route path="/payment/return" element={<PaymentReturn />} />
           </Route>
         </Route>
       </Route>
