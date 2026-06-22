@@ -7,8 +7,9 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import OrderCustomerInfo from "./components/OrderCustomerInfo";
 import OrderItemsPreview from "./components/OrderItemsPreview";
 import OrderSummary from "./components/OrderSummary";
-import { useOrderReceiverForm } from "./forms/order-customer-info";
+import { useOrderForm } from "./forms/order-customer-info";
 import { useEffect } from "react";
+import { PaymentMethodSelector } from "./components/PaymentMethod";
 
 const OrderPage = () => {
   //Cart
@@ -18,7 +19,7 @@ const OrderPage = () => {
   //Auth
   const user = useAppSelector((state) => state.user.user);
   const isAuthenticated = Boolean(user?.id);
-  const form = useOrderReceiverForm(user?.phone, user?.address);
+  const form = useOrderForm(user?.phone, user?.address);
 
   useEffect(() => {
     form.reset({
@@ -38,7 +39,7 @@ const OrderPage = () => {
       receiverPhone: values.receiverPhone,
       receiverAddress: values.receiverAddress,
 
-      paymentMethod: "COD",
+      paymentMethod: values.paymentMethod,
       note: "",
       voucherCode: null,
 
@@ -79,16 +80,31 @@ const OrderPage = () => {
       <div className="container py-6 space-y-6">
         <h1 className="text-xl font-semibold">Đặt hàng</h1>
 
-        <OrderCustomerInfo user={user} form={form} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-6">
+            <OrderCustomerInfo user={user} form={form} />
 
-        <OrderItemsPreview items={cart.items} />
+            <OrderItemsPreview items={cart.items} />
+          </div>
 
-        <OrderSummary
-          totalPrice={cart.totalPrice}
-          totalQuantity={cart.totalQuantity}
-          isSubmitting={createOrderMutation.isPending}
-          onSubmit={handleCreateOrder}
-        />
+          {/* RIGHT */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="sticky top-6 space-y-4">
+              <OrderSummary
+                totalPrice={cart.totalPrice}
+                totalQuantity={cart.totalQuantity}
+                isSubmitting={createOrderMutation.isPending}
+                onSubmit={handleCreateOrder}
+              />
+
+              <PaymentMethodSelector
+                value={form.watch("paymentMethod")}
+                onChange={(value) => form.setValue("paymentMethod", value)}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </QueryStateWrapper>
   );

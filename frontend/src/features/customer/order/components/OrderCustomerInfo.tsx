@@ -1,12 +1,12 @@
 import type { AdminUser } from "@features/admin/user/types/adminUser.type";
 import type { UseFormReturn } from "react-hook-form";
-import type { OrderReceiverSchema } from "../schemas/order.schema";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
+import type { OrderFormSchema } from "../schemas/order.schema";
 
 interface OrderCustomerInfoProps {
   user: AdminUser | null;
-  form: UseFormReturn<OrderReceiverSchema>;
+  form: UseFormReturn<OrderFormSchema>;
 }
 
 const OrderCustomerInfo = ({ user, form }: OrderCustomerInfoProps) => {
