@@ -170,6 +170,10 @@ export class PaymentService {
         },
       });
     });
+    //console.log('VNPAY_URL ENV:', this.configService.get('VNPAY_URL'));
+
+    // const vnpUrl = this.configService.get('VNPAY_URL');
+    // console.log('VNPAY_URL ENV:', vnpUrl);
 
     //Build URL
     const paymentUrl = this.vnpay.buildPaymentUrl({
@@ -183,6 +187,8 @@ export class PaymentService {
       vnp_CreateDate: dateFormat(new Date()),
       vnp_ExpireDate: dateFormat(expireDate),
     });
+
+    // console.log('FINAL PAYMENT URL:', paymentUrl);
 
     return {
       paymentUrl,
@@ -310,8 +316,8 @@ export class PaymentService {
   }
 
   async handleVnpayReturn(query: VnpayQueryRaw) {
-    // Verify checksum
     this.assertValidVnpayQuery(query);
+
     const isValid = this.vnpay.verifyReturnUrl(query);
 
     if (!isValid) {
@@ -328,16 +334,30 @@ export class PaymentService {
     });
 
     if (!payment) {
-      return { success: false, message: 'Payment not found' };
+      return {
+        success: false,
+        message: 'Payment not found',
+      };
     }
 
-    //Không update chỉ đọc trạng thái đã được IPN xử lý
-    switch (payment.status) {
+    // DEV ONLY
+    if (
+      process.env.NODE_ENV === 'development' &&
+      payment.status === PaymentStatus.PENDING
+    ) {
+      await this.handleVnpayIpn(query);
+    }
+
+    const latestPayment = await this.prisma.payment.findUnique({
+      where: { transactionRef: vnp_TxnRef },
+    });
+
+    switch (latestPayment?.status) {
       case PaymentStatus.SUCCESS:
         return {
           success: true,
           message: 'Payment successful',
-          orderId: payment.orderId,
+          orderId: latestPayment.orderId,
         };
 
       case PaymentStatus.PENDING:
