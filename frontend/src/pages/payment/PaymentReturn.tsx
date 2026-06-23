@@ -1,4 +1,4 @@
-import { usePaymentStatus } from "@features/customer/payment/hooks/usePaymentStatus";
+import { useVnpayReturn } from "@features/customer/payment/hooks/useVnpayReturn";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,29 +6,31 @@ export const PaymentReturn = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const params = new URLSearchParams(location.search);
-  const orderId = params.get("orderId");
-
-  const { data, isLoading } = usePaymentStatus(orderId || "");
+  const { mutate, isPending } = useVnpayReturn();
 
   useEffect(() => {
-    if (!data) return;
+    const params = new URLSearchParams(location.search);
 
-    const status = data.data.status;
+    mutate(params, {
+      onSuccess: (response) => {
+        const result = response.data;
 
-    if (status === "SUCCESS") {
-      navigate("/order-success");
-      return;
-    }
+        if (result.success) {
+          navigate("/order-success");
+          return;
+        }
 
-    if (status === "FAILED") {
-      navigate("/order-failed");
-      return;
-    }
-  }, [data, navigate]);
+        navigate("/order-failed");
+      },
 
-  if (isLoading) {
-    return <div>Checking payment status...</div>;
+      onError: () => {
+        navigate("/order-failed");
+      },
+    });
+  }, [location.search, mutate, navigate]);
+
+  if (isPending) {
+    return <div>Verifying payment...</div>;
   }
 
   return null;

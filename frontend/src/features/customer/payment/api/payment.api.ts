@@ -14,4 +14,12 @@ export const customerPaymentApi = {
     message: string;
     orderId?: string;
   }> => api.get(`/payment/status/${orderId}`),
+
+  vnpayReturn: (
+    params: URLSearchParams,
+  ): ApiResult<{
+    success: boolean;
+    message: string;
+    orderId?: string;
+  }> => api.get(`/payment/vnpay/return?${params.toString()}`),
 };
