@@ -1,3 +1,4 @@
+import { formatProductAttributes } from "@/utils/format-product-attributes";
 import type { OrderItemDetail } from "../../types/customerOrder.type";
 
 const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
@@ -14,11 +15,7 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
 
           {item.selectedAttributes && (
             <div>
-              {Object.entries(item.selectedAttributes).map(([k, v]) => (
-                <span key={k}>
-                  {k}: {v}{" "}
-                </span>
-              ))}
+              <span>{formatProductAttributes(item.selectedAttributes)}</span>
             </div>
           )}
         </div>
