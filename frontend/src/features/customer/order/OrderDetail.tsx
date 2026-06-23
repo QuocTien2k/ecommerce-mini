@@ -18,12 +18,21 @@ const OrderDetail = () => {
 
   return (
     <QueryStateWrapper isLoading={isLoading}>
-      <div className="order-detail">
+      <div className="space-y-6">
         <OrderTimeline status={data.status} />
-        <OrderHeader order={data} />
-        <OrderReceiverInfo receiver={data.receiver} note={data.note} />
-        <OrderItems items={data.items} />
-        <OrderPricing pricing={data.pricing} voucher={data.voucher} />
+
+        {/* ONE BIG CARD */}
+        <div className="rounded-lg border bg-card">
+          <OrderHeader order={data} />
+
+          <div className="p-4 space-y-6">
+            <OrderReceiverInfo receiver={data.receiver} note={data.note} />
+
+            <OrderItems items={data.items} />
+
+            <OrderPricing pricing={data.pricing} voucher={data.voucher} />
+          </div>
+        </div>
       </div>
     </QueryStateWrapper>
   );
