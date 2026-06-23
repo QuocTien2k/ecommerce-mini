@@ -1,6 +1,7 @@
 import { getOrderStepIndex, ORDER_TIMELINE } from "@shared/types/order-status";
 import type { OrderStatus } from "../../types/order-status.type";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Truck } from "lucide-react";
+import { cn } from "@lib/utils";
 
 type Props = {
   status: OrderStatus;
@@ -9,48 +10,81 @@ type Props = {
 const OrderTimeline = ({ status }: Props) => {
   const currentStep = getOrderStepIndex(status);
 
-  console.log(ORDER_TIMELINE);
+  const progressPercent =
+    currentStep >= 0 ? (currentStep / (ORDER_TIMELINE.length - 1)) * 100 : 0;
 
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <h3 className="mb-4 text-lg font-semibold">Tiến trình đơn hàng</h3>
+      <h3 className="mb-8 text-lg font-semibold">Tiến trình đơn hàng</h3>
 
-      <div className="space-y-0">
-        {ORDER_TIMELINE.map((step, index) => {
-          const completed = index < currentStep;
-          const current = index === currentStep;
-          const isLast = index === ORDER_TIMELINE.length - 1;
+      <div className="relative overflow-hidden">
+        {/* Base line */}
+        <div className="absolute top-5 left-0 h-1 w-full rounded-full bg-gray-200" />
 
-          return (
-            <div key={step.status} className="flex gap-3">
-              <div className="flex flex-col items-center">
-                {completed ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                ) : current ? (
-                  <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                ) : (
-                  <Circle className="h-5 w-5 text-gray-300" />
-                )}
+        {/* Progress line */}
+        <div
+          className="absolute top-5 left-0 h-1 rounded-full bg-green-500 transition-all duration-700"
+          style={{
+            width: `${progressPercent}%`,
+          }}
+        />
+        {currentStep < ORDER_TIMELINE.length - 1 && (
+          <div
+            className="shipping-segment absolute top-5 h-1 rounded-full"
+            style={{
+              left: `${progressPercent}%`,
+              width: `${100 / (ORDER_TIMELINE.length - 1)}%`,
+            }}
+          />
+        )}
 
-                {!isLast && <div className="mt-1 h-8 w-px bg-gray-200" />}
-              </div>
+        <div className="relative flex justify-between">
+          {ORDER_TIMELINE.map((step, index) => {
+            const completed = index < currentStep;
+            const current = index === currentStep;
 
-              <div className="pb-8">
-                <p
-                  className={
-                    current
-                      ? "font-medium text-blue-600"
-                      : completed
-                        ? "text-green-600"
-                        : "text-muted-foreground"
-                  }
+            return (
+              <div
+                key={step.status}
+                className="flex w-24 flex-col items-center text-center"
+              >
+                <div
+                  className={cn(
+                    "z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white",
+                    completed
+                      ? "border-green-500 text-green-500"
+                      : current
+                        ? "border-primary text-primary"
+                        : "border-gray-300 text-gray-300",
+                  )}
+                >
+                  {completed ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : current ? (
+                    <Truck className="delivery-truck h-5 w-5" />
+                  ) : (
+                    <Circle className="h-5 w-5 fill-current" />
+                  )}
+                </div>
+
+                <span
+                  className={`
+                mt-3 text-sm
+                ${
+                  completed
+                    ? "text-green-600"
+                    : current
+                      ? "font-medium text-primary"
+                      : "text-gray-400"
+                }
+              `}
                 >
                   {step.label}
-                </p>
+                </span>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

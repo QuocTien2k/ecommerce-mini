@@ -335,3 +335,42 @@
 .ProseMirror .selectedCell {
   background-color: rgba(59, 130, 246, 0.15);
 }
+
+/*Delivery*/
+@keyframes truck-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.delivery-truck {
+  animation: truck-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes flow {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 120px 0;
+  }
+}
+
+.shipping-segment {
+  background: repeating-linear-gradient(
+    90deg,
+    #3b82f6,
+    #3b82f6 10px,
+    #60a5fa 10px,
+    #60a5fa 20px
+  );
+
+  background-size: 120px 100%;
+  animation: flow 2s linear infinite;
+}
