@@ -8,6 +8,7 @@ import { CartPricingModule } from 'src/cart-pricing/cart-pricing.module';
 @Module({
   imports: [ProductVariantModule, PrismaModule, CartPricingModule],
   providers: [CartItemsService],
+  exports: [CartItemsService],
   controllers: [CartItemsController],
 })
 export class CartItemsModule {}

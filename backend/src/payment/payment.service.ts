@@ -23,6 +23,29 @@ export class PaymentService {
     @Inject('VNPAY_CLIENT') private readonly vnpay: VNPay,
   ) {}
 
+  private async clearUserCart(tx: Prisma.TransactionClient, userId: string) {
+    await tx.cartItem.deleteMany({
+      where: {
+        userId,
+      },
+    });
+  }
+
+  private async confirmOrderAndClearCart(
+    tx: Prisma.TransactionClient,
+    orderId: string,
+    userId: string,
+  ) {
+    // Update order status
+    await tx.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.CONFIRMED },
+    });
+
+    // Clear cart
+    await this.clearUserCart(tx, userId);
+  }
+
   /*Case COD*/
   async createCodPayment(
     userId: string,
@@ -63,16 +86,22 @@ export class PaymentService {
         });
       }
 
-      return tx.payment.create({
+      const newPayment = await tx.payment.create({
         data: {
           orderId: order.id,
           userId,
           method: PaymentMethod.COD,
-          status: PaymentStatus.PENDING,
+          status: PaymentStatus.SUCCESS, // COD thường success ngay
           amount: order.totalPrice,
           transactionRef: `COD-${order.id}-${Date.now()}`,
+          paidAt: new Date(),
         },
       });
+
+      // Confirm order + Clear cart
+      await this.confirmOrderAndClearCart(tx, order.id, userId);
+
+      return newPayment;
     });
 
     return {
@@ -290,6 +319,8 @@ export class PaymentService {
           where: { id: payment.orderId },
           data: { status: OrderStatus.CONFIRMED },
         });
+
+        await this.clearUserCart(tx, payment.userId);
 
         return true;
       });

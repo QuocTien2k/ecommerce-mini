@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProductVariantService } from '@product-variant/product-variant.service';
 import { CartPricingService } from 'src/cart-pricing/cart-pricing.service';
 import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { buildCartResponse } from './mappers/cart.mapper';
