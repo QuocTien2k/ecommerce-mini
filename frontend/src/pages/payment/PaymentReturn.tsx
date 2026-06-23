@@ -15,8 +15,8 @@ export const PaymentReturn = () => {
       onSuccess: (response) => {
         const result = response.data;
 
-        if (result.success) {
-          navigate("/order-success");
+        if (result.success && result.orderId) {
+          navigate(`/order/${result.orderId}`);
           return;
         }
 

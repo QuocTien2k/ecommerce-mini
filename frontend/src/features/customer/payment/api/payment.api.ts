@@ -1,3 +1,4 @@
+import type { VnpayReturnResponse } from "@features/customer/order/types/payment.type";
 import { api } from "@shared/api/axios";
 import type { ApiResult } from "@shared/types/api-result";
 
@@ -15,11 +16,6 @@ export const customerPaymentApi = {
     orderId?: string;
   }> => api.get(`/payment/status/${orderId}`),
 
-  vnpayReturn: (
-    params: URLSearchParams,
-  ): ApiResult<{
-    success: boolean;
-    message: string;
-    orderId?: string;
-  }> => api.get(`/payment/vnpay/return?${params.toString()}`),
+  vnpayReturn: (params: URLSearchParams): ApiResult<VnpayReturnResponse> =>
+    api.get("/payment/vnpay/return", { params }),
 };
