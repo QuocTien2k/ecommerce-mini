@@ -88,6 +88,17 @@ export interface GetOrdersQuery {
   limit?: number;
 }
 
+export interface OrderSummary {
+  id: string;
+  status: OrderStatus;
+  statusLabel: string;
+
+  totalPrice: string;
+  itemCount: number;
+
+  createdAt: string;
+}
+
 /*Case create */
 export interface CreateOrderResponse {
   order: OrderDetail;
