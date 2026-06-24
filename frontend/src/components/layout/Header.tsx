@@ -1,4 +1,4 @@
-import { Camera, Heart, KeyRound, Ticket, User } from "lucide-react";
+import { Camera, Heart, KeyRound, Package, Ticket, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -196,6 +196,14 @@ const Header = () => {
                     >
                       <Ticket className="w-4 h-4" />
                       <span>Voucher của tôi</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => navigate("/orders")}
+                    >
+                      <Package className="w-4 h-4" />
+                      <span>Đơn hàng của tôi</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
