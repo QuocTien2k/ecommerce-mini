@@ -1,4 +1,3 @@
-import { Camera, Heart, KeyRound, Package, Ticket, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,8 +30,25 @@ import {
 import { MobileUserPanel } from "@features/customer/account/components/mobile/MobileUserPanel";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { CartButton } from "@features/customer/cart/components/CartButton";
+import { userMenuConfig } from "@features/customer/config/user-menu.config";
 
 type ActiveModal = null | "profile" | "avatar" | "password";
+
+function renderMenuItem(item: any, index: number) {
+  const Icon = item.icon;
+
+  return (
+    <DropdownMenuItem
+      key={index}
+      className="px-3 py-2 cursor-pointer"
+      onClick={item.onClick}
+      disabled={!item.onClick}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{item.label}</span>
+    </DropdownMenuItem>
+  );
+}
 
 const Header = () => {
   //check auth
@@ -64,6 +80,16 @@ const Header = () => {
       navigate("/");
     }
   };
+
+  const userActions = {
+    profile: () => openModal("profile"),
+    avatar: () => openModal("avatar"),
+    password: () => openModal("password"),
+    orders: () => navigate("/orders"),
+    vouchers: () => navigate("/my-vouchers"),
+  };
+
+  const menuItems = userMenuConfig(userActions);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background">
@@ -161,50 +187,7 @@ const Header = () => {
                     align="end"
                     className="w-60 p-2 max-h-80 overflow-y-auto"
                   >
-                    <DropdownMenuItem
-                      className="px-3 py-2 cursor-pointer"
-                      onClick={() => openModal("profile")}
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Cập nhật thông tin</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      className="px-3 py-2 cursor-pointer"
-                      onClick={() => openModal("avatar")}
-                    >
-                      <Camera className="w-4 h-4" />
-                      <span>Cập nhật avatar</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      className="px-3 py-2 cursor-pointer"
-                      onClick={() => openModal("password")}
-                    >
-                      <KeyRound className="w-4 h-4" />
-                      <span>Đổi mật khẩu</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem className="px-3 py-2 cursor-pointer">
-                      <Heart className="w-4 h-4" />
-                      <span>Sản phẩm yêu thích</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      className="px-3 py-2 cursor-pointer"
-                      onClick={() => navigate("/my-vouchers")}
-                    >
-                      <Ticket className="w-4 h-4" />
-                      <span>Voucher của tôi</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem
-                      className="px-3 py-2 cursor-pointer"
-                      onClick={() => navigate("/orders")}
-                    >
-                      <Package className="w-4 h-4" />
-                      <span>Đơn hàng của tôi</span>
-                    </DropdownMenuItem>
+                    {menuItems.map(renderMenuItem)}
 
                     <DropdownMenuSeparator />
 
