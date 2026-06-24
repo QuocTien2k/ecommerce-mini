@@ -56,6 +56,7 @@ export interface OrderItemDetail {
   price: number;
 
   productName: string;
+  slug: string;
   productImage?: string;
 
   selectedAttributes?: Record<string, string>;

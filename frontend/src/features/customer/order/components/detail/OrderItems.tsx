@@ -2,6 +2,7 @@ import { formatProductAttributes } from "@/utils/format-product-attributes";
 import type { OrderItemDetail } from "../../types/customerOrder.type";
 import { formatCurrency } from "@lib/format-currency";
 import { ScrollArea } from "@components/ui/scroll-area";
+import { Link } from "react-router-dom";
 
 const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
   const shouldScroll = items.length > 5;
@@ -29,7 +30,12 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">
-              <h4 className="font-medium leading-5">{item.productName}</h4>
+              <Link
+                to={`/products/${item.slug}`}
+                className="font-medium leading-5 hover:underline"
+              >
+                {item.productName}
+              </Link>
 
               {item.selectedAttributes && (
                 <p className="text-sm text-muted-foreground">
@@ -63,6 +69,8 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
       ))}
     </>
   );
+
+  console.log(items);
 
   return (
     <section className="space-y-4">
