@@ -1,6 +1,7 @@
 import { formatProductAttributes } from "@/utils/format-product-attributes";
 import { Button } from "@components/ui/button";
 import type { CartItem } from "@features/customer/cart/types/customer-cart.type";
+import { formatCurrency } from "@lib/format-currency";
 import { useState } from "react";
 
 interface OrderItemsPreviewProps {
@@ -48,7 +49,7 @@ const OrderItemsPreview = ({ items }: OrderItemsPreviewProps) => {
                 </span>
 
                 <span className="text-sm font-medium">
-                  {item.totalPrice.toLocaleString()}₫
+                  {formatCurrency(item.totalPrice)}
                 </span>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { AsyncButton } from "@components/common/async-button";
+import { formatCurrency } from "@lib/format-currency";
 
 interface OrderSummaryProps {
   totalPrice: number;
@@ -22,7 +23,7 @@ const OrderSummary = ({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Tạm tính</span>
-            <span>{totalPrice.toLocaleString()}₫</span>
+            <span>{formatCurrency(totalPrice)}</span>
           </div>
 
           <div className="flex justify-between">
@@ -32,7 +33,7 @@ const OrderSummary = ({
 
           <div className="border-t pt-2 flex justify-between font-semibold">
             <span>Tổng cộng</span>
-            <span>{totalPrice.toLocaleString()}₫</span>
+            <span>{formatCurrency(totalPrice)}</span>
           </div>
         </div>
       </div>
