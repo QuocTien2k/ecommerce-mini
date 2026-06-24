@@ -65,6 +65,8 @@ export class OrderMapper {
 
       itemCount: order.items.length,
 
+      thumbnail: order.items[0]?.productImage ?? null,
+
       createdAt: order.createdAt,
     };
   }
