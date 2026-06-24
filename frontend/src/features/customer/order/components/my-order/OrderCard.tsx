@@ -2,6 +2,7 @@ import { Button } from "@components/ui/button";
 import type { OrderSummary } from "../../types/customerOrder.type";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "@lib/format-currency";
+import { ORDER_STATUS_COLORS } from "@shared/types/order-status";
 
 interface Props {
   order: OrderSummary;
@@ -9,34 +10,39 @@ interface Props {
 
 const OrderCard = ({ order }: Props) => {
   return (
-    <div className="rounded-lg border p-4">
-      <div className="flex items-center justify-between">
-        <span className="font-medium">#{order.id.slice(0, 8)}</span>
+    <div className="flex h-full flex-col rounded-lg border p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-sm font-medium">#{order.id.slice(0, 8)}</span>
 
-        <span>{order.statusLabel}</span>
+        <span
+          className={`text-sm px-2 py-1 rounded ${ORDER_STATUS_COLORS[order.status]}`}
+        >
+          {order.statusLabel}
+        </span>
       </div>
 
-      <div className="mt-3 flex items-center gap-3">
-        <img
-          src={order.thumbnail ?? "/placeholder-product.png"}
-          alt="Order thumbnail"
-          className="h-16 w-16 rounded-md object-cover"
-        />
+      <img
+        src={order.thumbnail ?? "/placeholder-product.png"}
+        alt="Order thumbnail"
+        className="h-40 w-full rounded-md object-cover"
+      />
 
-        <div>
-          <p className="text-sm text-muted-foreground">
-            {order.itemCount} sản phẩm
-          </p>
+      <div className="mt-4 flex items-center justify-between text-sm">
+        <span className="text-sm text-slate-500">
+          {order.itemCount} sản phẩm
+        </span>
 
-          <p className="font-semibold">{formatCurrency(order.totalPrice)}</p>
-        </div>
+        <span className="font-semibold text-red-600">
+          {formatCurrency(order.totalPrice)}
+        </span>
       </div>
 
-      <div className="mt-2">
-        <Button asChild>
-          <Link to={`/order/${order.id}`}>Xem chi tiết</Link>
-        </Button>
-      </div>
+      <Button
+        asChild
+        className="mt-4 bg-slate-900 hover:bg-slate-800 text-white self-center"
+      >
+        <Link to={`/order/${order.id}`}>Xem chi tiết</Link>
+      </Button>
     </div>
   );
 };
