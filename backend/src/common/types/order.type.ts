@@ -6,6 +6,7 @@ export type OrderItemData = {
   quantity: number;
   price: Prisma.Decimal;
   productName: string;
+  productSlug: string;
   productImage: string | null;
   selectedAttributes?: any;
 };

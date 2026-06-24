@@ -102,6 +102,7 @@ export class OrderService {
         quantity: item.quantity,
         price,
         productName: product.name,
+        productSlug: product.slug,
         productImage: variant.images?.[0] ?? null,
         selectedAttributes: variant.attributes ?? undefined,
       });

@@ -49,6 +49,7 @@ export class OrderMapper {
       quantity: item.quantity,
       price: item.price,
       productName: item.productName,
+      slug: item.productSlug,
       productImage: item.productImage,
       selectedAttributes: item.selectedAttributes,
     };
