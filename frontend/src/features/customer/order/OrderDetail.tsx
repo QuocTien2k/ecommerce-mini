@@ -5,7 +5,7 @@ import OrderReceiverInfo from "./components/detail/OrderReceiverInfo";
 import OrderItems from "./components/detail/OrderItems";
 import OrderPricing from "./components/detail/OrderPricing";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
-import OrderTimeline from "./components/detail/OrderTimeLine";
+import OrderTimeline from "./components/detail/OrderTimeline";
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,12 +25,18 @@ const OrderDetail = () => {
         <div className="rounded-lg border bg-card">
           <OrderHeader order={data} />
 
-          <div className="p-4 space-y-6">
-            <OrderReceiverInfo receiver={data.receiver} note={data.note} />
+          <div className="divide-y">
+            <div className="p-6">
+              <OrderReceiverInfo receiver={data.receiver} note={data.note} />
+            </div>
 
-            <OrderItems items={data.items} />
+            <div className="p-6">
+              <OrderItems items={data.items} />
+            </div>
 
-            <OrderPricing pricing={data.pricing} voucher={data.voucher} />
+            <div className="p-6">
+              <OrderPricing pricing={data.pricing} voucher={data.voucher} />
+            </div>
           </div>
         </div>
       </div>

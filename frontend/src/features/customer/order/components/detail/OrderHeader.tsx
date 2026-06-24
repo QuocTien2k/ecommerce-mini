@@ -10,8 +10,9 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
     <div className="p-6 space-y-6 border-b">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Đơn hàng #{order.id}</h2>
-
+          <h2 className="text-2xl font-bold tracking-tight">
+            Đơn hàng #{order.id}
+          </h2>
           <p className="text-sm text-muted-foreground">
             Đặt lúc{" "}
             {format(new Date(order.createdAt), "HH:mm dd/MM/yyyy", {
@@ -30,22 +31,25 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
         </span>
       </div>
 
-      <div className="mt-6 flex items-center justify-evenly gap-8 border-t pt-4 text-sm">
-        <div>
-          <span className="text-muted-foreground">Sản phẩm:</span>{" "}
-          <span className="font-medium">{order.items.length}</span>
+      <div className="grid grid-cols-3 gap-4 border-t pt-6">
+        <div className="rounded-lg bg-muted/50 p-4">
+          <div className="text-xs text-muted-foreground">Sản phẩm</div>
+
+          <div className="text-xl font-semibold">{order.items.length}</div>
         </div>
 
-        <div>
-          <span className="text-muted-foreground">Tổng thanh toán:</span>{" "}
-          <span className="font-semibold">
+        <div className="rounded-lg bg-muted/50 p-4">
+          <div className="text-xs text-muted-foreground">Tổng thanh toán</div>
+
+          <div className="text-xl font-bold">
             {formatCurrency(order.pricing.totalPrice)}
-          </span>
+          </div>
         </div>
 
-        <div>
-          <span className="text-muted-foreground">Trạng thái:</span>{" "}
-          <span className="font-medium">{order.statusLabel}</span>
+        <div className="rounded-lg bg-muted/50 p-4">
+          <div className="text-xs text-muted-foreground">Trạng thái</div>
+
+          <div className="font-semibold">{order.statusLabel}</div>
         </div>
       </div>
     </div>

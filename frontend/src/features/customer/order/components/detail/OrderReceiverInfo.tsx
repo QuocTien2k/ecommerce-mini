@@ -1,56 +1,77 @@
 import type { OrderReceiver } from "../../types/customerOrder.type";
 import { User, Phone, MapPin, FileText } from "lucide-react";
 
-const OrderReceiverInfo = ({
-  receiver,
-  note,
-}: {
+type Props = {
   receiver: OrderReceiver;
   note?: string | null;
-}) => {
+};
+
+const OrderReceiverInfo = ({ receiver, note }: Props) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-        Thông tin người nhận
-      </h3>
+    <section className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold">Thông tin người nhận</h3>
 
-      <div className="space-y-4">
-        {/* Name / Phone / Address */}
-        <div className="flex items-center gap-6 border-b pb-3 text-sm">
-          {/* Name */}
-          <div className="flex items-center gap-2 flex-1">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Name:</span>
-            <span className="font-medium">{receiver.name}</span>
+        <p className="text-sm text-muted-foreground">
+          Thông tin giao hàng của đơn hàng
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Name */}
+        <div className="flex items-start gap-3 rounded-lg border p-4">
+          <div className="rounded-md bg-muted p-2">
+            <User className="h-4 w-4" />
           </div>
 
-          {/* Phone */}
-          <div className="flex items-center gap-2 flex-1">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Phone:</span>
-            <span className="font-medium">{receiver.phone}</span>
-          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Người nhận</p>
 
-          {/* Address (wider) */}
-          <div className="flex items-center gap-2 flex-2 min-w-0">
-            <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="text-muted-foreground">Address:</span>
-            <span className="font-medium truncate">{receiver.address}</span>
+            <p className="font-medium">{receiver.name}</p>
           </div>
         </div>
 
-        {/* Note */}
-        {note && (
-          <div className="flex items-start gap-3 pt-2 border-t">
-            <FileText className="h-4 w-4 mt-0.5 text-muted-foreground" />
+        {/* Phone */}
+        <div className="flex items-start gap-3 rounded-lg border p-4">
+          <div className="rounded-md bg-muted p-2">
+            <Phone className="h-4 w-4" />
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">Số điện thoại</p>
+
+            <p className="font-medium">{receiver.phone}</p>
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="flex items-start gap-3 rounded-lg border p-4 md:col-span-2">
+          <div className="rounded-md bg-muted p-2">
+            <MapPin className="h-4 w-4" />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">Địa chỉ nhận hàng</p>
+
+            <p className="font-medium wrap-break-words">{receiver.address}</p>
+          </div>
+        </div>
+      </div>
+
+      {note && (
+        <div className="rounded-lg border border-dashed bg-muted/30 p-4">
+          <div className="flex items-start gap-3">
+            <FileText className="mt-0.5 h-4 w-4 text-muted-foreground" />
+
             <div>
-              <div className="text-xs text-muted-foreground">Note</div>
-              <div className="text-sm italic text-muted-foreground">{note}</div>
+              <p className="text-xs text-muted-foreground">Ghi chú đơn hàng</p>
+
+              <p className="mt-1 text-sm">{note}</p>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </section>
   );
 };
 
