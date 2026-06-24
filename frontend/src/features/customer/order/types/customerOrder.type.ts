@@ -82,6 +82,12 @@ export interface OrderDetail {
   updatedAt: string;
 }
 
+export interface GetOrdersQuery {
+  status?: OrderStatus;
+  page?: number;
+  limit?: number;
+}
+
 /*Case create */
 export interface CreateOrderResponse {
   order: OrderDetail;

@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
 import type { CreateOrderRequest } from "../types/customerOrder.type";
 import { customerOrderApi } from "../api/customerOrder.api";
-
-export const CUSTOMER_ORDER_QUERY_KEY = "CUSTOMER_ORDER";
+import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
+import { CUSTOMER_ORDER_QUERY_KEY } from "../constanst/order";
 
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
@@ -15,13 +14,14 @@ export const useCreateOrder = () => {
     onSuccess: (response) => {
       const { order } = response.data;
 
-      // update or invalidate cart (vì order tạo xong thì cart thay đổi)
       queryClient.invalidateQueries({
-        queryKey: [CUSTOMER_CART_QUERY_KEY],
+        queryKey: CUSTOMER_CART_QUERY_KEY.all,
       });
 
-      // optional: cache order detail ngay lập tức
-      queryClient.setQueryData([CUSTOMER_ORDER_QUERY_KEY, order.id], order);
+      queryClient.setQueryData(
+        CUSTOMER_ORDER_QUERY_KEY.detail(order.id),
+        order,
+      );
     },
   });
 };
