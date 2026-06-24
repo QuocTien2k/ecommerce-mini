@@ -12,6 +12,7 @@ model OrderItem {
   // snapshot
   price       Decimal  @db.Decimal(10, 2)
   productName String
+  productSlug String?
   productImage String?
   selectedAttributes Json?
 
