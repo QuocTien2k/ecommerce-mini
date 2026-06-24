@@ -92,7 +92,7 @@ export interface OrderSummary {
   id: string;
   status: OrderStatus;
   statusLabel: string;
-
+  thumbnail: string | null;
   totalPrice: string;
   itemCount: number;
 

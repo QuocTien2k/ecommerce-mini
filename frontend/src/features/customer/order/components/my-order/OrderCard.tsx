@@ -16,17 +16,27 @@ const OrderCard = ({ order }: Props) => {
         <span>{order.statusLabel}</span>
       </div>
 
-      <div className="mt-3 text-sm text-muted-foreground">
-        {order.itemCount} sản phẩm
+      <div className="mt-3 flex items-center gap-3">
+        <img
+          src={order.thumbnail ?? "/placeholder-product.png"}
+          alt="Order thumbnail"
+          className="h-16 w-16 rounded-md object-cover"
+        />
+
+        <div>
+          <p className="text-sm text-muted-foreground">
+            {order.itemCount} sản phẩm
+          </p>
+
+          <p className="font-semibold">{formatCurrency(order.totalPrice)}</p>
+        </div>
       </div>
 
-      <div className="mt-3 text-right font-semibold">
-        {formatCurrency(order.totalPrice)}
+      <div className="mt-2">
+        <Button asChild>
+          <Link to={`/order/${order.id}`}>Xem chi tiết</Link>
+        </Button>
       </div>
-
-      <Button asChild>
-        <Link to={`/order/${order.id}`}>Xem chi tiết</Link>
-      </Button>
     </div>
   );
 };
