@@ -27,6 +27,7 @@ import OrderPage from "@features/customer/order/OrderPage";
 import { PaymentReturn } from "@pages/payment/PaymentReturn";
 import OrderDetail from "@features/customer/order/OrderDetail";
 import MyOrders from "@features/customer/order/MyOrders";
+import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
 
 const AppRoutes = () => {
   return (
@@ -42,6 +43,7 @@ const AppRoutes = () => {
             <Route path="products" element={<AdminProductPage />} />
             <Route path="products/:id" element={<AdminProductDetail />} />
             <Route path="vouchers" element={<AdminVoucherPage />} />
+            <Route path="orders" element={<AdminOrderPage />} />
 
             {/* thêm các route admin khác */}
           </Route>
