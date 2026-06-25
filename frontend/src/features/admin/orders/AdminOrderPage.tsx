@@ -22,6 +22,7 @@ import { formatDate } from "@lib/format-date";
 import { formatCurrency } from "@lib/format-currency";
 import OrderNotFound from "@components/order/OrderNotFound";
 import OrderEmpty from "@components/order/OrderEmpty";
+import { Button } from "@components/ui/button";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
@@ -52,6 +53,12 @@ const AdminOrderPage = () => {
   const handleSearchOrderId = (value: string) => {
     setPage(1);
     setOrderId(value);
+  };
+
+  const onReset = () => {
+    setPage(1);
+    setStatus(undefined);
+    setOrderId("");
   };
 
   const hasFilters = !!status || !!orderId;
@@ -107,6 +114,10 @@ const AdminOrderPage = () => {
               <SelectItem value="CANCELLED">Đã huỷ</SelectItem>
             </SelectContent>
           </Select>
+
+          <Button variant="warning" onClick={onReset} className="shrink-0 px-5">
+            Reset
+          </Button>
         </div>
 
         {/* List */}
