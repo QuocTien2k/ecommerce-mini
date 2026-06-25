@@ -1,6 +1,7 @@
 import type { OrderStatus } from "@features/customer/order/types/order-status.type";
 
 export interface GetOrdersQuery {
+  orderId?: string;
   status?: OrderStatus;
   page?: number;
   limit?: number;
