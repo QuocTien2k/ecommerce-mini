@@ -31,6 +31,7 @@ import {
   Receiver,
 } from '@common/types/order.type';
 import { PaymentService } from '@payment/payment.service';
+import { NotificationResponseDto } from '@notification/dtos/notification.dto';
 
 @Injectable()
 export class OrderService {
@@ -486,28 +487,36 @@ export class OrderService {
 
       const label = ORDER_STATUS_LABEL[newStatus];
 
-      await tx.notification.create({
+      const notification = await tx.notification.create({
         data: {
-          userId: updatedOrder!.userId,
+          userId: updatedOrder.userId,
           title: 'Cập nhật đơn hàng',
-          message: `Đơn hàng ${updatedOrder!.id} đã chuyển sang ${label}`,
-          orderId: updatedOrder!.id,
+          message: `Đơn hàng ${updatedOrder.id} đã chuyển sang ${label}`,
+          path: `/order/${updatedOrder.id}`,
+          orderId: updatedOrder.id,
         },
       });
 
-      return updatedOrder!;
+      return {
+        order: updatedOrder,
+        notification,
+      };
     });
 
     //Emit sau khi transaction thành công
-    this.notificationsGateway.sendToUser(result.userId, {
+    const payload: NotificationResponseDto = {
+      id: result.notification.id,
       type: 'ORDER_STATUS_UPDATED',
-      orderId: result.id,
-      status: result.status,
-      statusLabel: ORDER_STATUS_LABEL[result.status],
-      message: `Đơn hàng ${result.id} đã chuyển sang ${ORDER_STATUS_LABEL[result.status]}`,
-    });
+      title: result.notification.title,
+      message: result.notification.message,
+      path: result.notification.path!,
+      isRead: result.notification.isRead,
+      createdAt: result.notification.createdAt,
+    };
 
-    return result;
+    this.notificationsGateway.sendToUser(result.notification.userId, payload);
+
+    return result.order;
   }
 
   /* case cancel order */
