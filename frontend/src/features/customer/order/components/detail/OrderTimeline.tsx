@@ -1,4 +1,8 @@
-import { getOrderStepIndex, ORDER_TIMELINE } from "@shared/types/order-status";
+import {
+  getOrderStatusLabel,
+  getOrderStepIndex,
+  ORDER_FLOW_TIMELINE,
+} from "@shared/types/order-status";
 import type { OrderStatus } from "../../types/order-status.type";
 import { CheckCircle2, Circle, Truck } from "lucide-react";
 import { cn } from "@lib/utils";
@@ -11,7 +15,9 @@ const OrderTimeline = ({ status }: Props) => {
   const currentStep = getOrderStepIndex(status);
 
   const progressPercent =
-    currentStep >= 0 ? (currentStep / (ORDER_TIMELINE.length - 1)) * 100 : 0;
+    currentStep >= 0
+      ? (currentStep / (ORDER_FLOW_TIMELINE.length - 1)) * 100
+      : 0;
 
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
@@ -28,24 +34,24 @@ const OrderTimeline = ({ status }: Props) => {
             width: `${progressPercent}%`,
           }}
         />
-        {currentStep < ORDER_TIMELINE.length - 1 && (
+        {currentStep < ORDER_FLOW_TIMELINE.length - 1 && (
           <div
             className="shipping-segment absolute top-5 h-1 rounded-full"
             style={{
               left: `${progressPercent}%`,
-              width: `${100 / (ORDER_TIMELINE.length - 1)}%`,
+              width: `${100 / (ORDER_FLOW_TIMELINE.length - 1)}%`,
             }}
           />
         )}
 
         <div className="relative flex justify-between">
-          {ORDER_TIMELINE.map((step, index) => {
+          {ORDER_FLOW_TIMELINE.map((step, index) => {
             const completed = index < currentStep;
             const current = index === currentStep;
 
             return (
               <div
-                key={step.status}
+                key={step}
                 className="flex w-24 flex-col items-center text-center"
               >
                 <div
@@ -79,7 +85,7 @@ const OrderTimeline = ({ status }: Props) => {
                 }
               `}
                 >
-                  {step.label}
+                  {getOrderStatusLabel(step)}
                 </span>
               </div>
             );
