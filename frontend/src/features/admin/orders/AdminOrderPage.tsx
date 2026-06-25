@@ -26,6 +26,7 @@ import { Button } from "@components/ui/button";
 import { cn } from "@lib/utils";
 import { AsyncButton } from "@components/common/async-button";
 import { Eye, Pencil } from "lucide-react";
+import AdminOrderDetail from "./components/AdminOrderDetail";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
@@ -255,6 +256,12 @@ const AdminOrderPage = () => {
           onPageChange={setPage}
         />
       </div>
+      {/* Modal */}
+      <AdminOrderDetail
+        open={openDetail}
+        orderId={selectedOrderId}
+        onClose={handleCloseModals}
+      />
     </QueryStateWrapper>
   );
 };

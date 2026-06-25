@@ -3,9 +3,10 @@ import { useOrderDetail } from "./hooks/useOrderDetail";
 import OrderHeader from "./components/detail/OrderHeader";
 import OrderReceiverInfo from "./components/detail/OrderReceiverInfo";
 import OrderItems from "./components/detail/OrderItems";
-import OrderPricing from "./components/detail/OrderPricing";
+
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import OrderTimeline from "./components/detail/OrderTimeline";
+import OrderPricing from "./components/detail/OrderPricing";
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();

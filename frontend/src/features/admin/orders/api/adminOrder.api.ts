@@ -1,6 +1,10 @@
 import { api } from "@shared/api/axios";
 import type { ApiResult } from "@shared/types/api-result";
-import type { GetOrdersQuery, OrderSummary } from "@shared/types/order.type";
+import type {
+  GetOrdersQuery,
+  OrderDetail,
+  OrderSummary,
+} from "@shared/types/order.type";
 import type { PaginatedResponse } from "@shared/types/pagination";
 
 export const adminOrderApi = {
@@ -8,4 +12,7 @@ export const adminOrderApi = {
     params?: GetOrdersQuery,
   ): ApiResult<PaginatedResponse<OrderSummary>> =>
     api.get("/order", { params }),
+
+  getOrderDetail: (orderId: string): ApiResult<OrderDetail> =>
+    api.get(`/order/${orderId}`),
 };
