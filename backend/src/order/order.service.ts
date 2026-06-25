@@ -598,7 +598,7 @@ export class OrderService {
       limit: 6,
     });
 
-    const { status } = query;
+    const { status, orderId } = query;
 
     // filter theo status
     const statusFilter = this.buildStatusFilter(status);
@@ -609,6 +609,9 @@ export class OrderService {
     const where: Prisma.OrderWhereInput = {
       ...statusFilter,
       ...roleFilter,
+      ...(orderId && {
+        id: orderId,
+      }),
     };
 
     // query song song
