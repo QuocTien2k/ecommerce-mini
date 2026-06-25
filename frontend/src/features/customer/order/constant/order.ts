@@ -1,4 +1,4 @@
-import type { GetOrdersQuery } from "../types/customerOrder.type";
+import type { GetOrdersQuery } from "@shared/types/order.type";
 
 const BASE = ["customer-orders"] as const;
 
