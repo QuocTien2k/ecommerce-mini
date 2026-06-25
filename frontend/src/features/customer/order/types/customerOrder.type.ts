@@ -82,23 +82,6 @@ export interface OrderDetail {
   updatedAt: string;
 }
 
-export interface GetOrdersQuery {
-  status?: OrderStatus;
-  page?: number;
-  limit?: number;
-}
-
-export interface OrderSummary {
-  id: string;
-  status: OrderStatus;
-  statusLabel: string;
-  thumbnail: string | null;
-  totalPrice: string;
-  itemCount: number;
-
-  createdAt: string;
-}
-
 /*Case create */
 export interface CreateOrderResponse {
   order: OrderDetail;

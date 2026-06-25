@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { CUSTOMER_ORDER_QUERY_KEY } from "../constanst/order";
-import type { GetOrdersQuery } from "../types/customerOrder.type";
 import { customerOrderApi } from "../api/customerOrder.api";
+import type { GetOrdersQuery } from "@shared/types/order.type";
 
 export const useOrders = (params?: GetOrdersQuery) => {
   return useQuery({

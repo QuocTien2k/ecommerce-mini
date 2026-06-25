@@ -1,8 +1,8 @@
 import { Button } from "@components/ui/button";
-import type { OrderSummary } from "../../types/customerOrder.type";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "@lib/format-currency";
 import { ORDER_STATUS_COLORS } from "@shared/types/order-status";
+import type { OrderSummary } from "@shared/types/order.type";
 
 interface Props {
   order: OrderSummary;

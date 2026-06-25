@@ -1,4 +1,4 @@
-import type { OrderSummary } from "../../types/customerOrder.type";
+import type { OrderSummary } from "@shared/types/order.type";
 import OrderCard from "./OrderCard";
 
 interface Props {
