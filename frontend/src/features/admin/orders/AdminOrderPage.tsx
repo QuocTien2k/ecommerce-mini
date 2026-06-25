@@ -20,6 +20,8 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import CopyableText from "@components/common/copyable-text";
 import { formatDate } from "@lib/format-date";
 import { formatCurrency } from "@lib/format-currency";
+import OrderNotFound from "@components/order/OrderNotFound";
+import OrderEmpty from "@components/order/OrderEmpty";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
@@ -51,6 +53,16 @@ const AdminOrderPage = () => {
     setPage(1);
     setOrderId(value);
   };
+
+  const hasFilters = !!status || !!orderId;
+
+  if (!isLoading && orders.length === 0 && hasFilters) {
+    return <OrderNotFound />;
+  }
+
+  if (!isLoading && orders.length === 0) {
+    return <OrderEmpty />;
+  }
 
   return (
     <QueryStateWrapper isLoading={isLoading}>
@@ -137,11 +149,6 @@ const AdminOrderPage = () => {
             );
           })}
         </div>
-
-        {/* EMPTY */}
-        {!isLoading && orders.length === 0 && (
-          <div className="text-center text-gray-500 py-6">No orders found</div>
-        )}
 
         {/* Pagination */}
         <AppPagination

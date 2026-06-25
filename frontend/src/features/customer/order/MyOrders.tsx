@@ -3,8 +3,8 @@ import { useOrders } from "./hooks/useOrders";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { SectionTitle } from "@components/ui/section-title";
 import AppPagination from "@components/common/pagination";
-import OrderEmpty from "./components/my-order/OrderEmpty";
 import OrderList from "./components/my-order/OrderList";
+import OrderEmpty from "@components/order/OrderEmpty";
 
 const MyOrders = () => {
   const [page, setPage] = useState(1);

@@ -8,7 +8,7 @@ const OrderEmpty = () => {
       <h3 className="text-lg font-semibold">Chưa có đơn hàng nào</h3>
 
       <p className="mt-2 text-sm text-muted-foreground">
-        Các đơn hàng của bạn sẽ xuất hiện tại đây.
+        Hệ thống hiện chưa ghi nhận đơn hàng nào.
       </p>
     </div>
   );
