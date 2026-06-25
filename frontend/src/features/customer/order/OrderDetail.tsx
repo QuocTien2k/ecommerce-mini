@@ -3,17 +3,17 @@ import { useOrderDetail } from "./hooks/useOrderDetail";
 import OrderHeader from "./components/detail/OrderHeader";
 import OrderReceiverInfo from "./components/detail/OrderReceiverInfo";
 import OrderItems from "./components/detail/OrderItems";
-
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import OrderTimeline from "./components/detail/OrderTimeline";
 import OrderPricing from "./components/detail/OrderPricing";
+import OrderNotFound from "@components/order/OrderNotFound";
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
 
   const { data, isLoading } = useOrderDetail(id!);
 
-  if (!data) return <div>Order not found</div>;
+  if (!data) return <OrderNotFound />;
 
   // console.log(data);
 
