@@ -1,8 +1,8 @@
 import { formatProductAttributes } from "@/utils/format-product-attributes";
-import type { OrderItemDetail } from "../../types/customerOrder.type";
 import { formatCurrency } from "@lib/format-currency";
 import { ScrollArea } from "@components/ui/scroll-area";
 import { Link } from "react-router-dom";
+import type { OrderItemDetail } from "@shared/types/order.type";
 
 const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
   const shouldScroll = items.length > 5;

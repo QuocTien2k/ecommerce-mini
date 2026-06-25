@@ -1,4 +1,4 @@
-import type { OrderReceiver } from "../../types/customerOrder.type";
+import type { OrderReceiver } from "@shared/types/order.type";
 import { User, Phone, MapPin, FileText } from "lucide-react";
 
 type Props = {

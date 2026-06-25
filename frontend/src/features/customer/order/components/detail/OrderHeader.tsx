@@ -1,7 +1,7 @@
 import { formatCurrency } from "@lib/format-currency";
-import type { OrderDetail } from "../../types/customerOrder.type";
 import { cn } from "@lib/utils";
 import { ORDER_STATUS_COLORS } from "@shared/types/order-status";
+import type { OrderDetail } from "@shared/types/order.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 

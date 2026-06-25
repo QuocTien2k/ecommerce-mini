@@ -1,15 +1,12 @@
 import { formatCurrency } from "@lib/format-currency";
-import type {
-  OrderPricing as OrderPricingType,
-  OrderVoucher,
-} from "../../types/customerOrder.type";
 import { Badge } from "@components/ui/badge";
+import type { OrderPricing, OrderVoucher } from "@shared/types/order.type";
 
 const OrderPricing = ({
   pricing,
   voucher,
 }: {
-  pricing: OrderPricingType;
+  pricing: OrderPricing;
   voucher: OrderVoucher | null;
 }) => {
   return (
