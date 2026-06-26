@@ -1,4 +1,4 @@
-import type { OrderStatus } from "@features/customer/order/types/order-status.type";
+import type { OrderStatus } from "@shared/types/order-status.type";
 import type { GetOrdersQuery, OrderSummary } from "@shared/types/order.type";
 import { useState } from "react";
 import { useAdminOrders } from "./hooks/useAdminOrders";
@@ -6,7 +6,7 @@ import AppPagination from "@components/common/pagination";
 import {
   getOrderStatusColor,
   getOrderStatusLabel,
-} from "@shared/types/order-status";
+} from "@shared/types/order-status.utils";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -27,6 +27,7 @@ import { cn } from "@lib/utils";
 import { AsyncButton } from "@components/common/async-button";
 import { Eye, Pencil } from "lucide-react";
 import AdminOrderDetail from "./components/AdminOrderDetail";
+import AdminUpdateOrder from "./components/AdminUpdateOrder";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
@@ -257,6 +258,12 @@ const AdminOrderPage = () => {
         />
       </div>
       {/* Modal */}
+      <AdminUpdateOrder
+        open={openUpdate}
+        onClose={handleCloseModals}
+        orderId={selectedOrderId}
+      />
+
       <AdminOrderDetail
         open={openDetail}
         orderId={selectedOrderId}

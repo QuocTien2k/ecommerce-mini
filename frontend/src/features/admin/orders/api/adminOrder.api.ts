@@ -6,6 +6,7 @@ import type {
   OrderSummary,
 } from "@shared/types/order.type";
 import type { PaginatedResponse } from "@shared/types/pagination";
+import type { UpdateOrderStatusRequest } from "../types/adimn-order.type";
 
 export const adminOrderApi = {
   getOrders: (
@@ -15,4 +16,9 @@ export const adminOrderApi = {
 
   getOrderDetail: (orderId: string): ApiResult<OrderDetail> =>
     api.get(`/order/${orderId}`),
+
+  updateOrderStatus: (
+    orderId: string,
+    data: UpdateOrderStatusRequest,
+  ): ApiResult<OrderDetail> => api.patch(`/order/${orderId}`, data),
 };

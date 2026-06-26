@@ -9,7 +9,7 @@ import { formatProductAttributes } from "@/utils/format-product-attributes";
 import {
   getOrderStatusColor,
   getOrderStatusLabel,
-} from "@shared/types/order-status";
+} from "@shared/types/order-status.utils";
 
 interface AdminOrderDetailProps {
   open: boolean;
