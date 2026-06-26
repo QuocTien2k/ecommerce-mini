@@ -369,7 +369,6 @@ export class OrderService {
       this.processOrderTransaction(tx, userId, dto, receiver),
     );
 
-    //PAYMENT
     const payment = await this.handlePayment(
       userId,
       order.id,
@@ -377,8 +376,20 @@ export class OrderService {
       ipAddr,
     );
 
+    const orderWithPayment = await this.prisma.order.findUnique({
+      where: { id: order.id },
+      include: {
+        items: true,
+        payment: true,
+      },
+    });
+
+    if (!orderWithPayment) {
+      throw new NotFoundException('Không tìm thấy order sau khi tạo!');
+    }
+
     return {
-      order,
+      order: orderWithPayment,
       payment,
     };
   }
@@ -645,6 +656,7 @@ export class OrderService {
         ...roleFilter,
       },
       include: {
+        payment: true,
         items: {
           orderBy: {
             createdAt: 'asc',

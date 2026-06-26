@@ -1,16 +1,27 @@
-import { Order, OrderItem } from '@prisma/client';
+import { Order, OrderItem, Payment } from '@prisma/client';
 import { ORDER_STATUS_LABEL } from './order-status.mapper';
 
 type OrderWithItems = Order & {
   items: OrderItem[];
 };
 
+type OrderDetailEntity = OrderWithItems & {
+  payment: Payment | null;
+};
+
 export class OrderMapper {
-  static toDetail(order: OrderWithItems) {
+  static toDetail(order: OrderDetailEntity) {
     return {
       id: order.id,
       status: order.status,
       statusLabel: ORDER_STATUS_LABEL[order.status],
+
+      payment: order.payment
+        ? {
+            method: order.payment.method,
+            status: order.payment.status,
+          }
+        : null,
 
       pricing: {
         subtotal: order.subtotal,
