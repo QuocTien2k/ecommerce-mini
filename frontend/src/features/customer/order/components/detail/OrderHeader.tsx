@@ -1,11 +1,14 @@
 import { formatCurrency } from "@lib/format-currency";
 import { cn } from "@lib/utils";
-import { ORDER_STATUS_COLORS } from "@shared/types/order-status";
+import { ORDER_STATUS_COLORS } from "@shared/types/order-status.utils";
 import type { OrderDetail } from "@shared/types/order.type";
+import { PAYMENT_LABEL, PAYMENT_STATUS_LABEL } from "@shared/types/payment";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
 const OrderHeader = ({ order }: { order: OrderDetail }) => {
+  const payment = order.payment;
+
   return (
     <div className="p-6 space-y-6 border-b">
       <div className="flex items-start justify-between">
@@ -28,6 +31,17 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
           )}
         >
           {order.statusLabel}
+        </span>
+      </div>
+
+      <div className="mt-3 flex gap-2">
+        <span className="text-[14px] text-muted-foreground">Thanh toán:</span>
+        <span className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-700">
+          {PAYMENT_LABEL[payment.method]}
+        </span>
+
+        <span className="rounded bg-muted px-2 py-1 text-xs">
+          {PAYMENT_STATUS_LABEL[payment.status]}
         </span>
       </div>
 

@@ -2,10 +2,10 @@ import {
   getOrderStatusLabel,
   getOrderStepIndex,
   ORDER_FLOW_TIMELINE,
-} from "@shared/types/order-status";
-import type { OrderStatus } from "../../types/order-status.type";
+} from "@shared/types/order-status.utils";
 import { CheckCircle2, Circle, Truck } from "lucide-react";
 import { cn } from "@lib/utils";
+import type { OrderStatus } from "@shared/types/order-status.type";
 
 type Props = {
   status: OrderStatus;
