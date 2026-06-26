@@ -49,18 +49,26 @@ export const NotificationContent = ({
             <div
               key={n.id}
               onClick={() => onNotificationClick(n)}
-              className="cursor-pointer border-b p-4 transition-colors hover:bg-gray-50"
+              className={`cursor-pointer border-b p-4 transition-colors hover:bg-gray-50 ${
+                !n.isRead ? "bg-blue-50/40" : ""
+              }`}
             >
               <div
-                className={`text-base ${
-                  n.isRead ? "font-medium" : "font-semibold"
+                className={`text-base leading-snug ${
+                  n.isRead
+                    ? "font-medium text-gray-900"
+                    : "font-semibold text-gray-950"
                 }`}
               >
                 {n.title}
               </div>
 
               {n.message && (
-                <div className="mt-1 text-sm leading-6 text-gray-600">
+                <div
+                  className={`mt-1 text-sm leading-6 ${
+                    n.isRead ? "text-gray-600" : "text-gray-800 font-medium"
+                  }`}
+                >
                   {n.message}
                 </div>
               )}

@@ -30,6 +30,10 @@ export const NotificationWidget = ({ mobile = false }: Props) => {
     };
   }, []);
 
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
+  };
+
   const { data: unreadData } = useUnreadNotificationCountQuery();
 
   useEffect(() => {
@@ -40,9 +44,7 @@ export const NotificationWidget = ({ mobile = false }: Props) => {
 
   return (
     <div ref={widgetRef} className="relative">
-      <div onClick={() => setOpen(true)}>
-        <NotificationBell />
-      </div>
+      <NotificationBell onClick={handleToggle} />
 
       {!mobile && (
         <NotificationDropdown open={open} onClose={() => setOpen(false)} />
