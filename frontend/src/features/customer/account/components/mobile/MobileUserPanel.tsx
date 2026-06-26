@@ -3,8 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import type { AdminUser } from "@features/admin/user/types/adminUser.type";
 import { userMenuConfig } from "@features/customer/config/user-menu.config";
-import { Camera, Heart, KeyRound, Ticket, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 type Props = {
   user: AdminUser | null;
@@ -23,8 +22,6 @@ export const MobileUserPanel = ({
   onOpenPassword,
   onLogout,
 }: Props) => {
-  const navigate = useNavigate();
-
   if (!isAuthenticated) {
     return (
       <div className="space-y-4 pt-8">
@@ -105,27 +102,6 @@ export const MobileUserPanel = ({
             </Button>
           );
         })}
-      </div>
-
-      {/* Shop actions */}
-      <div className="flex flex-col gap-1 border-t pt-2">
-        <Button
-          variant="ghost"
-          className="justify-start gap-2 h-11"
-          onClick={() => navigate("/favorites")}
-        >
-          <Heart className="h-4 w-4" />
-          Sản phẩm yêu thích
-        </Button>
-
-        <Button
-          variant="ghost"
-          className="justify-start gap-2 h-11"
-          onClick={() => navigate("/my-vouchers")}
-        >
-          <Ticket className="h-4 w-4" />
-          Voucher của tôi
-        </Button>
       </div>
 
       {/* Logout */}

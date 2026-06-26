@@ -19,44 +19,50 @@ const OrderTimeline = ({ status }: Props) => {
       ? (currentStep / (ORDER_FLOW_TIMELINE.length - 1)) * 100
       : 0;
 
+  const segmentPercent = 100 / (ORDER_FLOW_TIMELINE.length - 1);
+
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
       <h3 className="mb-8 text-lg font-semibold">Tiến trình đơn hàng</h3>
 
-      <div className="relative overflow-hidden">
+      <div className="relative">
         {/* Base line */}
-        <div className="absolute top-5 left-0 h-1 w-full rounded-full bg-gray-200" />
+        <div className="absolute top-4 left-[8.333%] right-[8.333%] h-1 rounded-full bg-gray-200" />
 
-        {/* Progress line */}
+        {/* Completed line */}
         <div
-          className="absolute top-5 left-0 h-1 rounded-full bg-green-500 transition-all duration-700"
+          className="absolute top-4 left-[8.333%] h-1 rounded-full bg-green-500 transition-all duration-700"
           style={{
-            width: `${progressPercent}%`,
+            width: `calc(${progressPercent}% * 0.8333)`,
           }}
         />
-        {currentStep < ORDER_FLOW_TIMELINE.length - 1 && (
+
+        {/* Animated shipping */}
+        {currentStep >= 0 && currentStep < ORDER_FLOW_TIMELINE.length - 1 && (
           <div
-            className="shipping-segment absolute top-5 h-1 rounded-full"
+            className="shipping-segment absolute top-4 h-1 rounded-full"
             style={{
-              left: `${progressPercent}%`,
-              width: `${100 / (ORDER_FLOW_TIMELINE.length - 1)}%`,
+              left: `calc(8.333% + ${progressPercent}% * 0.8333)`,
+              width: `calc(${segmentPercent}% * 0.8333)`,
             }}
           />
         )}
 
-        <div className="relative flex justify-between">
+        <div
+          className="relative grid"
+          style={{
+            gridTemplateColumns: `repeat(${ORDER_FLOW_TIMELINE.length}, minmax(0,1fr))`,
+          }}
+        >
           {ORDER_FLOW_TIMELINE.map((step, index) => {
             const completed = index < currentStep;
             const current = index === currentStep;
 
             return (
-              <div
-                key={step}
-                className="flex w-24 flex-col items-center text-center"
-              >
+              <div key={step} className="flex flex-col items-center">
                 <div
                   className={cn(
-                    "z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white",
+                    "z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white sm:h-10 sm:w-10",
                     completed
                       ? "border-green-500 text-green-500"
                       : current
@@ -65,25 +71,23 @@ const OrderTimeline = ({ status }: Props) => {
                   )}
                 >
                   {completed ? (
-                    <CheckCircle2 className="h-5 w-5" />
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                   ) : current ? (
-                    <Truck className="delivery-truck h-5 w-5" />
+                    <Truck className="delivery-truck h-4 w-4 sm:h-5 sm:w-5" />
                   ) : (
-                    <Circle className="h-5 w-5 fill-current" />
+                    <Circle className="h-4 w-4 fill-current sm:h-5 sm:w-5" />
                   )}
                 </div>
 
                 <span
-                  className={`
-                mt-3 text-sm
-                ${
-                  completed
-                    ? "text-green-600"
-                    : current
-                      ? "font-medium text-primary"
-                      : "text-gray-400"
-                }
-              `}
+                  className={cn(
+                    "mt-2 px-1 text-center text-[10px] leading-4 sm:text-sm",
+                    completed
+                      ? "text-green-600"
+                      : current
+                        ? "font-medium text-primary"
+                        : "text-gray-400",
+                  )}
                 >
                   {getOrderStatusLabel(step)}
                 </span>
