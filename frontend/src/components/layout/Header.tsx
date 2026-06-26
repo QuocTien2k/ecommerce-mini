@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@app/hooks";
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UploadAvatar } from "@features/customer/account/components/UploadAvatar";
 import { UpdateProfile } from "@features/customer/account/components/UpdateProfile";
 import { ChangePassword } from "@features/customer/account/components/ChangePassword";
@@ -63,6 +63,12 @@ const Header = () => {
     setOpenSheet(false);
     setActiveModal(modal);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpenSheet(false);
+  }, [location.pathname]);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

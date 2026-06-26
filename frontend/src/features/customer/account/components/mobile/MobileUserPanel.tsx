@@ -1,6 +1,8 @@
+import { useUserMenuActions } from "@/hooks/useUserMenuActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Button } from "@components/ui/button";
 import type { AdminUser } from "@features/admin/user/types/adminUser.type";
+import { userMenuConfig } from "@features/customer/config/user-menu.config";
 import { Camera, Heart, KeyRound, Ticket, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -45,6 +47,14 @@ export const MobileUserPanel = ({
     );
   }
 
+  const actions = useUserMenuActions({
+    onOpenProfile,
+    onOpenAvatar,
+    onOpenPassword,
+  });
+
+  const menuItems = userMenuConfig(actions);
+
   return (
     <div className="flex flex-col gap-2">
       {/* User header */}
@@ -59,32 +69,42 @@ export const MobileUserPanel = ({
 
       {/* Account actions */}
       <div className="flex flex-col gap-1">
-        <Button
-          variant="ghost"
-          className="justify-start gap-2 h-11"
-          onClick={onOpenProfile}
-        >
-          <User className="h-4 w-4" />
-          Cập nhật thông tin
-        </Button>
+        {menuItems.slice(0, 3).map((item, index) => {
+          const Icon = item.icon;
 
-        <Button
-          variant="ghost"
-          className="justify-start gap-2 h-11"
-          onClick={onOpenAvatar}
-        >
-          <Camera className="h-4 w-4" />
-          Cập nhật avatar
-        </Button>
+          return (
+            <Button
+              key={index}
+              variant="ghost"
+              className="justify-start gap-2 h-11"
+              onClick={item.onClick}
+              disabled={!item.onClick}
+            >
+              <Icon className="h-4 w-4" />
+              {item.label}
+            </Button>
+          );
+        })}
+      </div>
 
-        <Button
-          variant="ghost"
-          className="justify-start gap-2 h-11"
-          onClick={onOpenPassword}
-        >
-          <KeyRound className="h-4 w-4" />
-          Đổi mật khẩu
-        </Button>
+      {/* Shop actions */}
+      <div className="flex flex-col gap-1 border-t pt-2">
+        {menuItems.slice(3).map((item, index) => {
+          const Icon = item.icon;
+
+          return (
+            <Button
+              key={index}
+              variant="ghost"
+              className="justify-start gap-2 h-11"
+              onClick={item.onClick}
+              disabled={!item.onClick}
+            >
+              <Icon className="h-4 w-4" />
+              {item.label}
+            </Button>
+          );
+        })}
       </div>
 
       {/* Shop actions */}
