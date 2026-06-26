@@ -1,5 +1,9 @@
 import type { VoucherType } from "@features/admin/vouchers/types/admin-voucher.type";
-import type { OrderStatus } from "@features/customer/order/types/order-status.type";
+import type {
+  PaymentMethod,
+  PaymentStatus,
+} from "@features/customer/order/types/payment.type";
+import type { OrderStatus } from "@shared/types/order-status.type";
 
 export interface GetOrdersQuery {
   orderId?: string;
@@ -38,6 +42,11 @@ export interface OrderVoucher {
   value: number;
 }
 
+export interface OrderPayment {
+  method: PaymentMethod;
+  status: PaymentStatus;
+}
+
 export interface OrderItemDetail {
   id: string;
 
@@ -59,6 +68,8 @@ export interface OrderDetail {
 
   status: OrderStatus;
   statusLabel: string;
+
+  payment: OrderPayment;
 
   pricing: OrderPricing;
 

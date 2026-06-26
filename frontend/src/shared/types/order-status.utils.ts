@@ -1,4 +1,4 @@
-import type { OrderStatus } from "@features/customer/order/types/order-status.type";
+import type { OrderStatus } from "@shared/types/order-status.type";
 
 /**
  * FLOW STATUS: dùng cho progress tracking (user + admin detail)
