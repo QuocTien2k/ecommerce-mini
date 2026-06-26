@@ -58,12 +58,13 @@ export const useNotifications = () => {
       navigate(notification.path);
     }
 
-    onClose?.();
+    // delay close để không interrupt router commit
+    requestAnimationFrame(() => {
+      onClose?.();
+    });
 
     if (!notification.isRead) {
-      await markAsRead({
-        id: notification.id,
-      });
+      await markAsRead({ id: notification.id });
     }
   };
 
