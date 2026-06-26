@@ -15,7 +15,7 @@ const OrderDetail = () => {
 
   if (!data) return <OrderNotFound />;
 
-  console.log(data);
+  //console.log(data);
 
   return (
     <QueryStateWrapper isLoading={isLoading}>

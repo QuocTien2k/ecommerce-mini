@@ -1,32 +1,28 @@
 import { formatCurrency } from "@lib/format-currency";
+import { formatDate } from "@lib/format-date";
 import { cn } from "@lib/utils";
 import { ORDER_STATUS_COLORS } from "@shared/types/order-status.utils";
 import type { OrderDetail } from "@shared/types/order.type";
 import { PAYMENT_LABEL, PAYMENT_STATUS_LABEL } from "@shared/types/payment";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
 
 const OrderHeader = ({ order }: { order: OrderDetail }) => {
   const payment = order.payment;
 
   return (
-    <div className="p-6 space-y-6 border-b">
-      <div className="flex items-start justify-between">
-        <div>
+    <div className="p-4 sm:p-6 space-y-6 border-b">
+      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold tracking-tight">
             Đơn hàng #{order.id}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Đặt lúc{" "}
-            {format(new Date(order.createdAt), "HH:mm dd/MM/yyyy", {
-              locale: vi,
-            })}
+            Đặt lúc: {formatDate(order.createdAt)}
           </p>
         </div>
 
         <span
           className={cn(
-            "rounded-full px-3 py-1 text-sm font-medium",
+            "w-fit shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium",
             ORDER_STATUS_COLORS[order.status],
           )}
         >
@@ -34,8 +30,8 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
         </span>
       </div>
 
-      <div className="mt-3 flex gap-2">
-        <span className="text-[14px] text-muted-foreground">Thanh toán:</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm text-muted-foreground">Thanh toán:</span>
         <span className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-700">
           {PAYMENT_LABEL[payment.method]}
         </span>
@@ -45,7 +41,7 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 border-t pt-6">
+      <div className="grid grid-cols-1 gap-3 border-t pt-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg bg-muted/50 p-4">
           <div className="text-xs text-muted-foreground">Sản phẩm</div>
 
@@ -55,7 +51,7 @@ const OrderHeader = ({ order }: { order: OrderDetail }) => {
         <div className="rounded-lg bg-muted/50 p-4">
           <div className="text-xs text-muted-foreground">Tổng thanh toán</div>
 
-          <div className="text-xl font-bold">
+          <div className="text-lg font-bold sm:text-xl wrap-break-words">
             {formatCurrency(order.pricing.totalPrice)}
           </div>
         </div>
