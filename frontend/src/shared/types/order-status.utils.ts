@@ -31,6 +31,14 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   CANCELLED: "Đã huỷ",
 };
 
+export const ORDER_STATUS_OPTIONS = [
+  { value: "ALL", label: "Tất cả trạng thái" },
+  ...Object.entries(ORDER_STATUS_LABEL).map(([value, label]) => ({
+    value,
+    label,
+  })),
+] as const;
+
 /**
  * COLOR badge (UI-only, không dùng cho logic)
  */
