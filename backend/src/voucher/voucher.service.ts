@@ -20,6 +20,7 @@ import { ApplyVoucherResult } from '@common/types/voucher.type';
 import { NotificationsGateway } from '@notification/notification.gateway';
 import { VoucherDetailAdminResponseDto } from './dtos/voucher-detail.dto';
 import { NotificationResponseDto } from '@notification/dtos/notification.dto';
+import { AvailableVoucherDto } from './dtos/available-voucher.dto';
 
 @Injectable()
 export class VoucherService {
@@ -576,6 +577,93 @@ export class VoucherService {
         isActive: false,
       },
     });
+  }
+
+  /* Case get voucher flow cart */
+  async getAvailableVouchers(userId: string): Promise<AvailableVoucherDto[]> {
+    const cartItems = await this.prisma.cartItem.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        productId: true,
+        quantity: true,
+      },
+    });
+
+    if (cartItems.length === 0) {
+      return [];
+    }
+
+    const now = new Date();
+
+    const userVouchers = await this.prisma.userVoucher.findMany({
+      where: {
+        userId,
+
+        OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
+
+        voucher: {
+          isDeleted: false,
+          isActive: true,
+          AND: [
+            {
+              OR: [{ startAt: null }, { startAt: { lte: now } }],
+            },
+            {
+              OR: [{ endAt: null }, { endAt: { gte: now } }],
+            },
+          ],
+        },
+      },
+
+      include: {
+        voucher: true,
+      },
+
+      orderBy: {
+        assignedAt: 'desc',
+      },
+    });
+
+    const availableVouchers: AvailableVoucherDto[] = [];
+
+    for (const { voucher } of userVouchers) {
+      try {
+        const result = await this.applyVoucher(userId, {
+          voucherCode: voucher.code,
+          items: cartItems,
+        });
+
+        availableVouchers.push({
+          id: voucher.id,
+          code: voucher.code,
+          type: voucher.type,
+          value: Number(voucher.value),
+
+          maxDiscount: voucher.maxDiscount ? Number(voucher.maxDiscount) : null,
+
+          minOrderValue: voucher.minOrderValue
+            ? Number(voucher.minOrderValue)
+            : null,
+
+          scope: voucher.scope,
+          endAt: voucher.endAt,
+
+          subtotal: result.subtotal,
+          appliedSubtotal: result.appliedSubtotal,
+          discount: result.discount,
+          finalTotal: result.finalTotal,
+
+          remainingUsage: result.remainingUsage ?? null,
+        });
+      } catch {
+        // Voucher không áp dụng được với cart hiện tại
+        continue;
+      }
+    }
+
+    return availableVouchers;
   }
 
   /*Case apply*/

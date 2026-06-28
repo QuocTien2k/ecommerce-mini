@@ -38,6 +38,13 @@ export class VoucherController {
     return await this.voucherService.getMyVouchers(userId, query);
   }
 
+  @Get('available')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.USER)
+  async getAvailableVuchers(@CurrentUser('sub') userId: string) {
+    return this.voucherService.getAvailableVouchers(userId);
+  }
+
   @Get('admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
