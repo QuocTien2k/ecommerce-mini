@@ -39,3 +39,23 @@ export interface GetMyVouchersQuery {
   page?: number;
   limit?: number;
 }
+
+export interface AvailableVoucher {
+  id: string;
+  code: string;
+
+  type: VoucherType;
+  scope: VoucherScope;
+
+  value: number;
+  maxDiscount: number | null;
+  minOrderValue: number | null;
+
+  subtotal: number;
+  appliedSubtotal: number;
+  discount: number;
+  finalTotal: number;
+
+  remainingUsage: number | null;
+  endAt: string | null;
+}
