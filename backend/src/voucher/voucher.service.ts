@@ -21,12 +21,14 @@ import { NotificationsGateway } from '@notification/notification.gateway';
 import { VoucherDetailAdminResponseDto } from './dtos/voucher-detail.dto';
 import { NotificationResponseDto } from '@notification/dtos/notification.dto';
 import { AvailableVoucherDto } from './dtos/available-voucher.dto';
+import { CategoryService } from '@category/category.service';
 
 @Injectable()
 export class VoucherService {
   constructor(
     private prisma: PrismaService,
     private notificationsGateway: NotificationsGateway,
+    private categoryService: CategoryService,
   ) {}
 
   /* Case create */
@@ -122,6 +124,7 @@ export class VoucherService {
   }
 
   async createVoucher(dto: CreateVoucherDto) {
+    console.log('CREATE DTO:', dto);
     this.validate(dto);
 
     try {
@@ -580,11 +583,72 @@ export class VoucherService {
   }
 
   /* Case get voucher flow cart */
-  async getAvailableVouchers(userId: string): Promise<AvailableVoucherDto[]> {
-    const cartItems = await this.prisma.cartItem.findMany({
+  private async resolveUserVouchers(userId: string) {
+    const now = new Date();
+
+    /* GLOBAL vouchers (không cần UserVoucher) */
+    const globalVouchers = await this.prisma.voucher.findMany({
+      where: {
+        isDeleted: false,
+        isActive: true,
+        AND: [
+          { OR: [{ startAt: null }, { startAt: { lte: now } }] },
+          { OR: [{ endAt: null }, { endAt: { gte: now } }] },
+        ],
+      },
+      include: {
+        products: { select: { id: true } },
+        categories: { select: { id: true } },
+      },
+    });
+
+    // console.log('=== GLOBAL VOUCHERS ===');
+    // console.log(globalVouchers.map((v) => v.code));
+
+    /* ASSIGNED vouchers (UserVoucher) */
+    const assignedUserVouchers = await this.prisma.userVoucher.findMany({
       where: {
         userId,
+        OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
+        voucher: {
+          isDeleted: false,
+          isActive: true,
+        },
       },
+      include: {
+        voucher: {
+          include: {
+            products: { select: { id: true } },
+            categories: { select: { id: true } },
+          },
+        },
+      },
+    });
+
+    // console.log('=== ASSIGNED VOUCHERS ===');
+    // console.log(assignedUserVouchers.map((v) => v.voucher.code));
+
+    /* Normalize về cùng format */
+    const merged = [
+      ...globalVouchers.map((v) => ({ voucher: v, userVoucher: null })),
+      ...assignedUserVouchers.map((uv) => ({
+        voucher: uv.voucher,
+        userVoucher: uv,
+      })),
+    ];
+
+    const unique = new Map<string, any>();
+
+    for (const item of merged) {
+      unique.set(item.voucher.id, item);
+    }
+
+    return Array.from(unique.values());
+  }
+
+  async getAvailableVouchers(userId: string): Promise<AvailableVoucherDto[]> {
+    const cartItems = await this.prisma.cartItem.findMany({
+      where: { userId },
       select: {
         productId: true,
         quantity: true,
@@ -595,40 +659,11 @@ export class VoucherService {
       return [];
     }
 
-    const now = new Date();
-
-    const userVouchers = await this.prisma.userVoucher.findMany({
-      where: {
-        userId,
-
-        OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
-
-        voucher: {
-          isDeleted: false,
-          isActive: true,
-          AND: [
-            {
-              OR: [{ startAt: null }, { startAt: { lte: now } }],
-            },
-            {
-              OR: [{ endAt: null }, { endAt: { gte: now } }],
-            },
-          ],
-        },
-      },
-
-      include: {
-        voucher: true,
-      },
-
-      orderBy: {
-        assignedAt: 'desc',
-      },
-    });
+    const vouchers = await this.resolveUserVouchers(userId);
 
     const availableVouchers: AvailableVoucherDto[] = [];
 
-    for (const { voucher } of userVouchers) {
+    for (const { voucher } of vouchers) {
       try {
         const result = await this.applyVoucher(userId, {
           voucherCode: voucher.code,
@@ -640,25 +675,21 @@ export class VoucherService {
           code: voucher.code,
           type: voucher.type,
           value: Number(voucher.value),
-
           maxDiscount: voucher.maxDiscount ? Number(voucher.maxDiscount) : null,
-
           minOrderValue: voucher.minOrderValue
             ? Number(voucher.minOrderValue)
             : null,
-
           scope: voucher.scope,
           endAt: voucher.endAt,
-
           subtotal: result.subtotal,
           appliedSubtotal: result.appliedSubtotal,
           discount: result.discount,
           finalTotal: result.finalTotal,
-
           remainingUsage: result.remainingUsage ?? null,
         });
-      } catch {
-        // Voucher không áp dụng được với cart hiện tại
+      } catch (e) {
+        console.log('VOUCHER FAIL:', voucher.code);
+        console.log(e.message);
         continue;
       }
     }
@@ -684,6 +715,10 @@ export class VoucherService {
       },
     });
 
+    if (!voucher) {
+      throw new BadRequestException('Voucher không tồn tại');
+    }
+
     if (!voucher || voucher.isDeleted || !voucher.isActive) {
       throw new BadRequestException('Voucher không hợp lệ');
     }
@@ -704,18 +739,24 @@ export class VoucherService {
 
     const userVoucher = voucher.userVouchers[0];
 
-    if (!userVoucher) {
-      throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
+    if (voucher.scope === VoucherScope.ORDER) {
+      if (!userVoucher) {
+        throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
+      }
     }
 
-    const remaining =
-      userVoucher.remainingUsage ??
-      (userVoucher.usagePerUser != null
-        ? userVoucher.usagePerUser - userVoucher.usedCount
-        : null);
+    let remaining: number | null = null;
 
-    if (remaining != null && remaining <= 0) {
-      throw new BadRequestException('Bạn đã dùng hết voucher này');
+    if (voucher.scope === VoucherScope.ORDER) {
+      remaining =
+        userVoucher.remainingUsage ??
+        (userVoucher.usagePerUser != null
+          ? userVoucher.usagePerUser - userVoucher.usedCount
+          : null);
+
+      if (remaining != null && remaining <= 0) {
+        throw new BadRequestException('Bạn đã dùng hết voucher này');
+      }
     }
 
     const productIds = items.map((i) => i.productId);
@@ -766,7 +807,31 @@ export class VoucherService {
 
     if (voucher.scope === VoucherScope.CATEGORY) {
       const allowed = new Set(voucher.categories.map((c) => c.id));
-      applicableItems = enrichedItems.filter((i) => allowed.has(i.categoryId));
+
+      const enrichedWithAncestors = await Promise.all(
+        enrichedItems.map(async (i) => {
+          const ancestorIds = await this.categoryService.getAncestorIds(
+            i.categoryId,
+          );
+          // console.log('=== VOUCHER CATEGORY ===');
+          // console.log(voucher.categories.map((c) => c.id));
+
+          // console.log('=== PRODUCT ROOT CHAIN ===');
+          // console.log({
+          //   productId: i.productId,
+          //   ancestorIds,
+          // });
+
+          return {
+            ...i,
+            ancestorIds,
+          };
+        }),
+      );
+
+      applicableItems = enrichedWithAncestors.filter((i) =>
+        i.ancestorIds.some((id) => allowed.has(id)),
+      );
     }
 
     const appliedSubtotal = applicableItems.reduce(

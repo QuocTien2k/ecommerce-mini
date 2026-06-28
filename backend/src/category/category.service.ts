@@ -155,6 +155,12 @@ export class CategoryService {
     return ancestors;
   }
 
+  //Returns category lineage IDs (L1 → L2 → L3) for a given category => voucher.
+  async getAncestorIds(categoryId: string): Promise<string[]> {
+    const ancestors = await this.getAncestors(categoryId);
+    return ancestors.map((a) => a.id);
+  }
+
   //check product in tree
   async countActiveProductsInTree(categoryId: string): Promise<number> {
     const descendants = await this.getAllDescendantIds(categoryId);
