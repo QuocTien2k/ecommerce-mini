@@ -22,6 +22,7 @@ import { GetVouchersAdminDto } from './dtos/get-voucher-admin.dto';
 import { UpdateVoucherDto } from './dtos/update-voucher.dto';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
 import { GetVoucherDetailAdminDto } from './dtos/voucher-detail.dto';
+import { GetAvailableVouchersQueryDto } from './dtos/get-available-voucher.dto';
 
 @Controller('voucher')
 export class VoucherController {
@@ -41,8 +42,11 @@ export class VoucherController {
   @Get('available')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
-  async getAvailableVuchers(@CurrentUser('sub') userId: string) {
-    return this.voucherService.getAvailableVouchers(userId);
+  async getAvailableVouchers(
+    @CurrentUser('sub') userId: string,
+    @Query() query: GetAvailableVouchersQueryDto,
+  ) {
+    return this.voucherService.getAvailableVouchers(userId, query.subtotal);
   }
 
   @Get('admin')

@@ -646,29 +646,33 @@ export class VoucherService {
     return Array.from(unique.values());
   }
 
-  async getAvailableVouchers(userId: string): Promise<AvailableVoucherDto[]> {
-    const cartItems = await this.prisma.cartItem.findMany({
-      where: { userId },
-      select: {
-        productId: true,
-        quantity: true,
+  private async previewVoucher(voucher: Voucher, subtotal: number) {
+    const appliedSubtotal = subtotal;
+
+    const discount = this.calculateVoucherDiscount(voucher, appliedSubtotal);
+
+    return this.mapToApplyVoucherResult(
+      {
+        voucher,
+        subtotal,
+        appliedSubtotal,
+        remaining: null,
       },
-    });
+      discount,
+    );
+  }
 
-    if (cartItems.length === 0) {
-      return [];
-    }
-
+  async getAvailableVouchers(
+    userId: string,
+    subtotal: number,
+  ): Promise<AvailableVoucherDto[]> {
     const vouchers = await this.resolveUserVouchers(userId);
 
     const availableVouchers: AvailableVoucherDto[] = [];
 
     for (const { voucher } of vouchers) {
       try {
-        const result = await this.applyVoucher(userId, {
-          voucherCode: voucher.code,
-          items: cartItems,
-        });
+        const result = await this.previewVoucher(voucher, subtotal);
 
         availableVouchers.push({
           id: voucher.id,
@@ -687,9 +691,7 @@ export class VoucherService {
           finalTotal: result.finalTotal,
           remainingUsage: result.remainingUsage ?? null,
         });
-      } catch (e) {
-        // console.log('VOUCHER FAIL:', voucher.code);
-        // console.log(e.message);
+      } catch {
         continue;
       }
     }
