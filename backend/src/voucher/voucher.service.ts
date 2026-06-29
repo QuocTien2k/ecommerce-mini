@@ -688,8 +688,8 @@ export class VoucherService {
           remainingUsage: result.remainingUsage ?? null,
         });
       } catch (e) {
-        console.log('VOUCHER FAIL:', voucher.code);
-        console.log(e.message);
+        // console.log('VOUCHER FAIL:', voucher.code);
+        // console.log(e.message);
         continue;
       }
     }
