@@ -13,15 +13,15 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
         <div
           key={item.id}
           className={[
-            "flex items-start justify-between gap-4 p-4",
+            "flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between",
             index !== items.length - 1 && "border-b",
           ]
             .filter(Boolean)
             .join(" ")}
         >
           {/* LEFT */}
-          <div className="flex flex-1 gap-4">
-            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted">
+          <div className="flex min-w-0 flex-1 gap-4">
+            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border bg-muted sm:h-20 sm:w-20">
               <img
                 src={item.productImage}
                 alt={item.productName}
@@ -32,7 +32,7 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
             <div className="min-w-0 flex-1 space-y-1">
               <Link
                 to={`/products/${item.slug}`}
-                className="font-medium leading-5 hover:underline"
+                className="line-clamp-2 font-medium leading-5 hover:underline"
               >
                 {item.productName}
               </Link>
@@ -50,14 +50,14 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
           </div>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-8 text-sm">
-            <div className="min-w-17.5 text-center">
+          <div className="flex justify-between gap-6 border-t pt-3 text-sm md:border-0 md:pt-0">
+            <div className="text-left md:min-w-18 md:text-center">
               <div className="text-muted-foreground">Số lượng</div>
 
               <div className="font-medium">x{item.quantity}</div>
             </div>
 
-            <div className="min-w-35 text-right">
+            <div className="md:min-w-35 text-right">
               <div className="text-muted-foreground">Thành tiền</div>
 
               <div className="font-semibold">
@@ -83,7 +83,7 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
       </div>
 
       {shouldScroll ? (
-        <ScrollArea className="h-140 rounded-lg border">
+        <ScrollArea className="max-h-[70vh] md:h-140 rounded-lg border">
           <div>{content}</div>
         </ScrollArea>
       ) : (

@@ -14,34 +14,39 @@ const OrderPricing = ({
 }) => {
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Thanh toán</h3>
+      <h3 className="mb-4 text-lg font-semibold">Thanh toán</h3>
 
       <div className="space-y-3 text-sm">
-        <div className="flex justify-between">
+        <div className="flex items-center justify-between gap-4">
           <span>Tạm tính</span>
           <span>{formatCurrency(pricing.subtotal)}</span>
         </div>
 
-        <div className="flex justify-between text-green-600">
+        <div className="flex items-center justify-between gap-4 text-green-600">
           <span>Giảm giá</span>
           <span>-{formatCurrency(pricing.discountAmount)}</span>
         </div>
 
         {voucher && (
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between gap-4">
             <span>Mã giảm giá</span>
 
-            <Badge variant="secondary">{voucher.code}</Badge>
+            <Badge
+              variant="secondary"
+              className="max-w-40 truncate sm:max-w-none"
+            >
+              {voucher.code}
+            </Badge>
           </div>
         )}
       </div>
 
       <hr />
 
-      <div className="border-t pt-4 flex justify-between items-center">
+      <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-base font-semibold">Tổng thanh toán</span>
 
-        <span className="text-2xl font-bold">
+        <span className="text-xl font-bold wrap-break-word sm:text-2xl">
           {formatCurrency(pricing.totalPrice)}
         </span>
       </div>
