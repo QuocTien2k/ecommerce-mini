@@ -16,3 +16,10 @@ export const customerVoucherApi = {
   getAvailableVouchers: (): ApiResult<AvailableVoucher[]> =>
     api.get("/voucher/available"),
 };
+
+// getAvailableVouchers: (subtotal: number): ApiResult<AvailableVoucher[]> =>
+//   api.get("/voucher/available", {
+//     params: {
+//       subtotal,
+//     },
+//   });

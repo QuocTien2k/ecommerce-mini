@@ -9,3 +9,9 @@ export const useGetAvailableVouchers = () => {
     queryFn: () => customerVoucherApi.getAvailableVouchers(),
   });
 };
+
+// useQuery({
+//   queryKey: ["available-vouchers", cart.totalPrice],
+//   queryFn: () => getAvailableVouchers(cart.totalPrice),
+//   enabled: !!cart?.totalPrice,
+// });

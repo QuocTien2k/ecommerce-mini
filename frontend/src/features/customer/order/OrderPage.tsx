@@ -1,4 +1,4 @@
-import { useAppSelector } from "@app/hooks";
+import { useAppDispatch, useAppSelector } from "@app/hooks";
 import { useGetCart } from "../cart/hooks/useGetCart";
 import { useCreateOrder } from "./hooks/useCreateOrder";
 import { EmptyState } from "@components/cart/EmptyState";
@@ -12,6 +12,8 @@ import { useEffect } from "react";
 import { PaymentMethodSelector } from "./components/PaymentMethod";
 import { useCreateVnpayPayment } from "../payment/hooks/useCreateVnpay";
 import { useNavigate } from "react-router-dom";
+import { clearSelectedVoucher } from "./store/order.slice";
+import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 
 const OrderPage = () => {
   //Cart
@@ -22,6 +24,17 @@ const OrderPage = () => {
   const user = useAppSelector((state) => state.user.user);
   const isAuthenticated = Boolean(user?.id);
   const form = useOrderForm(user?.phone, user?.address);
+
+  //voucher
+  const dispatch = useAppDispatch();
+  const selectedVoucherId = useAppSelector(
+    (state) => state.order.selectedVoucherId,
+  );
+  const { data: voucherResponse } = useGetAvailableVouchers();
+  const availableVouchers = voucherResponse?.data;
+
+  const selectedVoucher =
+    availableVouchers?.find((v) => v.id === selectedVoucherId) ?? null;
 
   useEffect(() => {
     form.reset({
@@ -43,13 +56,15 @@ const OrderPage = () => {
       receiverAddress: values.receiverAddress,
       paymentMethod: values.paymentMethod,
       note: "",
-      voucherCode: null,
+      voucherCode: selectedVoucher?.code ?? null,
       items: cart.items.map((item) => ({
         productId: item.productId,
         variantId: item.variantId,
         quantity: item.quantity,
       })),
     });
+
+    dispatch(clearSelectedVoucher());
 
     const order = res.data.order;
 
@@ -104,6 +119,7 @@ const OrderPage = () => {
               <OrderSummary
                 totalPrice={cart.totalPrice}
                 totalQuantity={cart.totalQuantity}
+                selectedVoucher={selectedVoucher}
                 isSubmitting={createOrderMutation.isPending}
                 onSubmit={handleCreateOrder}
               />
