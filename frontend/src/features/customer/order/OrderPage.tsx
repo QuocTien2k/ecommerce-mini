@@ -55,7 +55,7 @@ const OrderPage = () => {
       receiverPhone: values.receiverPhone,
       receiverAddress: values.receiverAddress,
       paymentMethod: values.paymentMethod,
-      note: "",
+      note: values.note,
       voucherCode: selectedVoucher?.code ?? null,
       items: cart.items.map((item) => ({
         productId: item.productId,
@@ -73,7 +73,7 @@ const OrderPage = () => {
       return;
     }
 
-    navigate("/order-success");
+    navigate(`/order/${order.id}`);
   });
 
   if (!isAuthenticated) {

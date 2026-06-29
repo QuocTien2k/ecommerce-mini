@@ -3,6 +3,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import type { OrderFormSchema } from "../schemas/order.schema";
+import { Textarea } from "@components/ui/textarea";
 
 interface OrderCustomerInfoProps {
   user: AdminUser | null;
@@ -49,6 +50,29 @@ const OrderCustomerInfo = ({ user, form }: OrderCustomerInfoProps) => {
         {form.formState.errors.receiverAddress && (
           <p className="text-sm text-red-500">
             {form.formState.errors.receiverAddress.message}
+          </p>
+        )}
+      </div>
+
+      {/* Note */}
+      <div className="space-y-2">
+        <Label>Ghi chú</Label>
+
+        <Textarea
+          rows={3}
+          maxLength={300}
+          placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."
+          {...form.register("note")}
+        />
+
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Tối đa 300 ký tự</span>
+          <span>{form.watch("note")?.length ?? 0}/300</span>
+        </div>
+
+        {form.formState.errors.note && (
+          <p className="text-sm text-red-500">
+            {form.formState.errors.note.message}
           </p>
         )}
       </div>

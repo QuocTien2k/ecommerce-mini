@@ -70,7 +70,7 @@ const OrderItems = ({ items }: { items: OrderItemDetail[] }) => {
     </>
   );
 
-  console.log(items);
+  //console.log(items);
 
   return (
     <section className="space-y-4">

@@ -6,6 +6,7 @@ export const orderFormSchema = z.object({
 
   receiverAddress: z.string().trim().min(5, "Địa chỉ quá ngắn"),
   paymentMethod: z.enum(["COD", "VNPAY"]) satisfies z.ZodType<PaymentMethod>,
+  note: z.string().max(300, "Ghi chú không được vượt quá 300 ký tự").optional(),
 });
 
 export type OrderFormSchema = z.infer<typeof orderFormSchema>;

@@ -10,6 +10,7 @@ export const useOrderForm = (phone?: string, address?: string) => {
       receiverPhone: phone ?? "",
       receiverAddress: address ?? "",
       paymentMethod: "COD",
+      note: "",
     },
 
     mode: "onSubmit",
