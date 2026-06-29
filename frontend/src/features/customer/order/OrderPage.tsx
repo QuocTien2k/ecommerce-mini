@@ -30,7 +30,7 @@ const OrderPage = () => {
   const selectedVoucherId = useAppSelector(
     (state) => state.order.selectedVoucherId,
   );
-  const { data: voucherResponse } = useGetAvailableVouchers();
+  const { data: voucherResponse } = useGetAvailableVouchers(cart?.totalPrice);
   const availableVouchers = voucherResponse?.data;
 
   const selectedVoucher =

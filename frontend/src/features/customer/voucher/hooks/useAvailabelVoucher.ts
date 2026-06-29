@@ -3,15 +3,10 @@ import { customerVoucherApi } from "../api/customerVoucher.api";
 
 export const CUSTOMER_AVAILABLE_VOUCHER_QUERY_KEY = "available-vouchers";
 
-export const useGetAvailableVouchers = () => {
+export const useGetAvailableVouchers = (subtotal?: number) => {
   return useQuery({
-    queryKey: [CUSTOMER_AVAILABLE_VOUCHER_QUERY_KEY],
-    queryFn: () => customerVoucherApi.getAvailableVouchers(),
+    queryKey: ["available-vouchers", subtotal],
+    queryFn: () => customerVoucherApi.getAvailableVouchers(subtotal!),
+    enabled: !!subtotal,
   });
 };
-
-// useQuery({
-//   queryKey: ["available-vouchers", cart.totalPrice],
-//   queryFn: () => getAvailableVouchers(cart.totalPrice),
-//   enabled: !!cart?.totalPrice,
-// });

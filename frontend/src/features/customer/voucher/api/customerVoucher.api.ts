@@ -13,13 +13,8 @@ export const customerVoucherApi = {
   ): ApiResult<PaginatedResponse<UserVoucher>> =>
     api.get("/voucher/user", { params }),
 
-  getAvailableVouchers: (): ApiResult<AvailableVoucher[]> =>
-    api.get("/voucher/available"),
+  getAvailableVouchers: (subtotal: number): ApiResult<AvailableVoucher[]> =>
+    api.get("/voucher/available", {
+      params: { subtotal },
+    }),
 };
-
-// getAvailableVouchers: (subtotal: number): ApiResult<AvailableVoucher[]> =>
-//   api.get("/voucher/available", {
-//     params: {
-//       subtotal,
-//     },
-//   });

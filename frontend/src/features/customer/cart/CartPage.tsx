@@ -7,10 +7,10 @@ import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 
 export const CartPage = () => {
   const { data: cartResponse } = useGetCart();
-  const { data: voucherResponse } = useGetAvailableVouchers();
+  //const { data: voucherResponse } = useGetAvailableVouchers();
 
   const cart = cartResponse?.data;
-  //const { data: voucherResponse } = useGetAvailableVouchers(cart.totalPrice);
+  const { data: voucherResponse } = useGetAvailableVouchers(cart?.totalPrice);
   const availableVouchers = voucherResponse?.data;
 
   if (!cart || cart.items.length === 0) {
@@ -25,7 +25,7 @@ export const CartPage = () => {
     );
   }
 
-  console.log(availableVouchers);
+  //console.log(availableVouchers);
 
   return (
     <div className="container max-w-full py-8">
