@@ -25,7 +25,12 @@ export default function SocketProvider({ children }: Props) {
           id: data.id,
           title: data.title,
           message: data.message,
-          isRead: false,
+          path: data.path,
+
+          orderId: data.orderId,
+          orderStatus: data.orderStatus,
+
+          isRead: data.isRead,
           createdAt: data.createdAt,
         }),
       );

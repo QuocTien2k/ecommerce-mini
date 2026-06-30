@@ -1,9 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { OrderStatus } from "@shared/types/order-status.type";
 
 export interface Notification {
   id: string;
   title: string;
   message?: string;
+  path?: string;
+  type?: string;
+  orderId?: string;
+  orderStatus?: OrderStatus;
+
   isRead: boolean;
   createdAt?: string;
 }
@@ -11,7 +17,7 @@ export interface Notification {
 interface NotificationState {
   items: Notification[];
   unreadCount: number;
-  lastIncomingId?: string;
+  lastIncoming?: Notification;
 }
 
 const initialState: NotificationState = {
@@ -38,7 +44,7 @@ const notificationSlice = createSlice({
         state.unreadCount += 1;
       }
       // trigger UI event
-      state.lastIncomingId = action.payload.id;
+      state.lastIncoming = action.payload;
     },
 
     markAsRead(state, action: PayloadAction<string>) {

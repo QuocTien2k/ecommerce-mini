@@ -7,11 +7,48 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import OrderTimeline from "./components/detail/OrderTimeline";
 import OrderPricing from "./components/detail/OrderPricing";
 import OrderNotFound from "@components/order/OrderNotFound";
+import { useEffect } from "react";
+import { CUSTOMER_ORDER_QUERY_KEY } from "./constant/order";
+import { getOrderStatusLabel } from "@shared/types/order-status.utils";
+import type { OrderDetail } from "@shared/types/order.type";
+import { connectSocket, getSocket } from "@lib/socket";
+import { queryClient } from "@lib/react-query";
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
 
   const { data, isLoading } = useOrderDetail(id!);
+
+  //Đồng bộ trạng thái đơn hàng khi nhận thông báo realtime
+  useEffect(() => {
+    const socket = getSocket() ?? connectSocket();
+    if (!socket) return;
+
+    const handler = (data: any) => {
+      if (data.type !== "ORDER_STATUS_UPDATED") return;
+      if (data.orderId !== id) return;
+
+      queryClient.setQueryData(
+        CUSTOMER_ORDER_QUERY_KEY.detail(data.orderId),
+        (old: OrderDetail | undefined) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            status: data.orderStatus,
+            statusLabel: getOrderStatusLabel(data.orderStatus),
+            updatedAt: new Date().toISOString(),
+          };
+        },
+      );
+    };
+
+    socket.on("notification", handler);
+
+    return () => {
+      socket.off("notification", handler);
+    };
+  }, [id, queryClient]);
 
   if (!data) return <OrderNotFound />;
 
