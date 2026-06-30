@@ -14,6 +14,7 @@ import { useCreateVnpayPayment } from "../payment/hooks/useCreateVnpay";
 import { useNavigate } from "react-router-dom";
 import { clearSelectedVoucher } from "./store/order.slice";
 import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
+import { sonnerToast } from "@lib/sonner-toast";
 
 const OrderPage = () => {
   //Cart
@@ -72,6 +73,8 @@ const OrderPage = () => {
       createVnpayPayment.mutate(order.id);
       return;
     }
+
+    sonnerToast.success(res.message ?? "Tạo đơn hàng thành công");
 
     navigate(`/order/${order.id}`);
   });
