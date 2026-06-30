@@ -432,8 +432,12 @@ export class OrderService {
 
       const allowedNext = this.validTransitions[order.status] ?? [];
       if (!allowedNext.includes(newStatus)) {
+        const currentStatusLabel = ORDER_STATUS_LABEL[order.status];
+        const newStatusLabel = ORDER_STATUS_LABEL[newStatus];
+
         throw new BadRequestException(
-          `Không thể chuyển trạng thái từ ${order.status} sang ${newStatus}`,
+          `Không thể chuyển trạng thái từ "${currentStatusLabel}" sang "${newStatusLabel}". 
+          Vui lòng cập nhật theo đúng trình tự của đơn hàng.`,
         );
       }
 
