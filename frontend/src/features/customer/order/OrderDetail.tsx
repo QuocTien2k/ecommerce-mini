@@ -13,6 +13,7 @@ import { getOrderStatusLabel } from "@shared/types/order-status.utils";
 import type { OrderDetail } from "@shared/types/order.type";
 import { connectSocket, getSocket } from "@lib/socket";
 import { queryClient } from "@lib/react-query";
+import type { OrderStatusUpdatedEvent } from "./types/order-status-event-socket.type";
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +25,7 @@ const OrderDetail = () => {
     const socket = getSocket() ?? connectSocket();
     if (!socket) return;
 
-    const handler = (data: any) => {
+    const handler = (data: OrderStatusUpdatedEvent) => {
       if (data.type !== "ORDER_STATUS_UPDATED") return;
       if (data.orderId !== id) return;
 
