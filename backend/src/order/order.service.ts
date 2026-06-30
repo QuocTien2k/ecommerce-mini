@@ -518,9 +518,13 @@ export class OrderService {
     const payload: NotificationResponseDto = {
       id: result.notification.id,
       type: 'ORDER_STATUS_UPDATED',
+
+      orderId: result.notification.orderId ?? undefined,
+      orderStatus: result.order.status,
+
       title: result.notification.title,
       message: result.notification.message,
-      path: result.notification.path!,
+      path: result.notification.path ?? undefined,
       isRead: result.notification.isRead,
       createdAt: result.notification.createdAt,
     };

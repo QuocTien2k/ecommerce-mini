@@ -1,6 +1,7 @@
 import { IsOptional, Min, IsInt } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { IsUUID } from 'class-validator';
+import { OrderStatus } from '@prisma/client';
 
 export class NotificationQueryDto {
   @IsOptional()
@@ -31,6 +32,8 @@ export class NotificationResponseDto {
   title: string;
   message: string;
   path?: string;
+  orderId?: string;
+  orderStatus?: OrderStatus;
   isRead: boolean;
   createdAt: Date;
 }
