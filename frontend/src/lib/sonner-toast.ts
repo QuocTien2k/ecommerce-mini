@@ -5,7 +5,7 @@ export type SonnerToastOptions = {
   duration?: number;
 };
 
-const DEFAULT_DURATION = 900;
+const DEFAULT_DURATION = 3500;
 
 export const sonnerToast = {
   error: (message: string, options?: SonnerToastOptions) => {

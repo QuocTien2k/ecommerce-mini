@@ -19,7 +19,16 @@ function App() {
   return (
     <>
       <AppRoutes />
-      <Toaster position="top-center" expand={true} richColors />
+      <Toaster
+        position="top-center"
+        expand={true}
+        richColors
+        toastOptions={{
+          style: {
+            width: "min(520px, calc(100vw - 32px))",
+          },
+        }}
+      />
     </>
   );
 }
