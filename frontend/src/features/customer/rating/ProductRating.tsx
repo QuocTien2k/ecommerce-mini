@@ -1,28 +1,20 @@
 import { Star } from "lucide-react";
-import { useCreateRating } from "./hooks/useCreateRating";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
-import { useUpdateRating } from "./hooks/useUpdateRating";
-import { CUSTOMER_RATING_QUERY_KEY } from "./constant/rating-query-key.contants";
-import type { Rating } from "./types/customerRating.type";
-import { useQueryClient } from "@tanstack/react-query";
+import { useUpsertRating } from "./hooks/useUpsertRating";
+import { useGetMyRating } from "./hooks/useGetMyRating";
 
 type ProductRatingProps = {
   productId: string;
 };
 
 const ProductRating = ({ productId }: ProductRatingProps) => {
-  const queryClient = useQueryClient();
+  const { data: myRating } = useGetMyRating(productId);
 
-  const myRating = queryClient.getQueryData<Rating | null>(
-    CUSTOMER_RATING_QUERY_KEY.mine(productId),
-  );
-
-  const { mutateAsync: createRating } = useCreateRating();
-  const { mutateAsync: updateRating } = useUpdateRating();
+  const { mutateAsync: upsertRating } = useUpsertRating();
 
   const { loading, run } = useScopedLoading();
 
@@ -30,8 +22,16 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
     () => myRating?.value ?? 0,
   );
 
+  useEffect(() => {
+    setSelectedRating(myRating?.value ?? 0);
+  }, [myRating?.value]);
+
+  const submittingRef = useRef(false);
+
   const handleRate = async (value: number) => {
-    if (loading) return;
+    if (submittingRef.current) return;
+
+    submittingRef.current = true;
 
     sonnerToast.dismiss("rating-error");
 
@@ -40,37 +40,15 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
     setSelectedRating(value);
 
     try {
-      const result = await run(async () => {
-        const cachedRating = queryClient.getQueryData<Rating | null>(
-          CUSTOMER_RATING_QUERY_KEY.mine(productId),
-        );
-
-        //create
-        if (!cachedRating?.id) {
-          return await createRating({
-            productId,
-            value,
-          });
-        }
-
-        //update
-        return await updateRating({
+      const result = await run(() =>
+        upsertRating({
           productId,
-          payload: { value },
-        });
-      });
+          value,
+        }),
+      );
 
       if (result) {
         sonnerToast.success(result.message);
-
-        // IMPORTANT: ensure cache sync (force consistency)
-        queryClient.setQueryData(
-          CUSTOMER_RATING_QUERY_KEY.mine(productId),
-          (old: Rating | null | undefined) => ({
-            ...(old ?? {}),
-            ...result.data,
-          }),
-        );
       }
     } catch (error) {
       setSelectedRating(previousValue);
@@ -78,6 +56,8 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
       sonnerToast.error(getErrorMessage(error, "Đánh giá sản phẩm thất bại"), {
         id: "rating-error",
       });
+    } finally {
+      submittingRef.current = false;
     }
   };
 

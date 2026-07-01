@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateRatingPayload } from "../types/customerRating.type";
 import { customerRatingApi } from "../api/customerRating.api";
 import { CUSTOMER_RATING_QUERY_KEY } from "../constant/rating-query-key.contants";
+import type { RatingPayload } from "../types/customerRating.type";
 
-export const useCreateRating = () => {
+export const useUpsertRating = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateRatingPayload) =>
-      customerRatingApi.createRating(payload),
+    mutationFn: (payload: RatingPayload) =>
+      customerRatingApi.upsertRating(payload),
 
     onSuccess: (response) => {
       const rating = response.data;

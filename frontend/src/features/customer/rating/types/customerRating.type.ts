@@ -6,13 +6,8 @@ export interface Rating {
   createdAt: string;
   updatedAt: string;
 }
-/* Case create */
-export interface CreateRatingPayload {
-  productId: string;
-  value: number;
-}
 
-/* Case update */
-export interface UpdateRatingPayload {
+export interface RatingPayload {
+  productId: string;
   value: number;
 }
