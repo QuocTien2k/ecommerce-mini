@@ -15,8 +15,17 @@ export const useUpsertRating = () => {
 
       queryClient.setQueryData(
         CUSTOMER_RATING_QUERY_KEY.mine(rating.productId),
-        rating,
+        {
+          data: rating,
+        },
       );
+
+      // console.log(
+      //   "Cache after setQueryData:",
+      //   queryClient.getQueryData(
+      //     CUSTOMER_RATING_QUERY_KEY.mine(rating.productId),
+      //   ),
+      // );
     },
   });
 };

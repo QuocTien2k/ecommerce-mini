@@ -10,7 +10,9 @@ export const useDeleteRating = () => {
       customerRatingApi.deleteRating(productId),
 
     onSuccess: (_, productId) => {
-      queryClient.setQueryData(CUSTOMER_RATING_QUERY_KEY.mine(productId), null);
+      queryClient.setQueryData(CUSTOMER_RATING_QUERY_KEY.mine(productId), {
+        data: null,
+      });
     },
   });
 };

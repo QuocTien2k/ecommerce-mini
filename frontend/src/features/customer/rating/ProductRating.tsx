@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
 import { sonnerToast } from "@lib/sonner-toast";
@@ -14,7 +14,17 @@ type ProductRatingProps = {
 };
 
 const ProductRating = ({ productId }: ProductRatingProps) => {
-  const { data: myRating } = useGetMyRating(productId);
+  const ratingQuery = useGetMyRating(productId);
+
+  const myRating = ratingQuery.data?.data;
+
+  // console.log({
+  //   status: ratingQuery.status,
+  //   data: ratingQuery.data,
+  //   error: ratingQuery.error,
+  //   fetchStatus: ratingQuery.fetchStatus,
+  // });
+
   const { mutateAsync: deleteRating } = useDeleteRating();
 
   const { mutateAsync: upsertRating } = useUpsertRating();
@@ -81,6 +91,11 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
       });
     }
   };
+
+  // console.log({
+  //   myRating,
+  //   selectedRating,
+  // });
 
   return (
     <div className="space-y-3 rounded-lg border p-4">
