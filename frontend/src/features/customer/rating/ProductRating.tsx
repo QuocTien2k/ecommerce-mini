@@ -6,6 +6,8 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { useUpsertRating } from "./hooks/useUpsertRating";
 import { useGetMyRating } from "./hooks/useGetMyRating";
+import { useDeleteRating } from "./hooks/useDeleteRating";
+import { AsyncButton } from "@components/common/async-button";
 
 type ProductRatingProps = {
   productId: string;
@@ -13,6 +15,7 @@ type ProductRatingProps = {
 
 const ProductRating = ({ productId }: ProductRatingProps) => {
   const { data: myRating } = useGetMyRating(productId);
+  const { mutateAsync: deleteRating } = useDeleteRating();
 
   const { mutateAsync: upsertRating } = useUpsertRating();
 
@@ -26,12 +29,8 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
     setSelectedRating(myRating?.value ?? 0);
   }, [myRating?.value]);
 
-  const submittingRef = useRef(false);
-
   const handleRate = async (value: number) => {
-    if (submittingRef.current) return;
-
-    submittingRef.current = true;
+    if (loading) return;
 
     sonnerToast.dismiss("rating-error");
 
@@ -56,8 +55,30 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
       sonnerToast.error(getErrorMessage(error, "Đánh giá sản phẩm thất bại"), {
         id: "rating-error",
       });
-    } finally {
-      submittingRef.current = false;
+    }
+  };
+
+  const handleDelete = async () => {
+    if (loading || !myRating) return;
+
+    sonnerToast.dismiss("rating-error");
+
+    const previousValue = selectedRating;
+
+    setSelectedRating(0);
+
+    try {
+      const result = await run(() => deleteRating(productId));
+
+      if (result) {
+        sonnerToast.success(result.message);
+      }
+    } catch (error) {
+      setSelectedRating(previousValue);
+
+      sonnerToast.error(getErrorMessage(error, "Xóa đánh giá thất bại"), {
+        id: "rating-error",
+      });
     }
   };
 
@@ -89,6 +110,16 @@ const ProductRating = ({ productId }: ProductRatingProps) => {
             />
           </button>
         ))}
+        {myRating && (
+          <AsyncButton
+            type="button"
+            disabled={loading}
+            onClick={() => void handleDelete()}
+            variant={"destructive"}
+          >
+            Xóa đánh giá
+          </AsyncButton>
+        )}
       </div>
     </div>
   );

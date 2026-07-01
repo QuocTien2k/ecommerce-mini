@@ -8,4 +8,7 @@ export const customerRatingApi = {
 
   upsertRating: (payload: RatingPayload): ApiResult<Rating> =>
     api.post("/rating", payload),
+
+  deleteRating: (productId: string): ApiResult<void> =>
+    api.delete(`/rating/${productId}`),
 };
