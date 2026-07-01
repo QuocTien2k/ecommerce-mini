@@ -15,15 +15,15 @@ import {
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { RatingService } from '@rating/rating.service';
-import { CreateRatingDto } from '@rating/dtos/create-rating.dto';
-import { UpdateRatingDto } from '@rating/dtos/update-rating.sto';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
+import { RatingDto } from './dtos/rating.dto';
 
 @Controller('rating')
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
 
   @Get(':productId/me')
+  @Roles(Role.USER)
   @UseGuards(JwtAuthGuard)
   async getMyRating(
     @CurrentUser('sub') userId: string,
@@ -33,27 +33,18 @@ export class RatingController {
   }
 
   @Post()
+  @Roles(Role.USER)
   @UseGuards(JwtAuthGuard)
   @ResponseMessage('Đánh giá sản phẩm thành công!')
-  async createRating(
+  async upsertRating(
     @CurrentUser('sub') userId: string,
-    @Body() dto: CreateRatingDto,
+    @Body() dto: RatingDto,
   ) {
-    return await this.ratingService.create(userId, dto);
-  }
-
-  @Patch(':productId')
-  @UseGuards(JwtAuthGuard)
-  @ResponseMessage('Cập nhật đánh giá thành công!')
-  async update(
-    @CurrentUser('sub') userId: string,
-    @Param('productId', new ParseUUIDPipe()) productId: string,
-    @Body() dto: UpdateRatingDto,
-  ) {
-    return await this.ratingService.update(userId, productId, dto);
+    return await this.ratingService.upsert(userId, dto);
   }
 
   @Delete(':productId')
+  @Roles(Role.USER)
   @UseGuards(JwtAuthGuard)
   @ResponseMessage('Xóa đánh giá thành công!')
   async delete(

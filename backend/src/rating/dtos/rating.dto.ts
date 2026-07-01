@@ -1,7 +1,7 @@
-import { IsInt, IsNotEmpty, IsUUID, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsUUID, Max, Min } from 'class-validator';
 
-export class CreateRatingDto {
+export class RatingDto {
   @IsUUID()
   @IsNotEmpty()
   productId: string;
