@@ -22,8 +22,14 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { toast } from "sonner";
+import { useAppSelector } from "@app/hooks";
+import ProductRating from "@features/customer/rating/components/ProductRating";
 
 const ProductDetail = () => {
+  //check auth
+  const user = useAppSelector((state) => state.user.user);
+  const isAuthenticated = Boolean(user?.id);
+
   const { slug } = useParams<{ slug: string }>();
 
   const { data: product, isLoading } = usePublicProductDetail(slug ?? "");
@@ -192,6 +198,7 @@ const ProductDetail = () => {
                 <span>({product.ratingCount} đánh giá)</span>
               </div>
             </div>
+            {isAuthenticated && <ProductRating productId={product.id} />}
             <Separator />
 
             {/* Attributes */}
