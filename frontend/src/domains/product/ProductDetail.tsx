@@ -23,7 +23,7 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
 import { toast } from "sonner";
 import { useAppSelector } from "@app/hooks";
-import ProductRating from "@features/customer/rating/components/ProductRating";
+import ProductRating from "@features/customer/rating/ProductRating";
 
 const ProductDetail = () => {
   //check auth

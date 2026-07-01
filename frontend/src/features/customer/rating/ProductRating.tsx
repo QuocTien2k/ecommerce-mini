@@ -1,56 +1,79 @@
 import { Star } from "lucide-react";
-import { useGetMyRating } from "../hooks/useGetMyRating";
-import { useCreateRating } from "../hooks/useCreateRating";
-import { useEffect, useState } from "react";
+import { useCreateRating } from "./hooks/useCreateRating";
+import { useState } from "react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error";
+import { useUpdateRating } from "./hooks/useUpdateRating";
+import { CUSTOMER_RATING_QUERY_KEY } from "./constant/rating-query-key.contants";
+import type { Rating } from "./types/customerRating.type";
+import { useQueryClient } from "@tanstack/react-query";
 
 type ProductRatingProps = {
   productId: string;
 };
 
 const ProductRating = ({ productId }: ProductRatingProps) => {
-  const { data: myRating } = useGetMyRating(productId);
+  const queryClient = useQueryClient();
+
+  const myRating = queryClient.getQueryData<Rating | null>(
+    CUSTOMER_RATING_QUERY_KEY.mine(productId),
+  );
 
   const { mutateAsync: createRating } = useCreateRating();
-  //const { mutateAsync: updateRating } = useUpdateRating();
+  const { mutateAsync: updateRating } = useUpdateRating();
 
   const { loading, run } = useScopedLoading();
 
-  const [selectedRating, setSelectedRating] = useState(0);
-
-  useEffect(() => {
-    if (myRating) {
-      setSelectedRating(myRating.value);
-    }
-  }, [myRating]);
+  const [selectedRating, setSelectedRating] = useState(
+    () => myRating?.value ?? 0,
+  );
 
   const handleRate = async (value: number) => {
     if (loading) return;
 
-    setSelectedRating(value);
-
     sonnerToast.dismiss("rating-error");
+
+    const previousValue = selectedRating;
+
+    setSelectedRating(value);
 
     try {
       const result = await run(async () => {
-        if (!myRating) {
+        const cachedRating = queryClient.getQueryData<Rating | null>(
+          CUSTOMER_RATING_QUERY_KEY.mine(productId),
+        );
+
+        //create
+        if (!cachedRating?.id) {
           return await createRating({
             productId,
             value,
           });
         }
 
-        // return await updateRating({ productId, value });
+        //update
+        return await updateRating({
+          productId,
+          payload: { value },
+        });
       });
 
       if (result) {
         sonnerToast.success(result.message);
+
+        // IMPORTANT: ensure cache sync (force consistency)
+        queryClient.setQueryData(
+          CUSTOMER_RATING_QUERY_KEY.mine(productId),
+          (old: Rating | null | undefined) => ({
+            ...(old ?? {}),
+            ...result.data,
+          }),
+        );
       }
     } catch (error) {
-      setSelectedRating(myRating?.value ?? 0);
+      setSelectedRating(previousValue);
 
       sonnerToast.error(getErrorMessage(error, "Đánh giá sản phẩm thất bại"), {
         id: "rating-error",
