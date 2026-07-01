@@ -25,7 +25,11 @@ function App() {
         richColors
         toastOptions={{
           style: {
-            width: "min(520px, calc(100vw - 32px))",
+            width: "fit-content",
+            maxWidth: "520px",
+            textAlign: "center",
+            display: "inline-flex",
+            justifyContent: "center",
           },
         }}
       />
