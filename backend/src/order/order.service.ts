@@ -11,6 +11,7 @@ import {
   PaymentStatus,
   Prisma,
   User,
+  VoucherScope,
 } from '@prisma/client';
 import { UserService } from '@user/user.service';
 import { CreateOrderItemDto } from './dtos/create-order-item.input';
@@ -245,6 +246,7 @@ export class OrderService {
     }
 
     const userVoucher = voucher.userVouchers[0];
+    const requiresUserVoucher = voucher.scope === VoucherScope.ORDER;
 
     // update voucher
     const voucherUpdateResult = await tx.voucher.updateMany({
@@ -264,24 +266,26 @@ export class OrderService {
     }
 
     // update user voucher
-    const userVoucherUpdateResult = await tx.userVoucher.updateMany({
-      where: {
-        userId,
-        voucherId: voucher.id,
-        ...(userVoucher?.remainingUsage != null && {
-          remainingUsage: { gt: 0 },
-        }),
-      },
-      data: {
-        usedCount: { increment: 1 },
-        ...(userVoucher?.remainingUsage != null && {
-          remainingUsage: { decrement: 1 },
-        }),
-      },
-    });
+    if (requiresUserVoucher) {
+      const userVoucherUpdateResult = await tx.userVoucher.updateMany({
+        where: {
+          userId,
+          voucherId: voucher.id,
+          ...(userVoucher?.remainingUsage != null && {
+            remainingUsage: { gt: 0 },
+          }),
+        },
+        data: {
+          usedCount: { increment: 1 },
+          ...(userVoucher?.remainingUsage != null && {
+            remainingUsage: { decrement: 1 },
+          }),
+        },
+      });
 
-    if (userVoucherUpdateResult.count === 0) {
-      throw new BadRequestException('Bạn đã dùng hết voucher này');
+      if (userVoucherUpdateResult.count === 0) {
+        throw new BadRequestException('Bạn đã dùng hết voucher này');
+      }
     }
 
     return { voucherResult, discountAmount };
