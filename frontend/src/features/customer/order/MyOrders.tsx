@@ -1,13 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useOrders } from "./hooks/useOrders";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { SectionTitle } from "@components/ui/section-title";
 import AppPagination from "@components/common/pagination";
 import OrderList from "./components/my-order/OrderList";
 import OrderEmpty from "@components/order/OrderEmpty";
+import { useSearchParams } from "react-router-dom";
 
 const MyOrders = () => {
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("page") ?? 1);
 
   const queryParams = useMemo(
     () => ({
@@ -15,6 +18,17 @@ const MyOrders = () => {
     }),
     [page],
   );
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage === 1) {
+      setSearchParams({});
+      return;
+    }
+
+    setSearchParams({
+      page: String(newPage),
+    });
+  };
 
   const { data, isLoading } = useOrders(queryParams);
 
@@ -46,7 +60,7 @@ const MyOrders = () => {
                 <AppPagination
                   page={page}
                   totalPages={totalPages}
-                  onPageChange={setPage}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )}
