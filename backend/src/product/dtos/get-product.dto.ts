@@ -1,5 +1,13 @@
-import { Transform } from 'class-transformer';
-import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsOptional,
+  IsString,
+  IsNumberString,
+  IsIn,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class GetProductsQueryDto {
   @IsOptional()
@@ -28,6 +36,13 @@ export class GetProductsQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   priceSort?: 'asc' | 'desc';
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  minRating?: number;
 
   // cho admin dùng
   @IsOptional()

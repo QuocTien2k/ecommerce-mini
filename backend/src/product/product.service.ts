@@ -300,6 +300,12 @@ export class ProductService {
       where.brandId = query.brandId;
     }
 
+    if (query.minRating !== undefined) {
+      where.ratingAvg = {
+        gte: query.minRating,
+      };
+    }
+
     const search = query.search?.trim();
 
     if (search) {
@@ -460,6 +466,12 @@ export class ProductService {
 
     if (query.brandId) {
       where.brandId = query.brandId;
+    }
+
+    if (query.minRating !== undefined) {
+      where.ratingAvg = {
+        gte: query.minRating,
+      };
     }
 
     const search = query.search?.trim();
