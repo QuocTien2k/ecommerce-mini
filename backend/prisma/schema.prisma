@@ -347,6 +347,7 @@ model Product {
   @@index([price])
   @@index([categoryId, brandId])
   @@index([categoryId, price])
+  @@index([ratingAvg])
   @@map("products")
 }
 model Rating {
