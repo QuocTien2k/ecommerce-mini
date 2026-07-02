@@ -53,7 +53,7 @@ const OrderDetail = () => {
 
   if (!data) return <OrderNotFound />;
 
-  //console.log(data);
+  // console.log(data);
 
   return (
     <QueryStateWrapper isLoading={isLoading}>
@@ -70,7 +70,7 @@ const OrderDetail = () => {
             </div>
 
             <div className="p-6">
-              <OrderItems items={data.items} />
+              <OrderItems items={data.items} status={data.status} />
             </div>
 
             <div className="p-6">
