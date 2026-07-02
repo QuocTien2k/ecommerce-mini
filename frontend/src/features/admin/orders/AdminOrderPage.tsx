@@ -25,13 +25,15 @@ import OrderEmpty from "@components/order/OrderEmpty";
 import { Button } from "@components/ui/button";
 import { cn } from "@lib/utils";
 import { AsyncButton } from "@components/common/async-button";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Info, Pencil } from "lucide-react";
 import AdminOrderDetail from "./components/AdminOrderDetail";
 import AdminUpdateOrder from "./components/AdminUpdateOrder";
+import OrderStatusGuideModal from "./components/OrderStatusGuide";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<OrderStatus | undefined>();
+  const [openGuide, setOpenGuide] = useState(false);
 
   // UI state
   const [searchInput, setSearchInput] = useState("");
@@ -87,6 +89,15 @@ const AdminOrderPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <Title title="Quản lý đơn hàng" />
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpenGuide(true)}
+          >
+            <Info className="mr-2 h-4 w-4" />
+            Hướng dẫn
+          </Button>
 
           <span className="text-sm text-muted-foreground">
             Tổng số lượng đơn hàng: {meta?.total ?? 0}
@@ -269,6 +280,8 @@ const AdminOrderPage = () => {
         orderId={selectedOrderId}
         onClose={handleCloseModals}
       />
+
+      <OrderStatusGuideModal open={openGuide} onOpenChange={setOpenGuide} />
     </QueryStateWrapper>
   );
 };
