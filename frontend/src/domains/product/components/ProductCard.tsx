@@ -1,13 +1,23 @@
 import { Link } from "react-router-dom";
 import type { PublicProductListItem } from "../types/public-product.type";
 import { formatCurrency } from "@lib/format-currency";
+import { Star } from "lucide-react";
 
 type Props = {
   product: PublicProductListItem;
 };
 
 export function ProductCard({ product }: Props) {
-  const { slug, name, thumbnail, price, discountPrice, discountPct } = product;
+  const {
+    slug,
+    name,
+    thumbnail,
+    price,
+    discountPrice,
+    discountPct,
+    ratingAvg,
+    ratingCount,
+  } = product;
 
   const hasDiscount =
     Number(discountPrice) > 0 && Number(discountPrice) < Number(price);
@@ -33,6 +43,16 @@ export function ProductCard({ product }: Props) {
 
       <div className="space-y-2 p-3">
         <h3 className="line-clamp-2 h-10 text-sm font-medium">{name}</h3>
+
+        {ratingCount > 0 && (
+          <div className="flex items-center gap-1 text-sm">
+            <Star className="size-4 fill-yellow-400 text-yellow-400" />
+
+            <span className="font-medium">{Number(ratingAvg).toFixed(1)}</span>
+
+            <span className="text-muted-foreground">({ratingCount})</span>
+          </div>
+        )}
 
         {hasDiscount ? (
           <div className="flex items-center gap-2">
