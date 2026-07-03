@@ -25,27 +25,29 @@ export function ProductCard({ product }: Props) {
   return (
     <Link
       to={`/products/${slug}`}
-      className="group block overflow-hidden rounded-xl border bg-background transition-all hover:shadow-md"
+      className="group block overflow-hidden rounded-xl border bg-background transition-all hover:shadow-md active:scale-[0.98]"
     >
-      <div className="relative h-52 items-center justify-center overflow-hidden p-4">
+      <div className="relative h-40 sm:h-44 lg:h-52 p-3 lg:p-4 items-center justify-center overflow-hidden">
         <img
           src={thumbnail}
           alt={name}
-          className="mx-auto size-45 object-contain transition-transform duration-300 group-hover:scale-105"
+          className="mx-auto size-32 object-contain transition-transform duration-300 group-hover:scale-105 sm:size-36 lg:size-45"
         />
 
         {discountPct != null && discountPct > 0 && (
-          <div className=" absolute left-2 top-2 rounded-md bg-red-500 px-2 py-1 text-xs font-semibold text-white">
+          <div className="absolute left-2 top-2 rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-semibold text-white sm:px-2 sm:py-1 sm:text-xs">
             -{discountPct}%
           </div>
         )}
       </div>
 
       <div className="space-y-2 p-3">
-        <h3 className="line-clamp-2 h-10 text-sm font-medium">{name}</h3>
+        <h3 className="line-clamp-2 h-10 text-xs sm:text-sm font-medium">
+          {name}
+        </h3>
 
         {ratingCount > 0 && (
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center gap-1 text-xs sm:text-sm">
             <Star className="size-4 fill-yellow-400 text-yellow-400" />
 
             <span className="font-medium">{Number(ratingAvg).toFixed(1)}</span>
@@ -55,17 +57,19 @@ export function ProductCard({ product }: Props) {
         )}
 
         {hasDiscount ? (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
             <span className="font-semibold text-red-600">
               {formatCurrency(discountPrice)}
             </span>
 
-            <span className="text-xs line-through text-slate-400">
+            <span className="text-[11px] line-through text-slate-400 sm:text-xs">
               {formatCurrency(price)}
             </span>
           </div>
         ) : (
-          <div className="font-semibold">{formatCurrency(price)}</div>
+          <div className="text-sm font-semibold sm:text-base">
+            {formatCurrency(price)}
+          </div>
         )}
       </div>
     </Link>
