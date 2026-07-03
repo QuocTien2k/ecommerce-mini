@@ -75,6 +75,8 @@ export type AdminProductListQueryParams = {
 
   priceSort?: "asc" | "desc";
 
+  minRating?: number;
+
   isActive?: boolean;
 };
 

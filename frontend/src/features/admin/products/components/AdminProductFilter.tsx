@@ -19,6 +19,7 @@ type Props = {
     categoryId: string;
     brandId: string;
     priceSort: "" | "asc" | "desc";
+    minRating: "" | number;
   };
 
   actions: {
@@ -27,6 +28,7 @@ type Props = {
     setCategoryId: (value: string) => void;
     setBrandId: (value: string) => void;
     setPriceSort: (value: "" | "asc" | "desc") => void;
+    setMinRating: (value: "" | number) => void;
   };
 
   flatCategories: FlatCategoryItem[];
@@ -54,7 +56,7 @@ const AdminProductFilter = ({
       </div>
 
       {/* Category */}
-      <div className="w-72">
+      <div className="w-56">
         <Select
           value={filters.categoryId || "ALL"}
           onValueChange={(value) =>
@@ -80,7 +82,7 @@ const AdminProductFilter = ({
       </div>
 
       {/* Brand */}
-      <div className="w-60">
+      <div className="w-48">
         <Select
           value={filters.brandId || "ALL"}
           onValueChange={(value) =>
@@ -104,7 +106,7 @@ const AdminProductFilter = ({
       </div>
 
       {/* Price Sort */}
-      <div className="w-60">
+      <div className="w-44">
         <Select
           value={filters.priceSort || "DEFAULT"}
           onValueChange={(value) =>
@@ -127,8 +129,40 @@ const AdminProductFilter = ({
         </Select>
       </div>
 
+      {/* Rating */}
+      <div className="w-44">
+        <Select
+          value={
+            filters.minRating === "" ? "ALL" : filters.minRating.toString()
+          }
+          onValueChange={(value) =>
+            actions.setMinRating(value === "ALL" ? "" : Number(value))
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Đánh giá tối thiểu" />
+          </SelectTrigger>
+
+          <SelectContent position="popper">
+            <SelectItem value="ALL">Tất cả đánh giá</SelectItem>
+
+            <SelectItem value="5">Từ 5 sao</SelectItem>
+
+            <SelectItem value="4">Từ 4 sao</SelectItem>
+
+            <SelectItem value="3">Từ 3 sao</SelectItem>
+
+            <SelectItem value="2">Từ 2 sao</SelectItem>
+
+            <SelectItem value="1">Từ 1 sao</SelectItem>
+
+            <SelectItem value="0">Từ 0 sao</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Status */}
-      <div className="w-60">
+      <div className="w-44">
         <Select
           value={filters.isActive || "ALL"}
           onValueChange={(value) =>
