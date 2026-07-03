@@ -10,7 +10,7 @@ import OrderNotFound from "@components/order/OrderNotFound";
 import { useEffect } from "react";
 import { CUSTOMER_ORDER_QUERY_KEY } from "./constant/order";
 import { getOrderStatusLabel } from "@shared/types/order-status.utils";
-import type { OrderDetail } from "@shared/types/order.type";
+import type { OrderDetail as OrderDetailData } from "@shared/types/order.type";
 import { connectSocket, getSocket } from "@lib/socket";
 import { queryClient } from "@lib/react-query";
 import type { OrderStatusUpdatedEvent } from "./types/order-status-event-socket.type";
@@ -31,7 +31,7 @@ const OrderDetail = () => {
 
       queryClient.setQueryData(
         CUSTOMER_ORDER_QUERY_KEY.detail(data.orderId),
-        (old: OrderDetail | undefined) => {
+        (old: OrderDetailData | undefined) => {
           if (!old) return old;
 
           return {
