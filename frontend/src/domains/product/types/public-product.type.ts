@@ -11,6 +11,8 @@ export type PublicProductListQueryParams = {
   brandId?: string;
 
   priceSort?: "asc" | "desc";
+
+  minRating?: number;
 };
 
 export type PublicProductListItem = {

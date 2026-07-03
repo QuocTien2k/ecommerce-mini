@@ -2,12 +2,14 @@ import { ProductCategoryFilter } from "./category/ProductCategoryFilter";
 import { ProductBrandFilter } from "./brand/ProductBrandFilter";
 import { PriceSortFilter } from "./PriceSortSelect";
 import { Button } from "@components/ui/button";
+import { RatingFilter } from "./RatingFilter";
 
 interface ProductFilterProps {
   value: {
     categoryId: string;
     brandId: string;
     priceSort: "asc" | "desc" | "";
+    minRating?: number;
   };
 
   actions: {
@@ -15,13 +17,17 @@ interface ProductFilterProps {
     setCategoryId: (v: string) => void;
     setBrandId: (v: string) => void;
     setPriceSort: (v: "asc" | "desc" | "") => void;
+    setMinRating: (v?: number) => void;
     resetFilters: () => void;
   };
 }
 
 export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
   const hasActiveFilters =
-    !!value.categoryId || !!value.brandId || !!value.priceSort;
+    !!value.categoryId ||
+    !!value.brandId ||
+    !!value.priceSort ||
+    value.minRating !== undefined;
 
   return (
     <div className="rounded-lg border bg-white p-4">
@@ -63,7 +69,13 @@ export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
           />
         </section>
 
-        {/* <RatingSelect /> */}
+        {/* <Rating /> */}
+        <section className="border-t pt-4">
+          <RatingFilter
+            value={value.minRating}
+            onChange={actions.setMinRating}
+          />
+        </section>
       </div>
     </div>
   );

@@ -14,9 +14,15 @@ export const usePublicProductFilter = () => {
   const brandId = searchParams.get("brandId") || "";
   const rawPriceSort = searchParams.get("priceSort");
   const search = searchParams.get("search") || "";
+  const rawMinRating = searchParams.get("minRating");
 
   const priceSort: "" | "asc" | "desc" =
     rawPriceSort === "asc" || rawPriceSort === "desc" ? rawPriceSort : "";
+
+  const minRating =
+    rawMinRating !== null && !Number.isNaN(Number(rawMinRating))
+      ? Number(rawMinRating)
+      : undefined;
 
   const updateParams = (updates: Record<string, string | number | null>) => {
     setSearchParams((prev) => {
@@ -76,6 +82,13 @@ export const usePublicProductFilter = () => {
     });
   };
 
+  const setMinRating = (v?: number) => {
+    updateParams({
+      minRating: v ?? null,
+      page: 1,
+    });
+  };
+
   const queryParams = useMemo(() => {
     const params: PublicProductListQueryParams = {
       page,
@@ -85,9 +98,12 @@ export const usePublicProductFilter = () => {
     if (categoryId) params.categoryId = categoryId;
     if (brandId) params.brandId = brandId;
     if (priceSort) params.priceSort = priceSort;
+    if (minRating !== undefined) {
+      params.minRating = minRating;
+    }
 
     return params;
-  }, [page, categoryId, brandId, priceSort]);
+  }, [page, categoryId, brandId, priceSort, search, minRating]);
 
   const resetFilters = () => {
     if (debounceRef.current) {
@@ -106,6 +122,7 @@ export const usePublicProductFilter = () => {
       categoryId,
       brandId,
       priceSort,
+      minRating,
     },
 
     filterActions: {
@@ -113,6 +130,7 @@ export const usePublicProductFilter = () => {
       setCategoryId,
       setBrandId,
       setPriceSort,
+      setMinRating,
       resetFilters,
     },
 
