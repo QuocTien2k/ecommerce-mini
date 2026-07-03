@@ -25,9 +25,9 @@ import ProductDetail from "@/domains/product/ProductDetail";
 import { CartPage } from "@features/customer/cart/CartPage";
 import OrderPage from "@features/customer/order/OrderPage";
 import { PaymentReturn } from "@pages/payment/PaymentReturn";
-import OrderDetail from "@features/customer/order/OrderDetail";
 import MyOrders from "@features/customer/order/MyOrders";
 import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
+import OrderDetail from "@features/customer/order/OrderDetail";
 
 const AppRoutes = () => {
   return (

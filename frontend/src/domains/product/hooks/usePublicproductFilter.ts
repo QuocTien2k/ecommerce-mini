@@ -38,6 +38,8 @@ export const usePublicProductFilter = () => {
 
       return next;
     });
+
+    scrollToTop();
   };
 
   const goToPage = (p: number) => {

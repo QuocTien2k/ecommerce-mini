@@ -5,7 +5,6 @@ import AppPagination from "@components/common/pagination";
 import { ProductNotFound } from "@components/product/ProductNotFound";
 import { SectionTitle } from "@components/ui/section-title";
 import { ProductFilters } from "./search/ProductFilter";
-import { useEffect, useState } from "react";
 import { usePublicProductFilter } from "../hooks/usePublicProductFilter";
 
 type BreadcrumbItem = {
@@ -14,7 +13,6 @@ type BreadcrumbItem = {
 };
 
 export const ProductCatalog = () => {
-  const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const {
     goToPage,
 
@@ -28,14 +26,9 @@ export const ProductCatalog = () => {
   const { data, isLoading } = usePublicProductsQuery(queryParams);
 
   const products = data?.data.data ?? [];
+  const breadcrumb: BreadcrumbItem[] = data?.data.breadcrumb ?? [];
 
   //console.log("Data: ", data?.data.breadcrumb);
-
-  useEffect(() => {
-    if (data?.data?.breadcrumb) {
-      setBreadcrumb(data.data.breadcrumb);
-    }
-  }, [data]);
 
   const meta = data?.data.meta;
 
@@ -75,7 +68,7 @@ export const ProductCatalog = () => {
         )}
       </nav>
 
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid items-start gap-6 lg:grid-cols-12">
         {/* Filter */}
         <aside className="lg:col-span-3">
           <ProductFilters value={filters} actions={filterActions} />
@@ -83,7 +76,7 @@ export const ProductCatalog = () => {
 
         {/* PRODUCTS */}
         <main className="lg:col-span-9">
-          <div className="rounded-lg border bg-white p-4">
+          <div className="px-4">
             <QueryStateWrapper isLoading={isLoading}>
               {products.length ? (
                 <div className="space-y-6">

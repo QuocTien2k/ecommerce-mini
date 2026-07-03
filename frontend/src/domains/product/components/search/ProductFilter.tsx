@@ -30,8 +30,8 @@ export const ProductFilters = ({ value, actions }: ProductFilterProps) => {
     value.minRating !== undefined;
 
   return (
-    <div className="rounded-lg border bg-white p-4">
-      <div className="space-y-4">
+    <div className="h-full rounded-lg border bg-white p-4">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="font-medium">Bộ lọc</h3>
 
