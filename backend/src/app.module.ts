@@ -18,6 +18,8 @@ import { PaymentModule } from './payment/payment.module';
 import { RatingModule } from './rating/rating.module';
 import { BrandModule } from './brand/brand.module';
 import { PublicModule } from './public/public.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { PublicModule } from './public/public.module';
     RatingModule,
     BrandModule,
     PublicModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
