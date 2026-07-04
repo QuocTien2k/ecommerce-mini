@@ -1,7 +1,7 @@
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class DashboardRevenueilterDto {
+export class DashboardRevenueFilterDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -14,3 +14,8 @@ export class DashboardRevenueItemDto {
   label: string;
   revenue: number;
 }
+
+export type RevenueRow = {
+  month: number;
+  revenue: number;
+};

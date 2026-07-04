@@ -3,16 +3,21 @@ import { PrismaService } from '@prisma/prisma.service';
 import { DashboardOverviewDto } from './dto/dashboard-overview.dto';
 import { OrderStatus, Prisma } from '@prisma/client';
 import {
-  DashboardRevenueilterDto,
+  DashboardRevenueFilterDto,
   DashboardRevenueItemDto,
+  RevenueRow,
 } from './dto/dashboard-revenue.dto';
-import { RevenueRow } from './types/revenue.type';
 import {
   DashboardTopProductDto,
   DashboardTopProductMetric,
   DashboardTopProductsFilterDto,
 } from './dto/dashboard-top-product.dto';
 import { TopProductRow } from './types/top-product.type';
+import { DashboardOrderStatusDto } from './dto/dashboard-order-status.dto';
+import {
+  DashboardMonthlyOrderItemDto,
+  MonthlyOrderRow,
+} from './dto/dashboard-month-order.dto';
 
 @Injectable()
 export class DashboardService {
@@ -82,7 +87,7 @@ export class DashboardService {
 
   // Thống kê doanh thu theo từng tháng trong năm
   async getRevenue(
-    query: DashboardRevenueilterDto,
+    query: DashboardRevenueFilterDto,
   ): Promise<DashboardRevenueItemDto[]> {
     const year = query.year ?? new Date().getFullYear();
 
@@ -106,7 +111,7 @@ export class DashboardService {
     }));
   }
 
-  // case lấy top sản phẩm bán chạy
+  // case lấy top sản phẩm bán chạy (top-products)
   private mapTopProducts(rows: TopProductRow[]): DashboardTopProductDto[] {
     return rows.map((row) => ({
       productId: row.productId,
@@ -212,8 +217,85 @@ export class DashboardService {
         return this.getTopProductsBySalesMetric(metric, days, limit);
     }
   }
+
+  //case order status
+  async getOrderStatus(): Promise<DashboardOrderStatusDto> {
+    const rows = await this.prisma.order.groupBy({
+      by: ['status'],
+      _count: {
+        status: true,
+      },
+    });
+
+    const result: DashboardOrderStatusDto = {
+      pending: 0,
+      confirmed: 0,
+      processing: 0,
+      readyToShip: 0,
+      shipping: 0,
+      delivered: 0,
+      cancelled: 0,
+    };
+
+    for (const row of rows) {
+      switch (row.status) {
+        case OrderStatus.PENDING:
+          result.pending = row._count.status;
+          break;
+
+        case OrderStatus.CONFIRMED:
+          result.confirmed = row._count.status;
+          break;
+
+        case OrderStatus.PROCESSING:
+          result.processing = row._count.status;
+          break;
+
+        case OrderStatus.READY_TO_SHIP:
+          result.readyToShip = row._count.status;
+          break;
+
+        case OrderStatus.SHIPPING:
+          result.shipping = row._count.status;
+          break;
+
+        case OrderStatus.DELIVERED:
+          result.delivered = row._count.status;
+          break;
+
+        case OrderStatus.CANCELLED:
+          result.cancelled = row._count.status;
+          break;
+      }
+    }
+
+    return result;
+  }
+
+  //
+  async getMonthlyOrders(
+    query: DashboardRevenueFilterDto,
+  ): Promise<DashboardMonthlyOrderItemDto[]> {
+    const year = query.year ?? new Date().getFullYear();
+
+    const rows = await this.prisma.$queryRaw<MonthlyOrderRow[]>`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt")::int AS month,
+      COUNT(*)::int AS orders
+    FROM "orders"
+    WHERE
+      EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY EXTRACT(MONTH FROM "createdAt")
+    ORDER BY month;
+  `;
+
+    const orderMap = new Map(rows.map((item) => [item.month, item.orders]));
+
+    return Array.from({ length: 12 }, (_, index) => ({
+      label: `T${index + 1}`,
+      orders: orderMap.get(index + 1) ?? 0,
+    }));
+  }
 }
 
-// GET /dashboard/top-products
-// GET /dashboard/order-status
 // GET /dashboard/monthly-orders

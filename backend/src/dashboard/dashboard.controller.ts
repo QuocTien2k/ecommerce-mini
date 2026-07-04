@@ -5,8 +5,10 @@ import { RolesGuard } from '@auth/guards/roles.guard';
 import { Roles } from '@auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
-import { DashboardRevenueilterDto } from './dto/dashboard-revenue.dto';
+import { DashboardRevenueFilterDto } from './dto/dashboard-revenue.dto';
 import { DashboardTopProductsFilterDto } from './dto/dashboard-top-product.dto';
+import { DashboardOrderStatusDto } from './dto/dashboard-order-status.dto';
+import { DashboardMonthlyOrderItemDto } from './dto/dashboard-month-order.dto';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -24,7 +26,7 @@ export class DashboardController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Lấy thống kê doanh thu thành công')
-  async getRevenue(@Query() query: DashboardRevenueilterDto) {
+  async getRevenue(@Query() query: DashboardRevenueFilterDto) {
     return await this.dashboardService.getRevenue(query);
   }
 
@@ -34,5 +36,23 @@ export class DashboardController {
   @ResponseMessage('Lấy danh sách sản phẩm nổi bật thành công')
   async getTopProducts(@Query() query: DashboardTopProductsFilterDto) {
     return await this.dashboardService.getTopProducts(query);
+  }
+
+  @Get('top-products')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy thống kê trạng thái đơn hàng thành công')
+  getOrderStatus(): Promise<DashboardOrderStatusDto> {
+    return this.dashboardService.getOrderStatus();
+  }
+
+  @Get('monthly-orders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ResponseMessage('Lấy thống kê số lượng đơn hàng theo tháng thành công')
+  getMonthlyOrders(
+    @Query() query: DashboardRevenueFilterDto,
+  ): Promise<DashboardMonthlyOrderItemDto[]> {
+    return this.dashboardService.getMonthlyOrders(query);
   }
 }
