@@ -12,7 +12,6 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 import { Role } from "@/types/role";
-import AdminDashboard from "@pages/admin/AdminDashboard";
 import AdminUserPage from "@features/admin/user/AdminUserPage";
 import AdminCategoryPage from "@features/admin/categories/AdminCategoryPage";
 import AdminProductPage from "@features/admin/products/AdminProductPage";
@@ -28,6 +27,7 @@ import { PaymentReturn } from "@pages/payment/PaymentReturn";
 import MyOrders from "@features/customer/order/MyOrders";
 import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
 import OrderDetail from "@features/customer/order/OrderDetail";
+import DashboardPage from "@features/admin/dashboard/DashboardPage";
 
 const AppRoutes = () => {
   return (
@@ -36,7 +36,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<ProtectedRoute />}>
         <Route element={<RoleRoute allowedRoles={[Role.ADMIN]} />}>
           <Route element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<DashboardPage />} />
             <Route path="users" element={<AdminUserPage />} />
             <Route path="categories" element={<AdminCategoryPage />} />
             <Route path="brands" element={<AdminBrandPage />} />
