@@ -25,6 +25,7 @@ import TopProductsMetricSelect from "./TopProductsMetricSelect";
 import TopProductsDaySelect from "./TopProductsDaysSelect";
 import { Spinner } from "@components/ui/spinner";
 import { topProductChartConfig } from "./top-products-chart.config";
+import ProductTick from "./ProductTick";
 
 const metricLabels: Record<DashboardTopProductMetricType, string> = {
   quantity: "Số lượng bán",
@@ -105,6 +106,7 @@ export default function DashboardTopProducts() {
                 type="category"
                 dataKey="name"
                 width={160}
+                tick={<ProductTick />}
                 tickLine={false}
                 axisLine={false}
               />
@@ -144,7 +146,7 @@ export default function DashboardTopProducts() {
                 }
               />
 
-              <Bar dataKey="value" radius={6} fill="var(--color-value)" />
+              <Bar dataKey="value" radius={6} barSize={18} fill="#93c5fd" />
             </BarChart>
           </ChartContainer>
         )}
