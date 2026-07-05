@@ -1,5 +1,6 @@
 import { Title } from "@components/ui/title-module";
 import DashboardOverview from "./components/DashboardOverview";
+import DashboardRevenue from "./components/revenue/DashboardRevenueChart";
 
 const DashboardPage = () => {
   return (
@@ -9,6 +10,8 @@ const DashboardPage = () => {
         description="Tổng quan hoạt động và thống kê hệ thống."
       />
       <DashboardOverview />
+
+      <DashboardRevenue />
     </div>
   );
 };

@@ -1,12 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { ADMIN_DASHBOARD_QUERY_KEY } from "../constant/admin-dashboard.constant";
 import { adminDashboard } from "../api/adminDashboard.apit";
+import type { DashboardRevenueFilter } from "../types/admin-dashboard.type";
 
+/* Case overview */
 export const useDashboardOverview = () => {
   return useQuery({
     queryKey: ADMIN_DASHBOARD_QUERY_KEY.overview(),
     queryFn: async () => {
       const res = await adminDashboard.getOverview();
+      return res.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+/* Case revenue */
+export const useDashboardRevenue = (params?: DashboardRevenueFilter) => {
+  return useQuery({
+    queryKey: ADMIN_DASHBOARD_QUERY_KEY.revenue(params),
+    queryFn: async () => {
+      const res = await adminDashboard.getRevenue(params);
       return res.data;
     },
     staleTime: 1000 * 60 * 5,
