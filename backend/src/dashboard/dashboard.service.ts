@@ -144,6 +144,14 @@ export class DashboardService {
 
     const valueSql = this.getMetricSql(metric);
 
+    const statuses = [
+      Prisma.sql`${OrderStatus.CONFIRMED}::"OrderStatus"`,
+      Prisma.sql`${OrderStatus.PROCESSING}::"OrderStatus"`,
+      Prisma.sql`${OrderStatus.READY_TO_SHIP}::"OrderStatus"`,
+      Prisma.sql`${OrderStatus.SHIPPING}::"OrderStatus"`,
+      Prisma.sql`${OrderStatus.DELIVERED}::"OrderStatus"`,
+    ];
+
     const rows = await this.prisma.$queryRaw<TopProductRow[]>(Prisma.sql`
       SELECT
         p.id AS "productId",
@@ -155,14 +163,7 @@ export class DashboardService {
         ON oi."orderId" = o.id
       INNER JOIN "products" p
         ON oi."productId" = p.id
-      WHERE
-        o.status IN (
-          ${OrderStatus.CONFIRMED},
-          ${OrderStatus.PROCESSING},
-          ${OrderStatus.READY_TO_SHIP},
-          ${OrderStatus.SHIPPING},
-          ${OrderStatus.DELIVERED}
-        )
+      WHERE o.status IN (${Prisma.join(statuses)})
         AND o."createdAt" >= ${fromDate}
         AND p."deletedAt" IS NULL
       GROUP BY
