@@ -1,4 +1,7 @@
-import type { DashboardRevenueFilter } from "../types/admin-dashboard.type";
+import type {
+  DashboardRevenueFilter,
+  DashboardTopProductsFilter,
+} from "../types/admin-dashboard.type";
 
 export const ADMIN_DASHBOARD_QUERY_KEY = {
   all: ["admin-dashboard"] as const,
@@ -14,6 +17,6 @@ export const ADMIN_DASHBOARD_QUERY_KEY = {
   //   orderStatus: () =>
   //     [...ADMIN_DASHBOARD_QUERY_KEY.all, "order-status"] as const,
 
-  //   topProducts: (params?: DashboardTopProductsFilter) =>
-  //     [...ADMIN_DASHBOARD_QUERY_KEY.all, "top-products", params] as const,
+  topProducts: (params?: DashboardTopProductsFilter) =>
+    [...ADMIN_DASHBOARD_QUERY_KEY.all, "top-products", params] as const,
 };

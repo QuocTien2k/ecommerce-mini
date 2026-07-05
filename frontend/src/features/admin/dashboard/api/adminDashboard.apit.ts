@@ -3,6 +3,8 @@ import type {
   DashboardOverview,
   DashboardRevenueFilter,
   DashboardRevenueItem,
+  DashboardTopProduct,
+  DashboardTopProductsFilter,
 } from "../types/admin-dashboard.type";
 import { api } from "@shared/api/axios";
 
@@ -14,6 +16,13 @@ export const adminDashboard = {
     params?: DashboardRevenueFilter,
   ): ApiResult<DashboardRevenueItem[]> =>
     api.get("/dashboard/revenue", {
+      params,
+    }),
+
+  getTopProducts: (
+    params?: DashboardTopProductsFilter,
+  ): ApiResult<DashboardTopProduct[]> =>
+    api.get("/dashboard/top-products", {
       params,
     }),
 };

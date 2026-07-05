@@ -1,6 +1,7 @@
 import { Title } from "@components/ui/title-module";
 import DashboardOverview from "./components/DashboardOverview";
 import DashboardRevenue from "./components/revenue/DashboardRevenueChart";
+import DashboardTopProducts from "./components/top-product/DashboardTopProducts";
 
 const DashboardPage = () => {
   return (
@@ -12,6 +13,8 @@ const DashboardPage = () => {
       <DashboardOverview />
 
       <DashboardRevenue />
+
+      <DashboardTopProducts />
     </div>
   );
 };
