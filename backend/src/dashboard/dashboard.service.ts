@@ -92,16 +92,9 @@ export class DashboardService {
     const year = query.year ?? new Date().getFullYear();
 
     const rows = await this.prisma.$queryRaw<RevenueRow[]>`
-    SELECT
-      EXTRACT(MONTH FROM "createdAt")::int AS month,
-      COALESCE(SUM("totalPrice"), 0)::float AS revenue
-    FROM "orders"
-    WHERE
-      "status" = ${OrderStatus.DELIVERED}
-      AND EXTRACT(YEAR FROM "createdAt") = ${year}
-    GROUP BY EXTRACT(MONTH FROM "createdAt")
-    ORDER BY month;
-  `;
+    SELECT EXTRACT(MONTH FROM "createdAt")::int AS month, COALESCE(SUM("totalPrice"), 0)::float AS revenue
+    FROM "orders" WHERE "status" = ${OrderStatus.DELIVERED}::"OrderStatus" AND EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY EXTRACT(MONTH FROM "createdAt") ORDER BY month;`;
 
     const revenueMap = new Map(rows.map((item) => [item.month, item.revenue]));
 
