@@ -11,8 +11,8 @@ import {
   DashboardTopProductDto,
   DashboardTopProductMetric,
   DashboardTopProductsFilterDto,
+  TopProductRow,
 } from './dto/dashboard-top-product.dto';
-import { TopProductRow } from './types/top-product.type';
 import { DashboardOrderStatusDto } from './dto/dashboard-order-status.dto';
 import {
   DashboardMonthlyOrderItemDto,

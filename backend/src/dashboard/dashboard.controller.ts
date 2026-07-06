@@ -38,7 +38,7 @@ export class DashboardController {
     return await this.dashboardService.getTopProducts(query);
   }
 
-  @Get('top-products')
+  @Get('order-status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Lấy thống kê trạng thái đơn hàng thành công')

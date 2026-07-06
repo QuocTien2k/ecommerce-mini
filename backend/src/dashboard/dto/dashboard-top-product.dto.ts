@@ -35,3 +35,10 @@ export class DashboardTopProductDto {
 
   value: number;
 }
+
+export type TopProductRow = {
+  productId: string;
+  name: string;
+  thumbnail: string;
+  value: number;
+};
