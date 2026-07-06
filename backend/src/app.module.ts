@@ -19,6 +19,7 @@ import { RatingModule } from './rating/rating.module';
 import { BrandModule } from './brand/brand.module';
 import { PublicModule } from './public/public.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { SettingModule } from './setting/setting.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     BrandModule,
     PublicModule,
     DashboardModule,
+    SettingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
