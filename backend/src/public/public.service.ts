@@ -4,6 +4,7 @@ import { GetProductsQueryDto } from '@product/dtos/get-product.dto';
 import { ProductService } from '@product/product.service';
 import { BrandService } from 'src/brand/brand.service';
 import { GetPublicBrandDto } from 'src/brand/dtos/get-brand.dto';
+import { SettingService } from 'src/setting/setting.service';
 
 @Injectable()
 export class PublicService {
@@ -11,6 +12,7 @@ export class PublicService {
     private readonly productService: ProductService,
     private readonly categoryService: CategoryService,
     private readonly brandService: BrandService,
+    private readonly settingService: SettingService,
   ) {}
 
   async getHomeData() {
@@ -40,5 +42,10 @@ export class PublicService {
     const product_detail = await this.productService.findProductDetail(slug);
 
     return product_detail;
+  }
+
+  /* Case setting */
+  async getSetting() {
+    return this.settingService.findOne();
   }
 }

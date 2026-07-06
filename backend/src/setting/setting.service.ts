@@ -172,4 +172,9 @@ export class SettingService {
       },
     });
   }
+
+  /*Case get */
+  async findOne() {
+    return this.getSettingOrThrow();
+  }
 }

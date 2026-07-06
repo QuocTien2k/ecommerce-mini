@@ -8,5 +8,6 @@ import { CloudinaryModule } from '@common/cloudinary/cloudinary.module';
   imports: [PrismaModule, CloudinaryModule],
   controllers: [SettingController],
   providers: [SettingService],
+  exports: [SettingService],
 })
 export class SettingModule {}

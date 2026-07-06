@@ -31,4 +31,9 @@ export class PublicController {
   async getproductDetail(@Param('slug') slug: string) {
     return this.publicService.getProductDetail(slug);
   }
+
+  @Get('setting')
+  async getSetting() {
+    return this.publicService.getSetting();
+  }
 }
