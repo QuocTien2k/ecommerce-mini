@@ -7,6 +7,7 @@ import {
   BadgeCheck,
   TicketPercent,
   ClipboardList,
+  Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
   { to: "/admin/products", label: "Quản lý sản phẩm", icon: Package },
   { to: "/admin/vouchers", label: "Quản lý voucher", icon: TicketPercent },
   { to: "/admin/orders", label: "Quản lý đơn hàng", icon: ClipboardList },
+  { to: "/admin/settings", label: "Cấu hình website", icon: Settings },
 ];
 
 const Sidebar: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {

@@ -28,6 +28,7 @@ import MyOrders from "@features/customer/order/MyOrders";
 import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
 import OrderDetail from "@features/customer/order/OrderDetail";
 import DashboardPage from "@features/admin/dashboard/DashboardPage";
+import AdminSettingPage from "@features/admin/setting/AdminSettingPage";
 
 const AppRoutes = () => {
   return (
@@ -44,6 +45,7 @@ const AppRoutes = () => {
             <Route path="products/:id" element={<AdminProductDetail />} />
             <Route path="vouchers" element={<AdminVoucherPage />} />
             <Route path="orders" element={<AdminOrderPage />} />
+            <Route path="settings" element={<AdminSettingPage />} />
 
             {/* thêm các route admin khác */}
           </Route>
