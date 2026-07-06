@@ -13,6 +13,6 @@ export const adminSettingApi = {
   ): ApiResult<CreateSettingResponse> => {
     const formData = buildFormData(data, file ? { file } : undefined);
 
-    return api.post("/settings", formData);
+    return api.post("/setting", formData);
   },
 };

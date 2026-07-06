@@ -5,7 +5,10 @@ export const settingLogoSchema = z.instanceof(File, {
   message: "Logo không hợp lệ",
 });
 
-export const settingLogoUrlSchema = z.string().url("URL logo không hợp lệ");
+export const settingLogoUrlSchema = z
+  .string()
+  .url("URL logo không hợp lệ")
+  .or(z.literal(""));
 
 // base
 const settingBaseSchema = z.object({
