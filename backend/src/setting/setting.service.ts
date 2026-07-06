@@ -1,7 +1,12 @@
 import { CloudinaryService } from '@common/cloudinary/cloudinary.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateSettingDto } from './dto/create-setting.dto';
+import { UpdateSettingDto } from './dto/update-setting.dto';
 
 @Injectable()
 export class SettingService {
@@ -79,6 +84,91 @@ export class SettingService {
         zaloUrl: dto.zaloUrl,
 
         googleMapUrl: dto.googleMapUrl,
+      },
+    });
+  }
+
+  /*Case update */
+  private async getSettingOrThrow() {
+    const setting = await this.prisma.setting.findFirst();
+
+    if (!setting) {
+      throw new NotFoundException('Cấu hình website không tồn tại');
+    }
+
+    return setting;
+  }
+
+  private async resolveUpdateLogo(
+    current: {
+      logo: string | null;
+      logoPublicId: string | null;
+    },
+    dto: UpdateSettingDto,
+    file?: Express.Multer.File,
+  ) {
+    const hasFile = !!file;
+    const hasLogoUrl = dto.logo !== undefined;
+
+    if (hasFile && hasLogoUrl) {
+      throw new BadRequestException(
+        'Chỉ được upload logo hoặc cung cấp URL logo, không được dùng đồng thời',
+      );
+    }
+
+    // Không cập nhật logo
+    if (!hasFile && !hasLogoUrl) {
+      return {
+        logo: current.logo,
+        logoPublicId: current.logoPublicId,
+      };
+    }
+
+    // Upload logo mới
+    if (hasFile) {
+      const upload = await this.cloudinaryService.uploadImage(file, 'settings');
+
+      if (current.logoPublicId) {
+        await this.cloudinaryService.deleteImage(current.logoPublicId);
+      }
+
+      return {
+        logo: upload.secure_url,
+        logoPublicId: upload.public_id,
+      };
+    }
+
+    // Cập nhật bằng URL hoặc xóa logo
+    if (current.logoPublicId) {
+      await this.cloudinaryService.deleteImage(current.logoPublicId);
+    }
+
+    return {
+      logo: dto.logo ?? null,
+      logoPublicId: null,
+    };
+  }
+
+  async update(dto: UpdateSettingDto, file?: Express.Multer.File) {
+    const setting = await this.getSettingOrThrow();
+
+    const { logo, logoPublicId } = await this.resolveUpdateLogo(
+      {
+        logo: setting.logo,
+        logoPublicId: setting.logoPublicId,
+      },
+      dto,
+      file,
+    );
+
+    return this.prisma.setting.update({
+      where: {
+        id: setting.id,
+      },
+      data: {
+        ...dto,
+        logo,
+        logoPublicId,
       },
     });
   }
