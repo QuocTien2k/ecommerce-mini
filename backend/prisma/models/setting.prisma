@@ -1,0 +1,29 @@
+model Setting {
+  id String @id @default(cuid())
+
+  siteName      String
+
+  logo          String?
+  logoPublicId  String?
+
+  email         String?
+
+  hotline1      String?
+  hotline2      String?
+
+  address       String?
+
+  workingHours  String?
+
+  facebookUrl   String?
+  youtubeUrl    String?
+  tiktokUrl     String?
+  zaloUrl       String?
+
+  googleMapUrl  String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("settings")
+}
