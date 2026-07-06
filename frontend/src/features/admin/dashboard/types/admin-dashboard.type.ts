@@ -41,3 +41,14 @@ export interface DashboardTopProductsFilter {
   days?: number;
   limit?: number;
 }
+
+/* Case order status */
+export interface DashboardOrderStatus {
+  pending: number;
+  confirmed: number;
+  processing: number;
+  readyToShip: number;
+  shipping: number;
+  delivered: number;
+  cancelled: number;
+}

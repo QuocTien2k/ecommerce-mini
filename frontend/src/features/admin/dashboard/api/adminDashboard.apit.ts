@@ -1,5 +1,6 @@
 import type { ApiResult } from "@shared/types/api-result";
 import type {
+  DashboardOrderStatus,
   DashboardOverview,
   DashboardRevenueFilter,
   DashboardRevenueItem,
@@ -25,4 +26,7 @@ export const adminDashboard = {
     api.get("/dashboard/top-products", {
       params,
     }),
+
+  getOrderStatus: (): ApiResult<DashboardOrderStatus> =>
+    api.get("/dashboard/order-status"),
 };

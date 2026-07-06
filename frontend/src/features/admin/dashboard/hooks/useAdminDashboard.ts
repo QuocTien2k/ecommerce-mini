@@ -43,3 +43,15 @@ export const useDashboardTopProducts = (
     staleTime: 1000 * 60 * 5,
   });
 };
+
+/* Case order status */
+export const useDashboardOrderStatus = () => {
+  return useQuery({
+    queryKey: ADMIN_DASHBOARD_QUERY_KEY.orderStatus(),
+    queryFn: async () => {
+      const res = await adminDashboard.getOrderStatus();
+      return res.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
