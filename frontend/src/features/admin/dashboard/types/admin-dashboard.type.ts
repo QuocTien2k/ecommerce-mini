@@ -52,3 +52,9 @@ export interface DashboardOrderStatus {
   delivered: number;
   cancelled: number;
 }
+
+/* Case monthly order */
+export interface DashboardMonthlyOrderItem {
+  label: string;
+  orders: number;
+}

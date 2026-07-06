@@ -11,8 +11,8 @@ export const ADMIN_DASHBOARD_QUERY_KEY = {
   revenue: (params?: DashboardRevenueFilter) =>
     [...ADMIN_DASHBOARD_QUERY_KEY.all, "revenue", params] as const,
 
-  //   monthlyOrders: (params?: DashboardRevenueFilter) =>
-  //     [...ADMIN_DASHBOARD_QUERY_KEY.all, "monthly-orders", params] as const,
+  monthlyOrders: (params?: DashboardRevenueFilter) =>
+    [...ADMIN_DASHBOARD_QUERY_KEY.all, "monthly-orders", params] as const,
 
   orderStatus: () =>
     [...ADMIN_DASHBOARD_QUERY_KEY.all, "order-status"] as const,

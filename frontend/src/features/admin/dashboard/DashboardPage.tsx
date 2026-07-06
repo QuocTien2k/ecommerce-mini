@@ -3,6 +3,7 @@ import DashboardOverview from "./components/DashboardOverview";
 import DashboardRevenue from "./components/revenue/DashboardRevenueChart";
 import DashboardTopProducts from "./components/top-product/DashboardTopProducts";
 import DashboardOrderStatusChart from "./components/DashboardOrderStatusChart";
+import DashboardMonthlyOrderChart from "./components/monthly-orders/DashboardMonthlyOrderChart";
 
 const DashboardPage = () => {
   return (
@@ -10,10 +11,14 @@ const DashboardPage = () => {
       <Title
         title="Dashboard"
         description="Tổng quan hoạt động và thống kê hệ thống."
+        titleClassName="text-4xl font-bold"
       />
+
       <DashboardOverview />
 
       <DashboardRevenue />
+
+      <DashboardMonthlyOrderChart />
 
       <DashboardOrderStatusChart />
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { revenueChartConfig } from "./revenue-chart.config";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -13,17 +12,17 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useDashboardRevenue } from "../../hooks/useAdminDashboard";
-import { Spinner } from "@components/ui/spinner";
-import { formatCurrency } from "@lib/format-currency";
+import { monthlyOrderChartConfig } from "./monthly-order-chart.config";
+import { useDashboardMonthlyOrders } from "../../hooks/useAdminDashboard";
 import DashboardYearSelect from "../DashboardYearSelec";
+import { Spinner } from "@components/ui/spinner";
 
-export default function DashboardRevenue() {
+export default function DashboardMonthlyOrderChart() {
   const currentYear = new Date().getFullYear();
 
   const [year, setYear] = useState(currentYear);
 
-  const { data = [], isLoading } = useDashboardRevenue({
+  const { data = [], isLoading } = useDashboardMonthlyOrders({
     year,
   });
 
@@ -31,9 +30,11 @@ export default function DashboardRevenue() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="space-y-1">
-          <CardTitle className="text-xl font-semibold">Doanh thu</CardTitle>
+          <CardTitle className="text-xl font-semibold">Đơn hàng</CardTitle>
 
-          <CardDescription>Thống kê doanh thu theo từng tháng</CardDescription>
+          <CardDescription>
+            Thống kê số lượng đơn hàng theo từng tháng
+          </CardDescription>
         </div>
 
         <DashboardYearSelect value={year} onValueChange={setYear} />
@@ -45,8 +46,11 @@ export default function DashboardRevenue() {
             <Spinner />
           </div>
         ) : (
-          <ChartContainer config={revenueChartConfig} className="h-80 w-full">
-            <AreaChart data={data}>
+          <ChartContainer
+            config={monthlyOrderChartConfig}
+            className="h-80 w-full"
+          >
+            <BarChart data={data}>
               <CartesianGrid vertical={false} />
 
               <XAxis
@@ -60,16 +64,14 @@ export default function DashboardRevenue() {
                 cursor={false}
                 content={
                   <ChartTooltipContent
-                    indicator="line"
+                    indicator="dashed"
                     labelFormatter={(label) => `Tháng ${label.slice(1)}`}
                     formatter={(value) => (
                       <div className="flex w-full items-center justify-between gap-6">
-                        <span className="text-muted-foreground">Doanh thu</span>
+                        <span className="text-muted-foreground">Đơn hàng</span>
 
                         <span className="font-mono font-medium tabular-nums">
-                          {formatCurrency(
-                            Array.isArray(value) ? value[0] : value,
-                          )}
+                          {value}
                         </span>
                       </div>
                     )}
@@ -77,15 +79,12 @@ export default function DashboardRevenue() {
                 }
               />
 
-              <Area
-                dataKey="revenue"
-                type="monotone"
-                fill="var(--color-revenue)"
-                fillOpacity={0.25}
-                stroke="var(--color-revenue)"
-                strokeWidth={2}
+              <Bar
+                dataKey="orders"
+                fill="var(--color-orders)"
+                radius={[6, 6, 0, 0]}
               />
-            </AreaChart>
+            </BarChart>
           </ChartContainer>
         )}
       </CardContent>

@@ -6,15 +6,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type RevenueYearSelectProps = {
+type DashboardYearSelectProps = {
   value: number;
   onValueChange: (year: number) => void;
 };
 
-export default function RevenueYearSelect({
+export default function DashboardYearSelect({
   value,
   onValueChange,
-}: RevenueYearSelectProps) {
+}: DashboardYearSelectProps) {
   const currentYear = new Date().getFullYear();
 
   const years = Array.from({ length: 5 }, (_, index) => currentYear - index);

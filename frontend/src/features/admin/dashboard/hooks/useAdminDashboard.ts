@@ -55,3 +55,15 @@ export const useDashboardOrderStatus = () => {
     staleTime: 1000 * 60 * 5,
   });
 };
+
+/* Case monthly orders */
+export const useDashboardMonthlyOrders = (params?: DashboardRevenueFilter) => {
+  return useQuery({
+    queryKey: ADMIN_DASHBOARD_QUERY_KEY.monthlyOrders(params),
+    queryFn: async () => {
+      const res = await adminDashboard.getMonthlyOrders(params);
+      return res.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
