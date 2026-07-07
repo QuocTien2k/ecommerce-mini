@@ -14,3 +14,7 @@ export const getErrorMessage = (
 
   return fallback;
 };
+
+export const isNotFoundError = (error: unknown): boolean => {
+  return isApiError(error) && error.response?.status === 404;
+};

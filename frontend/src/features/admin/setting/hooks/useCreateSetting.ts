@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateSettingPayload } from "../types/admin-setting.type";
 import { adminSettingApi } from "../api/adminSetting.api";
-import { ADMIN_SETTING_QUERY_KEY } from "../constant/admin-setting.constant";
+import { SETTING_QUERY_KEY } from "@/domains/setting/constant/setting.constant";
 
 type AdminCreateSettingMutationPayload = {
   data: CreateSettingPayload;
@@ -17,7 +17,7 @@ export const useAdminCreateSetting = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [ADMIN_SETTING_QUERY_KEY],
+        queryKey: SETTING_QUERY_KEY.all,
       });
     },
   });
