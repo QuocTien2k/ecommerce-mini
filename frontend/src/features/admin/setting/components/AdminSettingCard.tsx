@@ -1,34 +1,45 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import type { Setting } from "@/domains/setting/types/setting.type";
-import { Button } from "@components/ui/button";
-import { useState } from "react";
-import AdminSettingDialog from "./AdminSettingDialog";
+import { Separator } from "@components/ui/separator";
 
 type AdminSettingCardProps = {
   setting: Setting;
 };
 
 const AdminSettingCard = ({ setting }: AdminSettingCardProps) => {
-  const [openUpdate, setOpenUpdate] = useState(false);
-
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-semibold">
-          Thông tin cấu hình
-        </CardTitle>
-        <Button onClick={() => setOpenUpdate(true)}>Chỉnh sửa</Button>
-      </CardHeader>
+    <Card className="ring-0! shadow-none! rounded-none!">
+      <CardContent className="space-y-8 py-2">
+        {/* Thông tin chung */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-semibold whitespace-nowrap">
+              Thông tin chung
+            </h3>
 
-      <CardContent className="space-y-8">
+            <Separator className="h-3 bg-muted-foreground" />
+          </div>
+
+          <div className="pt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <InfoItem label="Tên website" value={setting.siteName} />
+            <InfoItem label="Email" value={setting.email} />
+            <InfoItem label="Hotline 1" value={setting.hotline1} />
+            <InfoItem label="Hotline 2" value={setting.hotline2} />
+            <InfoItem label="Địa chỉ" value={setting.address} />
+            <InfoItem label="Giờ làm việc" value={setting.workingHours} />
+          </div>
+        </section>
+
         {/* Logo */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase">
-            Logo
-          </h3>
+        <section className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-semibold whitespace-nowrap">Logo</h3>
+
+            <Separator className="h-3 bg-muted-foreground" />
+          </div>
 
           {setting.logo ? (
-            <div className="w-40 h-24 rounded-lg border p-2 flex items-center justify-center">
+            <div className="h-40 w-64 rounded-xl border bg-muted/20 p-4 flex items-center justify-center">
               <img
                 src={setting.logo}
                 alt={setting.siteName}
@@ -36,42 +47,31 @@ const AdminSettingCard = ({ setting }: AdminSettingCardProps) => {
               />
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Chưa có logo</p>
+            <div className="h-40 w-64 rounded-xl border bg-muted/20 flex items-center justify-center text-muted-foreground">
+              Chưa có logo
+            </div>
           )}
-        </div>
-
-        {/* Thông tin chung */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <InfoItem label="Tên website" value={setting.siteName} />
-          <InfoItem label="Email" value={setting.email} />
-          <InfoItem label="Hotline 1" value={setting.hotline1} />
-          <InfoItem label="Hotline 2" value={setting.hotline2} />
-          <InfoItem label="Địa chỉ" value={setting.address} />
-          <InfoItem label="Giờ làm việc" value={setting.workingHours} />
-        </div>
+        </section>
 
         {/* Mạng xã hội */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase">
-            Liên kết mạng xã hội
-          </h3>
+        <section className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-semibold whitespace-nowrap">
+              Mạng xã hội
+            </h3>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Separator className="h-3 bg-muted-foreground" />
+          </div>
+
+          <div className="pt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
             <InfoItem label="Facebook" value={setting.facebookUrl} isLink />
             <InfoItem label="YouTube" value={setting.youtubeUrl} isLink />
             <InfoItem label="TikTok" value={setting.tiktokUrl} isLink />
             <InfoItem label="Zalo" value={setting.zaloUrl} isLink />
             <InfoItem label="Google Map" value={setting.googleMapUrl} isLink />
           </div>
-        </div>
+        </section>
       </CardContent>
-
-      <AdminSettingDialog
-        open={openUpdate}
-        mode="update"
-        setting={setting}
-        onClose={() => setOpenUpdate(false)}
-      />
     </Card>
   );
 };
@@ -82,25 +82,31 @@ type InfoItemProps = {
   isLink?: boolean;
 };
 
-const InfoItem = ({ label, value, isLink }: InfoItemProps) => (
-  <div className="space-y-1">
-    <p className="text-sm font-medium text-muted-foreground">{label}</p>
+const InfoItem = ({ label, value, isLink }: InfoItemProps) => {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
 
-    {!value ? (
-      <p>-</p>
-    ) : isLink ? (
-      <a
-        href={value}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary hover:underline"
-      >
-        Mở liên kết
-      </a>
-    ) : (
-      <p>{value}</p>
-    )}
-  </div>
-);
+      <div className="flex min-h-12 items-center rounded-lg border bg-muted/20 px-4 py-3">
+        {!value ? (
+          <span className="text-base text-muted-foreground">-</span>
+        ) : isLink ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate text-base font-medium text-primary hover:underline"
+          >
+            {value}
+          </a>
+        ) : (
+          <span className="wrap-break-words text-base font-medium">
+            {value}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default AdminSettingCard;

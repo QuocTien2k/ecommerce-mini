@@ -8,7 +8,7 @@ import { isNotFoundError } from "@lib/error";
 import AdminSettingDialog from "./components/AdminSettingDialog";
 
 const AdminSettingPage = () => {
-  const [openCreate, setOpenCreate] = useState(false);
+  const [mode, setMode] = useState<"create" | "update" | null>(null);
   const { data: setting, isLoading, error } = useGetSetting();
   const isNotFound = isNotFoundError(error);
 
@@ -19,17 +19,17 @@ const AdminSettingPage = () => {
         <div className="flex items-center justify-between">
           <Title title="Quản lý cấu hình" />
 
-          {isNotFound && (
-            <Button onClick={() => setOpenCreate(true)}>Tạo cấu hình</Button>
-          )}
+          <Button onClick={() => setMode(isNotFound ? "create" : "update")}>
+            {isNotFound ? "Tạo cấu hình" : "Chỉnh sửa"}
+          </Button>
         </div>
-
         {setting && <AdminSettingCard setting={setting} />}
       </div>
       <AdminSettingDialog
-        open={openCreate}
-        onClose={() => setOpenCreate(false)}
-        mode="create"
+        open={mode !== null}
+        mode={mode ?? "create"}
+        setting={setting}
+        onClose={() => setMode(null)}
       />
     </QueryStateWrapper>
   );
