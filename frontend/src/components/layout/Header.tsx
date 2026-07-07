@@ -31,6 +31,7 @@ import { MobileUserPanel } from "@features/customer/account/components/mobile/Mo
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { CartButton } from "@features/customer/cart/components/CartButton";
 import { userMenuConfig } from "@features/customer/config/user-menu.config";
+import { SiteLogo } from "@components/common/logo";
 
 type ActiveModal = null | "profile" | "avatar" | "password";
 
@@ -104,9 +105,11 @@ const Header = () => {
         <div className="container mx-auto px-4 py-2">
           {/* Top row */}
           <div className="flex h-12 items-center justify-between">
-            <Link to="/" className="text-lg font-bold tracking-tight shrink-0">
-              TechStore
-            </Link>
+            <SiteLogo
+              className="shrink-0"
+              imageClassName="h-9 w-auto object-contain"
+              textClassName="text-lg font-bold tracking-tight"
+            />
 
             <div className="flex items-center gap-1">
               {isAuthenticated && <NotificationWidget mobile={true} />}
@@ -154,9 +157,11 @@ const Header = () => {
       <div className="hidden md:block">
         <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4">
           {/* Logo */}
-          <Link to="/" className="shrink-0 text-2xl font-bold tracking-tight">
-            TechStore
-          </Link>
+          <SiteLogo
+            className="shrink-0"
+            imageClassName="h-15 w-auto object-contain"
+            textClassName="text-2xl font-bold tracking-tight"
+          />
 
           {/* Search */}
           <div className="flex-1 max-w-xl">
