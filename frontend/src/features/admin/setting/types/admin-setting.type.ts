@@ -24,3 +24,8 @@ export interface CreateSettingPayload {
 }
 
 export type CreateSettingResponse = Setting;
+
+/* Case update */
+export type UpdateSettingPayload = Partial<CreateSettingPayload>;
+
+export type UpdateSettingResponse = Setting;

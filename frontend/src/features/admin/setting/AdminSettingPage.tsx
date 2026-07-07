@@ -1,11 +1,11 @@
 import { Button } from "@components/ui/button";
 import { Title } from "@components/ui/title-module";
 import { useState } from "react";
-import AdminCreateSetting from "./components/AdminCreateSetting";
 import { useGetSetting } from "@/domains/setting/hooks/useSetting";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import AdminSettingCard from "./components/AdminSettingCard";
 import { isNotFoundError } from "@lib/error";
+import AdminSettingDialog from "./components/AdminSettingDialog";
 
 const AdminSettingPage = () => {
   const [openCreate, setOpenCreate] = useState(false);
@@ -26,9 +26,10 @@ const AdminSettingPage = () => {
 
         {setting && <AdminSettingCard setting={setting} />}
       </div>
-      <AdminCreateSetting
+      <AdminSettingDialog
         open={openCreate}
         onClose={() => setOpenCreate(false)}
+        mode="create"
       />
     </QueryStateWrapper>
   );

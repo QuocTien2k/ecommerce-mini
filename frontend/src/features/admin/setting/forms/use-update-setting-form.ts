@@ -1,17 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
-  createSettingSchema,
-  type CreateSettingFormOutput,
-  type CreateSettingFormValues,
+  updateSettingSchema,
+  type UpdateSettingFormOutput,
+  type UpdateSettingFormValues,
 } from "../schemas/setting.schema";
 import { settingFormDefaultValues } from "./setting-form-default-values";
 
-export const useAdminCreateSettingForm = () => {
-  return useForm<CreateSettingFormValues, unknown, CreateSettingFormOutput>({
-    resolver: zodResolver(createSettingSchema),
+export const useAdminUpdateSettingForm = () => {
+  return useForm<UpdateSettingFormValues, unknown, UpdateSettingFormOutput>({
+    resolver: zodResolver(updateSettingSchema),
 
     defaultValues: settingFormDefaultValues,
+
     mode: "onSubmit",
   });
 };

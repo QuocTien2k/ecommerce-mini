@@ -1,17 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Setting } from "@/domains/setting/types/setting.type";
+import { Button } from "@components/ui/button";
+import { useState } from "react";
+import AdminSettingDialog from "./AdminSettingDialog";
 
 type AdminSettingCardProps = {
   setting: Setting;
 };
 
 const AdminSettingCard = ({ setting }: AdminSettingCardProps) => {
+  const [openUpdate, setOpenUpdate] = useState(false);
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl font-semibold">
           Thông tin cấu hình
         </CardTitle>
+        <Button onClick={() => setOpenUpdate(true)}>Chỉnh sửa</Button>
       </CardHeader>
 
       <CardContent className="space-y-8">
@@ -59,6 +65,13 @@ const AdminSettingCard = ({ setting }: AdminSettingCardProps) => {
           </div>
         </div>
       </CardContent>
+
+      <AdminSettingDialog
+        open={openUpdate}
+        mode="update"
+        setting={setting}
+        onClose={() => setOpenUpdate(false)}
+      />
     </Card>
   );
 };

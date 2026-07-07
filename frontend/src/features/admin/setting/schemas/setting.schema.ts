@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// reusable
+/* Reusable */
 export const settingLogoSchema = z.instanceof(File, {
   message: "Logo không hợp lệ",
 });
@@ -10,7 +10,7 @@ export const settingLogoUrlSchema = z
   .url("URL logo không hợp lệ")
   .or(z.literal(""));
 
-// base
+/* Base */
 const settingBaseSchema = z.object({
   siteName: z
     .string()
@@ -24,6 +24,7 @@ const settingBaseSchema = z.object({
     .string()
     .regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ")
     .optional(),
+
   hotline2: z
     .string()
     .regex(/^(0|\+84)[0-9]{9}$/, "Số điện thoại không hợp lệ")
@@ -38,17 +39,21 @@ const settingBaseSchema = z.object({
     .url("URL Facebook không hợp lệ")
     .optional()
     .or(z.literal("")),
+
   youtubeUrl: z
     .string()
     .url("URL Youtube không hợp lệ")
     .optional()
     .or(z.literal("")),
+
   tiktokUrl: z
     .string()
     .url("URL TikTok không hợp lệ")
     .optional()
     .or(z.literal("")),
+
   zaloUrl: z.string().url("URL Zalo không hợp lệ").optional().or(z.literal("")),
+
   googleMapUrl: z
     .string()
     .url("URL Google Map không hợp lệ")
@@ -56,29 +61,38 @@ const settingBaseSchema = z.object({
     .or(z.literal("")),
 });
 
-// shared
-export const settingFormSchema = settingBaseSchema.extend({
+/* Shared */
+const settingFormSchema = settingBaseSchema.extend({
   file: settingLogoSchema.optional(),
   logo: settingLogoUrlSchema.optional(),
 });
 
-// create
-export const createSettingSchema = settingFormSchema.superRefine(
-  (data, ctx) => {
-    const hasFile = !!data.file;
-    const hasLogo = !!data.logo;
+const validateLogoSource = (
+  data: z.infer<typeof settingFormSchema>,
+  ctx: z.RefinementCtx,
+) => {
+  if (data.file && data.logo) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["file"],
+      message:
+        "Chỉ được upload logo hoặc cung cấp URL logo, không được dùng đồng thời",
+    });
+  }
+};
 
-    if (hasFile && hasLogo) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["file"],
-        message:
-          "Chỉ được upload logo hoặc cung cấp URL logo, không được dùng đồng thời",
-      });
-    }
-  },
-);
+/* Create */
+export const createSettingSchema =
+  settingFormSchema.superRefine(validateLogoSource);
 
 export type CreateSettingFormValues = z.input<typeof createSettingSchema>;
 
 export type CreateSettingFormOutput = z.output<typeof createSettingSchema>;
+
+/* Update */
+export const updateSettingSchema =
+  settingFormSchema.superRefine(validateLogoSource);
+
+export type UpdateSettingFormValues = z.input<typeof updateSettingSchema>;
+
+export type UpdateSettingFormOutput = z.output<typeof updateSettingSchema>;
