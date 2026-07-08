@@ -29,6 +29,7 @@ model Product {
   ratings       Rating[]
   cartItems     CartItem[]
   vouchers Voucher[]
+  wishlist      Wishlist[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

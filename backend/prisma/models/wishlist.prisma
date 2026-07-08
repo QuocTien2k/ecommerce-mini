@@ -1,0 +1,16 @@
+model Wishlist {
+  userId    String
+  productId String
+
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
+
+  @@index([userId])
+  @@index([productId])
+
+  @@map("wishlists")
+}
