@@ -20,6 +20,7 @@ import { BrandModule } from './brand/brand.module';
 import { PublicModule } from './public/public.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SettingModule } from './setting/setting.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { SettingModule } from './setting/setting.module';
     PublicModule,
     DashboardModule,
     SettingModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
