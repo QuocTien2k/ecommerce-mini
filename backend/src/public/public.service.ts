@@ -15,12 +15,6 @@ export class PublicService {
     private readonly settingService: SettingService,
   ) {}
 
-  async getHomeData() {
-    const products = await this.productService.getHomeProducts();
-
-    return products;
-  }
-
   /* Case category */
   async getCategories() {
     return this.categoryService.getPublicCategoryTree();
@@ -32,14 +26,23 @@ export class PublicService {
   }
 
   /* Case product */
-  async getProducts(query: GetProductsQueryDto) {
-    const products = await this.productService.findAllProducts(query);
+  async getHomeData(userId?: string) {
+    const products = await this.productService.getHomeProducts(userId);
 
     return products;
   }
 
-  async getProductDetail(slug: string) {
-    const product_detail = await this.productService.findProductDetail(slug);
+  async getProducts(query: GetProductsQueryDto, userId?: string) {
+    const products = await this.productService.findAllProducts(query, userId);
+
+    return products;
+  }
+
+  async getProductDetail(slug: string, userId?: string) {
+    const product_detail = await this.productService.findProductDetail(
+      slug,
+      userId,
+    );
 
     return product_detail;
   }

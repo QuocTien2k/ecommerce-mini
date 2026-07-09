@@ -263,8 +263,35 @@ export class ProductService {
     });
   }
 
+  //helper wishlist
+  private buildWishlistSelect(userId?: string) {
+    if (!userId) return {};
+
+    return {
+      wishlist: {
+        where: {
+          userId,
+        },
+        select: {
+          productId: true,
+        },
+      },
+    };
+  }
+
+  private formatProduct<
+    T extends { price: Prisma.Decimal; discountPrice: Prisma.Decimal | null },
+  >(product: T, isWishlisted = false) {
+    return {
+      ...product,
+      price: product.price.toString(),
+      discountPrice: product.discountPrice?.toString() ?? null,
+      isWishlisted,
+    };
+  }
+
   //lists product for user
-  async findAllProducts(query: GetProductsQueryDto) {
+  async findAllProducts(query: GetProductsQueryDto, userId?: string) {
     // pagination (default limit = 10)
     const { page, limit, skip } = getPagination({
       ...query,
@@ -344,6 +371,8 @@ export class ProductService {
 
           createdAt: true,
           updatedAt: true,
+
+          ...this.buildWishlistSelect(userId),
         },
       }),
 
@@ -352,14 +381,15 @@ export class ProductService {
       }),
     ]);
 
-    //convert decimal -> string
-    const mappedData = data.map((item) => ({
-      ...item,
-      price: item.price.toString(),
-      discountPrice: item.discountPrice?.toString() ?? null,
-    }));
+    //convert decimal to string
+    const mappedData = data.map((item) => {
+      const { wishlist = [], ...product } = item as typeof item & {
+        wishlist?: { productId: string }[];
+      };
 
-    // format response
+      return this.formatProduct(product, wishlist.length > 0);
+    });
+
     const response = buildPaginatedResponse(mappedData, total, page, limit);
 
     return {
@@ -369,16 +399,24 @@ export class ProductService {
   }
 
   //detail for user
-  async findProductDetail(slug: string) {
+  async findProductDetail(slug: string, userId?: string) {
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
         category: {
-          select: { id: true, name: true, slug: true },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
         },
         creator: {
-          select: { id: true, fullname: true },
+          select: {
+            id: true,
+            fullname: true,
+          },
         },
+        ...this.buildWishlistSelect(userId),
       },
     });
 
@@ -390,7 +428,6 @@ export class ProductService {
       product.id,
     );
 
-    // filter + map variants cho user
     const mappedVariants = variants.map((v) => ({
       id: v.id,
       color: v.color,
@@ -399,29 +436,35 @@ export class ProductService {
       stock: v.stock,
     }));
 
+    const { wishlist = [], ...productData } = product as typeof product & {
+      wishlist?: { productId: string }[];
+    };
+
     return {
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      thumbnail: product.thumbnail,
+      id: productData.id,
+      name: productData.name,
+      slug: productData.slug,
+      description: productData.description,
+      thumbnail: productData.thumbnail,
 
-      price: product.price.toString(),
-      discountPrice: product.discountPrice?.toString() ?? null,
-      discountPct: product.discountPct,
+      price: productData.price.toString(),
+      discountPrice: productData.discountPrice?.toString() ?? null,
+      discountPct: productData.discountPct,
 
-      ratingAvg: product.ratingAvg,
-      ratingCount: product.ratingCount,
+      ratingAvg: productData.ratingAvg,
+      ratingCount: productData.ratingCount,
 
-      category: product.category,
-      creator: product.creator,
+      isWishlisted: wishlist.length > 0,
+
+      category: productData.category,
+      creator: productData.creator,
 
       variants: mappedVariants,
     };
   }
 
-  //latest products for home page
-  async getHomeProducts() {
+  // latest products for home page
+  async getHomeProducts(userId?: string) {
     const products = await this.prisma.product.findMany({
       where: {
         isActive: true,
@@ -436,19 +479,25 @@ export class ProductService {
         name: true,
         slug: true,
         thumbnail: true,
+
         price: true,
         discountPrice: true,
         discountPct: true,
+
         ratingAvg: true,
         ratingCount: true,
+
+        ...this.buildWishlistSelect(userId),
       },
     });
 
-    return products.map((item) => ({
-      ...item,
-      price: item.price.toString(),
-      discountPrice: item.discountPrice?.toString() ?? null,
-    }));
+    return products.map((item) => {
+      const { wishlist = [], ...product } = item as typeof item & {
+        wishlist?: { productId: string }[];
+      };
+
+      return this.formatProduct(product, wishlist.length > 0);
+    });
   }
 
   //lists product for admin
