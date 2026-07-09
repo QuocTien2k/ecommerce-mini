@@ -43,7 +43,7 @@ export const usePublicProductFilter = () => {
   };
 
   const goToPage = (p: number) => {
-    updateParams({ page: p });
+    updateParams({ trang: p });
     scrollToTop();
   };
 
