@@ -61,6 +61,7 @@ export class WishlistService {
       ...item.product,
       price: item.product.price.toString(),
       discountPrice: item.product.discountPrice?.toString() ?? null,
+      isWishlisted: true,
       wishedAt: item.createdAt,
     }));
 
