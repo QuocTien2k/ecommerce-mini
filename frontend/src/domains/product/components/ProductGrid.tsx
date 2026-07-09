@@ -1,9 +1,9 @@
 import { cn } from "@lib/utils";
-import type { PublicProductListItem } from "../types/public-product.type";
+import type { ProductCardItem } from "../types/public-product.type";
 import { ProductCard } from "./ProductCard";
 
 type Props = {
-  products: PublicProductListItem[];
+  products: ProductCardItem[];
   className?: string;
 };
 

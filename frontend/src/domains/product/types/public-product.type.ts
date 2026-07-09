@@ -15,12 +15,11 @@ export type PublicProductListQueryParams = {
   minRating?: number;
 };
 
-export type PublicProductListItem = {
+export interface ProductCardItem {
   id: string;
 
   name: string;
   slug: string;
-  description: string | null;
   thumbnail: string;
 
   price: string;
@@ -29,13 +28,17 @@ export type PublicProductListItem = {
 
   ratingAvg: number | null;
   ratingCount: number;
+}
+
+export interface PublicProductListItem extends ProductCardItem {
+  description: string | null;
 
   categoryId: string;
   brandId: string;
 
   createdAt: string;
   updatedAt: string;
-};
+}
 
 export type CategoryBreadcrumb = {
   id: string;

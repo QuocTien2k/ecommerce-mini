@@ -9,7 +9,7 @@ export const usePublicProductFilter = () => {
 
   const debounceRef = useRef<number | null>(null);
 
-  const page = Number(searchParams.get("page") || 1);
+  const page = Number(searchParams.get("trang") || 1);
   const categoryId = searchParams.get("categoryId") || "";
   const brandId = searchParams.get("brandId") || "";
   const rawPriceSort = searchParams.get("priceSort");

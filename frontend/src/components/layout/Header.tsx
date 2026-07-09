@@ -93,6 +93,7 @@ const Header = () => {
     avatar: () => openModal("avatar"),
     password: () => openModal("password"),
     orders: () => navigate("/orders"),
+    wishlists: () => navigate("/my-wishlists"),
     vouchers: () => navigate("/my-vouchers"),
   };
 

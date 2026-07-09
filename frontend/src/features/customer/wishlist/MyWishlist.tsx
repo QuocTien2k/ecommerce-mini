@@ -1,13 +1,13 @@
 import { useMemo } from "react";
-import { useOrders } from "./hooks/useOrders";
+import { useCustomerWishlistQuery } from "./hooks/useCustomerWishlist";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { SectionTitle } from "@components/ui/section-title";
 import AppPagination from "@components/common/pagination";
-import OrderList from "./components/my-order/OrderList";
-import OrderEmpty from "@components/order/OrderEmpty";
+import { ProductGrid } from "@/domains/product/components/ProductGrid";
+import { WishlistEmpty } from "@components/wishlist/WishlistEmpty";
 import { useSearchParams } from "react-router-dom";
 
-const MyOrders = () => {
+const MyWishlist = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("trang") ?? 1);
@@ -30,30 +30,30 @@ const MyOrders = () => {
     });
   };
 
-  const { data, isLoading } = useOrders(queryParams);
+  const { data, isLoading } = useCustomerWishlistQuery(queryParams);
 
-  const orders = data?.data ?? [];
-  const meta = data?.meta;
+  const wishlists = data?.data?.data ?? [];
+  const meta = data?.data?.meta;
 
   const totalPages = meta?.totalPages ?? 1;
 
-  //console.log("Orders trả về: ", orders);
+  //console.log(data);
 
   return (
     <QueryStateWrapper isLoading={isLoading}>
       <div className="container py-6">
         <div className="mb-6">
           <SectionTitle
-            title="Đơn hàng của tôi"
-            description="Theo dõi trạng thái các đơn hàng đã đặt"
+            title="Sản phẩm yêu thích"
+            description="Danh sách sản phẩm bạn đã thêm vào yêu thích"
           />
         </div>
 
-        {orders.length === 0 ? (
-          <OrderEmpty />
+        {wishlists.length === 0 ? (
+          <WishlistEmpty />
         ) : (
           <>
-            <OrderList orders={orders} />
+            <ProductGrid products={wishlists} className="xl:grid-cols-4" />
 
             {totalPages > 1 && (
               <div className="mt-6">
@@ -71,4 +71,4 @@ const MyOrders = () => {
   );
 };
 
-export default MyOrders;
+export default MyWishlist;

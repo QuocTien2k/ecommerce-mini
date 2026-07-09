@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import type { PublicProductListItem } from "../types/public-product.type";
+import type { ProductCardItem } from "../types/public-product.type";
 import { formatCurrency } from "@lib/format-currency";
 import { Star } from "lucide-react";
 
 type Props = {
-  product: PublicProductListItem;
+  product: ProductCardItem;
 };
 
 export function ProductCard({ product }: Props) {

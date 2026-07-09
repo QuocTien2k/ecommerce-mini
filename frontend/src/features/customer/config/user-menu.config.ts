@@ -19,7 +19,7 @@ export const userMenuConfig = (actions: any) => [
   {
     icon: Heart,
     label: "Sản phẩm yêu thích",
-    onClick: undefined,
+    onClick: actions.wishlists,
   },
   {
     icon: Ticket,

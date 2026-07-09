@@ -29,6 +29,7 @@ import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
 import OrderDetail from "@features/customer/order/OrderDetail";
 import DashboardPage from "@features/admin/dashboard/DashboardPage";
 import AdminSettingPage from "@features/admin/setting/AdminSettingPage";
+import MyWishlist from "@features/customer/wishlist/MyWishlist";
 
 const AppRoutes = () => {
   return (
@@ -62,6 +63,7 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>
             <Route path="my-vouchers" element={<MyVouchers />} />
+            <Route path="my-wishlists" element={<MyWishlist />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="/checkout" element={<OrderPage />} />
             <Route path="/orders" element={<MyOrders />} />
