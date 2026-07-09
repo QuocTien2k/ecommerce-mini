@@ -26,7 +26,7 @@ const MyWishlist = () => {
     }
 
     setSearchParams({
-      page: String(newPage),
+      trang: String(newPage),
     });
   };
 

@@ -26,7 +26,7 @@ const MyOrders = () => {
     }
 
     setSearchParams({
-      page: String(newPage),
+      trang: String(newPage),
     });
   };
 

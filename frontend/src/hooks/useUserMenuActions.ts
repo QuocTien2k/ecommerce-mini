@@ -17,5 +17,6 @@ export const useUserMenuActions = ({
     password: onOpenPassword,
     orders: () => navigate("/orders"),
     vouchers: () => navigate("/my-vouchers"),
+    wishlists: () => navigate("/my-wishlists"),
   };
 };
