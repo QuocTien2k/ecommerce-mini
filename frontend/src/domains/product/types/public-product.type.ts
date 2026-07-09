@@ -28,6 +28,8 @@ export interface ProductCardItem {
 
   ratingAvg: number | null;
   ratingCount: number;
+
+  isWishlisted: boolean;
 }
 
 export interface PublicProductListItem extends ProductCardItem {
@@ -102,4 +104,6 @@ export type PublicProductDetailResponse = {
   creator: Creator;
 
   variants: PublicProductVariant[];
+
+  isWishlisted: boolean;
 };

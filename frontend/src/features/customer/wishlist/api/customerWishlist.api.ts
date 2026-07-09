@@ -1,6 +1,7 @@
 import type { ApiResult } from "@shared/types/api-result";
 import type {
   GetWishlistQuery,
+  ToggleWishlistResponse,
   WishlistItem,
 } from "../types/customerWishlist.type";
 import { api } from "@shared/api/axios";
@@ -11,4 +12,7 @@ export const customerWishlistApi = {
     params?: GetWishlistQuery,
   ): ApiResult<PaginatedResponse<WishlistItem>> =>
     api.get("/wishlist", { params }),
+
+  toggleWishlist: (productId: string): ApiResult<ToggleWishlistResponse> =>
+    api.patch(`/wishlist/${productId}`),
 };

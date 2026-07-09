@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import type { ProductCardItem } from "../types/public-product.type";
 import { formatCurrency } from "@lib/format-currency";
 import { Star } from "lucide-react";
+import { WishlistButton } from "@features/customer/wishlist/components/WishlistButton";
 
 type Props = {
   product: ProductCardItem;
@@ -32,6 +33,12 @@ export function ProductCard({ product }: Props) {
           src={thumbnail}
           alt={name}
           className="mx-auto size-32 object-contain transition-transform duration-300 group-hover:scale-105 sm:size-36 lg:size-45"
+        />
+
+        <WishlistButton
+          productId={product.id}
+          isWishlisted={product.isWishlisted}
+          className="absolute right-2 top-2 z-10 bg-background/90 shadow"
         />
 
         {discountPct != null && discountPct > 0 && (

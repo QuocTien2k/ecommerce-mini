@@ -8,6 +8,11 @@ export interface GetWishlistQuery {
 export interface WishlistItem extends ProductCardItem {
   isActive: boolean;
   deletedAt: string | null;
-
+  isWishlisted: boolean;
   wishedAt: string;
+}
+
+export interface ToggleWishlistResponse {
+  isWishlisted: boolean;
+  message: string;
 }

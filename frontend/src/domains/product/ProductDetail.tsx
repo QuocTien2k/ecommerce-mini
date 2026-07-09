@@ -24,6 +24,7 @@ import { getErrorMessage } from "@lib/error";
 import { toast } from "sonner";
 import { useAppSelector } from "@app/hooks";
 import ProductRating from "@features/customer/rating/ProductRating";
+import { WishlistButton } from "@features/customer/wishlist/components/WishlistButton";
 
 const ProductDetail = () => {
   //check auth
@@ -177,7 +178,17 @@ const ProductDetail = () => {
 
           {/* Right Side - Info*/}
           <div className="space-y-4">
-            <h1 className="text-2xl font-bold">{product.name}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl font-bold">{product.name}</h1>
+
+              {isAuthenticated && (
+                <WishlistButton
+                  productId={product.id}
+                  isWishlisted={product.isWishlisted}
+                  className="shrink-0"
+                />
+              )}
+            </div>
 
             {/* Category */}
             <div className="flex items-center gap-6">
