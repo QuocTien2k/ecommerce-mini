@@ -32,7 +32,7 @@ export class WishlistController {
   }
 
   @Patch(':productId')
-  @ResponseMessage('Lấy danh sách yêu thích thành công')
+  @ResponseMessage('Cập nhật danh sách yêu thích thành công')
   toggleWishlist(
     @CurrentUser('sub') userId: string,
     @Param('productId', new ParseUUIDPipe()) productId: string,

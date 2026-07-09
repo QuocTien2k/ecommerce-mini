@@ -103,7 +103,6 @@ export class WishlistService {
 
       return {
         isWishlisted: false,
-        message: 'Đã xóa khỏi danh sách yêu thích',
       };
     }
 
@@ -116,7 +115,6 @@ export class WishlistService {
 
     return {
       isWishlisted: true,
-      message: 'Đã thêm vào danh sách yêu thích',
     };
   }
 }
