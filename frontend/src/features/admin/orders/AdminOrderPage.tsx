@@ -25,10 +25,11 @@ import OrderEmpty from "@components/order/OrderEmpty";
 import { Button } from "@components/ui/button";
 import { cn } from "@lib/utils";
 import { AsyncButton } from "@components/common/async-button";
-import { Eye, Info, Pencil } from "lucide-react";
+import { Download, Eye, Info, Pencil } from "lucide-react";
 import AdminOrderDetail from "./components/AdminOrderDetail";
 import AdminUpdateOrder from "./components/AdminUpdateOrder";
 import OrderStatusGuideModal from "./components/OrderStatusGuide";
+import { useExportOrders } from "./hooks/useAdminOrderExport";
 
 const AdminOrderPage = () => {
   const [page, setPage] = useState(1);
@@ -51,6 +52,14 @@ const AdminOrderPage = () => {
   };
 
   const { data, isLoading, isFetching } = useAdminOrders(params);
+
+  //export excell
+  const { exportOrders } = useExportOrders();
+  const handleExport = async () => {
+    await exportOrders({
+      status,
+    });
+  };
 
   // DATA NORMALIZATION
   const orders: OrderSummary[] = data?.data ?? [];
@@ -88,20 +97,29 @@ const AdminOrderPage = () => {
       <div className="p-6 space-y-6 bg-white border border-gray-300 rounded-xl shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Title title="Quản lý đơn hàng" />
+          <div>
+            <Title title="Quản lý đơn hàng" />
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setOpenGuide(true)}
-          >
-            <Info className="mr-2 h-4 w-4" />
-            Hướng dẫn
-          </Button>
+            <p className="text-sm text-muted-foreground">
+              Tổng số đơn hàng: {meta?.total ?? 0}
+            </p>
+          </div>
 
-          <span className="text-sm text-muted-foreground">
-            Tổng số lượng đơn hàng: {meta?.total ?? 0}
-          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setOpenGuide(true)}
+            >
+              <Info className="mr-2 h-4 w-4" />
+              Hướng dẫn
+            </Button>
+
+            <Button onClick={handleExport}>
+              <Download className="mr-2 h-4 w-4" />
+              Xuất Excel
+            </Button>
+          </div>
         </div>
 
         {/* Filter Bar */}

@@ -7,6 +7,7 @@ import type {
 } from "@shared/types/order.type";
 import type { PaginatedResponse } from "@shared/types/pagination";
 import type { UpdateOrderStatusRequest } from "../types/adimn-order.type";
+import type { OrderStatus } from "@shared/types/order-status.type";
 
 export const adminOrderApi = {
   getOrders: (
@@ -21,4 +22,10 @@ export const adminOrderApi = {
     orderId: string,
     data: UpdateOrderStatusRequest,
   ): ApiResult<OrderDetail> => api.patch(`/order/${orderId}`, data),
+
+  exportOrders: (params?: GetOrdersQuery) =>
+    api.get("/order/export", {
+      params,
+      responseType: "blob",
+    }),
 };
