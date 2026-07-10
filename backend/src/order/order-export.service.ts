@@ -7,6 +7,7 @@ import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
 import { Workbook, Row } from 'exceljs';
 import { ORDER_STATUS_LABEL } from './mapper/order-status.mapper';
+import { ATTRIBUTE_LABELS } from './constant/attribute-labels';
 
 type OrderWithItems = Prisma.OrderGetPayload<{
   include: {
@@ -67,12 +68,18 @@ export class OrderExportService {
   private formatSelectedAttributes(
     attributes: Prisma.JsonValue | null,
   ): string {
-    if (!attributes || typeof attributes !== 'object') {
-      return '';
-    }
+    if (!attributes) return '';
 
-    return Object.entries(attributes as Record<string, string>)
-      .map(([key, value]) => `${key}: ${value}`)
+    const parsed =
+      typeof attributes === 'string'
+        ? JSON.parse(attributes)
+        : (attributes as Record<string, unknown>);
+
+    return Object.entries(parsed)
+      .map(([key, value]) => {
+        const label = ATTRIBUTE_LABELS[key] ?? key;
+        return `${label}: ${value}`;
+      })
       .join(', ');
   }
 
@@ -187,6 +194,7 @@ export class OrderExportService {
 
     for (const order of orders) {
       for (const item of order.items) {
+        //console.log(item.selectedAttributes);
         itemSheet.addRow({
           orderId: order.id,
           productName: item.productName,
