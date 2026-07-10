@@ -8,8 +8,10 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@auth/guards/roles.guard';
@@ -20,12 +22,15 @@ import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { UpdateOrderStatusDto } from './dtos/update-order.dto';
 import { GetOrdersQueryDto } from './dtos/get-orders.dto';
 import { OrderMapper } from './mapper/order.mapper';
-import { Request } from 'express';
 import { ResponseMessage } from '@common/decorators/response-message.decorator';
+import { OrderExportService } from './order-export.service';
 
 @Controller('order')
 export class OrderController {
-  constructor(private readonly ordersService: OrderService) {}
+  constructor(
+    private readonly ordersService: OrderService,
+    private readonly orderExportService: OrderExportService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -84,6 +89,27 @@ export class OrderController {
     @CurrentUser('role') role: Role,
   ) {
     return this.ordersService.getOrders(query, userId, role);
+  }
+
+  @Get('export')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async exportOrders(@Query() query: GetOrdersQueryDto, @Res() res: Response) {
+    const workbook = await this.orderExportService.exportOrders(query.status);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=orders-${Date.now()}.xlsx`,
+    );
+
+    await workbook.xlsx.write(res);
+
+    res.end();
   }
 
   @Get(':id')

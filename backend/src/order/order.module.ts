@@ -6,6 +6,7 @@ import { UserModule } from '@user/user.module';
 import { NotificationModule } from '@notification/notification.module';
 import { VoucherModule } from '@voucher/voucher.module';
 import { PaymentModule } from '@payment/payment.module';
+import { OrderExportService } from './order-export.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { PaymentModule } from '@payment/payment.module';
     VoucherModule,
     PaymentModule,
   ],
-  providers: [OrderService],
+  providers: [OrderService, OrderExportService],
   controllers: [OrderController],
   exports: [OrderService],
 })
