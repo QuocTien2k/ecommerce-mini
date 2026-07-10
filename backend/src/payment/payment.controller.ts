@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@auth/decorators/current-user.decorator';
 import { CreateVnpayPaymentDto } from './dtos/create-payment.dto';
 import { Request } from 'express';
+import { MomoIpnDto } from './types/momo.type';
 
 @Controller('payment')
 export class PaymentController {
@@ -38,6 +39,11 @@ export class PaymentController {
     );
 
     return data;
+  }
+
+  @Post('momo/ipn')
+  async handleMomoIpn(@Body() body: MomoIpnDto) {
+    return this.paymentService.handleMomoIpn(body);
   }
 
   @Get('vnpay/ipn')

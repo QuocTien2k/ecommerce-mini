@@ -7,19 +7,25 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  Order,
   OrderStatus,
+  Payment,
   PaymentMethod,
   PaymentStatus,
   Prisma,
 } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { VNPay, ProductCode, VnpLocale, dateFormat } from 'vnpay';
+import { HttpService } from '@nestjs/axios';
+import * as crypto from 'crypto';
+import { MomoIpnDto } from './types/momo.type';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigService,
+    private readonly httpService: HttpService,
     @Inject('VNPAY_CLIENT') private readonly vnpay: VNPay,
   ) {}
 
@@ -44,6 +50,59 @@ export class PaymentService {
 
     // Clear cart
     await this.clearUserCart(tx, userId);
+  }
+
+  private async createOrReusePayment(
+    tx: Prisma.TransactionClient,
+    order: Order,
+    userId: string,
+    method: PaymentMethod,
+    now: Date,
+    expireDate: Date,
+  ): Promise<Payment> {
+    const existing = await tx.payment.findUnique({
+      where: {
+        orderId: order.id,
+      },
+    });
+
+    if (existing) {
+      if (existing.status === PaymentStatus.SUCCESS) {
+        throw new BadRequestException('Order already paid');
+      }
+
+      if (existing.status === PaymentStatus.PENDING) {
+        if (!existing.expiredAt || existing.expiredAt > now) {
+          return existing;
+        }
+
+        await tx.payment.delete({
+          where: {
+            id: existing.id,
+          },
+        });
+      } else {
+        await tx.payment.delete({
+          where: {
+            id: existing.id,
+          },
+        });
+      }
+    }
+
+    const transactionRef = `${order.id}-${Date.now()}`;
+
+    return tx.payment.create({
+      data: {
+        orderId: order.id,
+        userId,
+        method,
+        status: PaymentStatus.PENDING,
+        amount: order.totalPrice,
+        transactionRef,
+        expiredAt: expireDate,
+      },
+    });
   }
 
   /*Case COD*/
@@ -154,51 +213,16 @@ export class PaymentService {
     expireDate.setMinutes(expireDate.getMinutes() + 15);
 
     //Transaction
-    const payment = await this.prisma.$transaction(async (tx) => {
-      // check existing payment
-      const existing = await tx.payment.findUnique({
-        where: { orderId: order.id },
-      });
-
-      if (existing) {
-        if (existing.status === 'SUCCESS') {
-          throw new BadRequestException('Order already paid');
-        }
-
-        if (existing.status === PaymentStatus.PENDING) {
-          // check expired
-          if (!existing.expiredAt || existing.expiredAt > now) {
-            return existing; // reuse nếu còn hạn
-          }
-
-          // hết hạn → delete để tạo mới
-          await tx.payment.delete({
-            where: { id: existing.id },
-          });
-        } else {
-          // FAILED / CANCELLED
-          await tx.payment.delete({
-            where: { id: existing.id },
-          });
-        }
-      }
-
-      // unique transactionRef per attempt
-      const transactionRef = `${order.id}-${Date.now()}`;
-
-      // create
-      return tx.payment.create({
-        data: {
-          orderId: order.id,
-          userId,
-          method: PaymentMethod.VNPAY,
-          status: PaymentStatus.PENDING,
-          amount: order.totalPrice,
-          transactionRef,
-          expiredAt: expireDate,
-        },
-      });
-    });
+    const payment = await this.prisma.$transaction((tx) =>
+      this.createOrReusePayment(
+        tx,
+        order,
+        userId,
+        PaymentMethod.VNPAY,
+        now,
+        expireDate,
+      ),
+    );
     //console.log('VNPAY_URL ENV:', this.configService.get('VNPAY_URL'));
 
     // const vnpUrl = this.configService.get('VNPAY_URL');
@@ -535,5 +559,353 @@ export class PaymentService {
           message: 'Unknown payment status',
         };
     }
+  }
+
+  /* Case MoMo */
+  private get momoConfig() {
+    return {
+      endpoint: this.configService.getOrThrow('MOMO_ENDPOINT'),
+      partnerCode: this.configService.getOrThrow('MOMO_PARTNER_CODE'),
+      accessKey: this.configService.getOrThrow('MOMO_ACCESS_KEY'),
+      secretKey: this.configService.getOrThrow('MOMO_SECRET_KEY'),
+      partnerName: this.configService.getOrThrow('MOMO_PARTNER_NAME'),
+      storeId: this.configService.getOrThrow('MOMO_STORE_ID'),
+      redirectUrl: this.configService.getOrThrow('MOMO_REDIRECT_URL'),
+      ipnUrl: this.configService.getOrThrow('MOMO_IPN_URL'),
+    };
+  }
+
+  private async createOrReuseMomoPayment(
+    tx: Prisma.TransactionClient,
+    order: Order,
+    userId: string,
+    now: Date,
+    expireDate: Date,
+  ): Promise<Payment> {
+    const existing = await tx.payment.findUnique({
+      where: {
+        orderId: order.id,
+      },
+    });
+
+    if (existing) {
+      if (existing.status === PaymentStatus.SUCCESS) {
+        throw new BadRequestException('Order already paid');
+      }
+
+      if (existing.status === PaymentStatus.PENDING) {
+        if (!existing.expiredAt || existing.expiredAt > now) {
+          return existing;
+        }
+
+        await tx.payment.delete({
+          where: {
+            id: existing.id,
+          },
+        });
+      } else {
+        await tx.payment.delete({
+          where: {
+            id: existing.id,
+          },
+        });
+      }
+    }
+
+    const transactionRef = `${order.id}-${Date.now()}`;
+
+    return tx.payment.create({
+      data: {
+        orderId: order.id,
+        userId,
+        method: PaymentMethod.MOMO,
+        status: PaymentStatus.PENDING,
+        amount: order.totalPrice,
+        transactionRef,
+        expiredAt: expireDate,
+      },
+    });
+  }
+
+  private generateMomoCreateSignature(params: {
+    amount: string;
+    requestId: string;
+    orderId: string;
+    orderInfo: string;
+    requestType: string;
+    extraData: string;
+  }): string {
+    const momo = this.momoConfig;
+
+    const rawSignature =
+      `accessKey=${momo.accessKey}` +
+      `&amount=${params.amount}` +
+      `&extraData=${params.extraData}` +
+      `&ipnUrl=${momo.ipnUrl}` +
+      `&orderId=${params.orderId}` +
+      `&orderInfo=${params.orderInfo}` +
+      `&partnerCode=${momo.partnerCode}` +
+      `&redirectUrl=${momo.redirectUrl}` +
+      `&requestId=${params.requestId}` +
+      `&requestType=${params.requestType}`;
+
+    return crypto
+      .createHmac('sha256', momo.secretKey)
+      .update(rawSignature)
+      .digest('hex');
+  }
+
+  private buildMomoCreateRequest(params: {
+    requestId: string;
+    orderId: string;
+    amount: string;
+    orderInfo: string;
+    requestType: string;
+    extraData: string;
+    signature: string;
+  }) {
+    const momo = this.momoConfig;
+
+    return {
+      partnerCode: momo.partnerCode,
+      partnerName: momo.partnerName,
+      storeId: momo.storeId,
+      requestId: params.requestId,
+      amount: params.amount,
+      orderId: params.orderId,
+      orderInfo: params.orderInfo,
+      redirectUrl: momo.redirectUrl,
+      ipnUrl: momo.ipnUrl,
+      lang: 'vi',
+      requestType: params.requestType,
+      autoCapture: true,
+      extraData: params.extraData,
+      signature: params.signature,
+    };
+  }
+
+  private async createMomoGatewayPayment(requestBody: Record<string, any>) {
+    const { data } = await this.httpService.axiosRef.post(
+      this.momoConfig.endpoint,
+      requestBody,
+    );
+
+    return data;
+  }
+
+  async createMomoPayment(
+    userId: string,
+    orderId: string,
+  ): Promise<{ paymentUrl: string; paymentId: string }> {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Không tìm thấy đơn hàng');
+    }
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new BadRequestException('Order is not valid for payment');
+    }
+
+    const now = new Date();
+    //expire time (15 phút)
+    const expireDate = new Date(now);
+    expireDate.setMinutes(expireDate.getMinutes() + 15);
+
+    //Transaction
+    const payment = await this.prisma.$transaction((tx) =>
+      this.createOrReusePayment(
+        tx,
+        order,
+        userId,
+        PaymentMethod.MOMO,
+        now,
+        expireDate,
+      ),
+    );
+
+    const requestId = payment.transactionRef;
+    const orderIdMomo = payment.transactionRef;
+    const amount = payment.amount.toNumber().toString();
+    const orderInfo = `Thanh toan don hang ${order.id}`;
+    const requestType = 'payWithMethod';
+    const extraData = '';
+
+    const signature = this.generateMomoCreateSignature({
+      amount,
+      requestId,
+      orderId: orderIdMomo,
+      orderInfo,
+      requestType,
+      extraData,
+    });
+
+    const requestBody = this.buildMomoCreateRequest({
+      requestId,
+      orderId: orderIdMomo,
+      amount,
+      orderInfo,
+      requestType,
+      extraData,
+      signature,
+    });
+
+    const data = await this.createMomoGatewayPayment(requestBody);
+
+    if (data.resultCode !== 0) {
+      await this.prisma.payment.delete({
+        where: { id: payment.id },
+      });
+
+      throw new BadRequestException(
+        data.message || 'Không thể tạo thanh toán MoMo',
+      );
+    }
+
+    return {
+      paymentUrl: data.payUrl,
+      paymentId: payment.id,
+    };
+  }
+
+  private verifyMomoSignature(payload: MomoIpnDto): boolean {
+    const momo = this.momoConfig;
+
+    const rawSignature =
+      `accessKey=${momo.accessKey}` +
+      `&amount=${payload.amount}` +
+      `&extraData=${payload.extraData}` +
+      `&message=${payload.message}` +
+      `&orderId=${payload.orderId}` +
+      `&orderInfo=${payload.orderInfo}` +
+      `&orderType=${payload.orderType}` +
+      `&partnerCode=${payload.partnerCode}` +
+      `&payType=${payload.payType}` +
+      `&requestId=${payload.requestId}` +
+      `&responseTime=${payload.responseTime}` +
+      `&resultCode=${payload.resultCode}` +
+      `&transId=${payload.transId}`;
+
+    const expectedSignature = crypto
+      .createHmac('sha256', momo.secretKey)
+      .update(rawSignature)
+      .digest('hex');
+
+    return expectedSignature === payload.signature;
+  }
+
+  private validateMomoIpn(
+    payment: Payment,
+    payload: MomoIpnDto,
+  ): { resultCode: number; message: string } | null {
+    const momo = this.momoConfig;
+
+    if (payment.amount.toNumber() !== Number(payload.amount)) {
+      return {
+        resultCode: 99,
+        message: 'Invalid amount',
+      };
+    }
+
+    if (payload.partnerCode !== momo.partnerCode) {
+      return {
+        resultCode: 98,
+        message: 'Invalid partnerCode',
+      };
+    }
+
+    return null;
+  }
+
+  private async processMomoPaymentResult(
+    payment: Payment,
+    resultCode: number,
+  ): Promise<void> {
+    if (resultCode === 0) {
+      await this.prisma.$transaction(async (tx) => {
+        await tx.payment.update({
+          where: {
+            id: payment.id,
+          },
+          data: {
+            status: PaymentStatus.SUCCESS,
+            paidAt: new Date(),
+          },
+        });
+
+        await tx.order.update({
+          where: {
+            id: payment.orderId,
+          },
+          data: {
+            status: OrderStatus.CONFIRMED,
+          },
+        });
+      });
+
+      return;
+    }
+
+    await this.prisma.payment.update({
+      where: {
+        id: payment.id,
+      },
+      data: {
+        status: PaymentStatus.FAILED,
+      },
+    });
+  }
+
+  async handleMomoIpn(payload: MomoIpnDto) {
+    if (!this.verifyMomoSignature(payload)) {
+      return {
+        resultCode: 97,
+        message: 'Invalid signature',
+      };
+    }
+
+    const { orderId, resultCode } = payload;
+
+    const payment = await this.prisma.payment.findFirst({
+      where: {
+        transactionRef: orderId,
+      },
+      include: {
+        order: true,
+      },
+    });
+
+    if (!payment) {
+      return {
+        resultCode: 1,
+        message: 'Payment not found',
+      };
+    }
+
+    const validation = this.validateMomoIpn(payment, payload);
+
+    if (validation) {
+      return validation;
+    }
+
+    // idempotent
+    if (payment.status === PaymentStatus.SUCCESS) {
+      return {
+        resultCode: 0,
+        message: 'success',
+      };
+    }
+
+    await this.processMomoPaymentResult(payment, resultCode);
+
+    return {
+      resultCode: 0,
+      message: 'success',
+    };
   }
 }
