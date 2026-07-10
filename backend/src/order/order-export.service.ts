@@ -5,12 +5,64 @@ import {
 } from '@nestjs/common';
 import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '@prisma/prisma.service';
-import { Workbook } from 'exceljs';
+import { Workbook, Row } from 'exceljs';
 import { ORDER_STATUS_LABEL } from './mapper/order-status.mapper';
+
+type OrderWithItems = Prisma.OrderGetPayload<{
+  include: {
+    items: true;
+  };
+}>;
 
 @Injectable()
 export class OrderExportService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /* handle name for download filename */
+  private buildFileName(status?: OrderStatus): string {
+    const date = new Date().toISOString().slice(0, 10);
+
+    return `orders-${status?.toLowerCase() ?? 'all'}-${date}.xlsx`;
+  }
+
+  getExportFileName(status?: OrderStatus): string {
+    return this.buildFileName(status);
+  }
+
+  /* style header in excell */
+  private styleHeader(row: Row): void {
+    row.font = {
+      bold: true,
+      size: 12,
+      color: {
+        argb: 'FFFFFFFF',
+      },
+    };
+
+    row.alignment = {
+      horizontal: 'center',
+      vertical: 'middle',
+    };
+
+    row.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: {
+        argb: '2563EB',
+      },
+    };
+
+    row.height = 24;
+
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' },
+      };
+    });
+  }
 
   private formatSelectedAttributes(
     attributes: Prisma.JsonValue | null,
@@ -24,12 +76,12 @@ export class OrderExportService {
       .join(', ');
   }
 
-  async exportOrders(status?: OrderStatus): Promise<Workbook> {
+  private async getOrders(status?: OrderStatus): Promise<OrderWithItems[]> {
     const where: Prisma.OrderWhereInput = {
       ...(status && { status }),
     };
 
-    const orders = await this.prisma.order.findMany({
+    return this.prisma.order.findMany({
       where,
       orderBy: {
         createdAt: 'desc',
@@ -38,18 +90,19 @@ export class OrderExportService {
         items: true,
       },
     });
+  }
 
-    if (orders.length === 0) {
-      throw new NotFoundException('Không có đơn hàng để xuất');
-    }
-
+  private createWorkbook(): Workbook {
     const workbook = new Workbook();
 
     workbook.creator = 'Mini E-commerce';
     workbook.created = new Date();
 
+    return workbook;
+  }
+
+  private buildOrderSheet(workbook: Workbook, orders: OrderWithItems[]): void {
     const orderSheet = workbook.addWorksheet('Orders');
-    const itemSheet = workbook.addWorksheet('Order Items');
 
     orderSheet.columns = [
       { header: 'Mã đơn', key: 'id', width: 40 },
@@ -66,16 +119,19 @@ export class OrderExportService {
       { header: 'Ngày tạo', key: 'createdAt', width: 25 },
     ];
 
-    const headerRow = orderSheet.getRow(1);
+    orderSheet.views = [
+      {
+        state: 'frozen',
+        ySplit: 1,
+      },
+    ];
 
-    headerRow.font = {
-      bold: true,
+    orderSheet.autoFilter = {
+      from: 'A1',
+      to: 'L1',
     };
 
-    headerRow.alignment = {
-      vertical: 'middle',
-      horizontal: 'center',
-    };
+    this.styleHeader(orderSheet.getRow(1));
 
     for (const order of orders) {
       orderSheet.addRow({
@@ -97,10 +153,15 @@ export class OrderExportService {
     orderSheet.getColumn('subtotal').numFmt = '#,##0';
     orderSheet.getColumn('discountAmount').numFmt = '#,##0';
     orderSheet.getColumn('totalPrice').numFmt = '#,##0';
-
     orderSheet.getColumn('createdAt').numFmt = 'dd/mm/yyyy hh:mm';
+  }
 
-    /* Order items */
+  private buildOrderItemSheet(
+    workbook: Workbook,
+    orders: OrderWithItems[],
+  ): void {
+    const itemSheet = workbook.addWorksheet('Order Items');
+
     itemSheet.columns = [
       { header: 'Mã đơn', key: 'orderId', width: 40 },
       { header: 'Tên sản phẩm', key: 'productName', width: 35 },
@@ -110,16 +171,19 @@ export class OrderExportService {
       { header: 'Thành tiền', key: 'total', width: 18 },
     ];
 
-    const itemHeaderRow = itemSheet.getRow(1);
+    itemSheet.views = [
+      {
+        state: 'frozen',
+        ySplit: 1,
+      },
+    ];
 
-    itemHeaderRow.font = {
-      bold: true,
+    itemSheet.autoFilter = {
+      from: 'A1',
+      to: 'F1',
     };
 
-    itemHeaderRow.alignment = {
-      vertical: 'middle',
-      horizontal: 'center',
-    };
+    this.styleHeader(itemSheet.getRow(1));
 
     for (const order of orders) {
       for (const item of order.items) {
@@ -136,6 +200,19 @@ export class OrderExportService {
 
     itemSheet.getColumn('price').numFmt = '#,##0';
     itemSheet.getColumn('total').numFmt = '#,##0';
+  }
+
+  async exportOrders(status?: OrderStatus): Promise<Workbook> {
+    const orders = await this.getOrders(status);
+
+    if (!orders.length) {
+      throw new NotFoundException('Không có đơn hàng để xuất');
+    }
+
+    const workbook = this.createWorkbook();
+
+    this.buildOrderSheet(workbook, orders);
+    this.buildOrderItemSheet(workbook, orders);
 
     return workbook;
   }

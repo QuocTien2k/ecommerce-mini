@@ -102,10 +102,9 @@ export class OrderController {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=orders-${Date.now()}.xlsx`,
-    );
+    const filename = this.orderExportService.getExportFileName(query.status);
+
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
     await workbook.xlsx.write(res);
 
