@@ -8,10 +8,12 @@ import { PrismaService } from '@prisma/prisma.service';
 import { Workbook, Row } from 'exceljs';
 import { ORDER_STATUS_LABEL } from './mapper/order-status.mapper';
 import { ATTRIBUTE_LABELS } from './constant/attribute-labels';
+import { PAYMENT_METHOD_LABEL } from './constant/payment-label';
 
 type OrderWithItems = Prisma.OrderGetPayload<{
   include: {
     items: true;
+    payment: true;
   };
 }>;
 
@@ -95,6 +97,7 @@ export class OrderExportService {
       },
       include: {
         items: true,
+        payment: true,
       },
     });
   }
@@ -114,6 +117,7 @@ export class OrderExportService {
     orderSheet.columns = [
       { header: 'Mã đơn', key: 'id', width: 40 },
       { header: 'Trạng thái', key: 'status', width: 20 },
+      { header: 'Thanh toán', key: 'paymentMethod', width: 18 },
       { header: 'Người nhận', key: 'receiverName', width: 25 },
       { header: 'Số điện thoại', key: 'receiverPhone', width: 18 },
       { header: 'Địa chỉ', key: 'receiverAddress', width: 40 },
@@ -135,7 +139,7 @@ export class OrderExportService {
 
     orderSheet.autoFilter = {
       from: 'A1',
-      to: 'L1',
+      to: 'M1',
     };
 
     this.styleHeader(orderSheet.getRow(1));
@@ -144,6 +148,9 @@ export class OrderExportService {
       orderSheet.addRow({
         id: order.id,
         status: ORDER_STATUS_LABEL[order.status],
+        paymentMethod: order.payment
+          ? PAYMENT_METHOD_LABEL[order.payment.method]
+          : '',
         receiverName: order.receiverName,
         receiverPhone: order.receiverPhone,
         receiverAddress: order.receiverAddress,
