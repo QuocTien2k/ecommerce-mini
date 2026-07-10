@@ -64,6 +64,7 @@ async function bootstrap() {
   app.enableCors({
     origin: configService.get('FRONTEND_URL'),
     credentials: true,
+    exposedHeaders: ['Content-Disposition', 'Content-Type'],
   });
 
   const port = configService.get<number>('PORT') || 3000;
