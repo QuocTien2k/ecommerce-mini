@@ -18,7 +18,7 @@ export const useUpdateCartItem = () => {
       }),
 
     onSuccess: (response) => {
-      queryClient.setQueryData([CUSTOMER_CART_QUERY_KEY], response);
+      queryClient.setQueryData(CUSTOMER_CART_QUERY_KEY.all, response);
     },
   });
 };

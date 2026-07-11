@@ -8,6 +8,7 @@ import { PAYMENT_LABEL, PAYMENT_STATUS_LABEL } from "@shared/types/payment";
 const OrderHeader = ({ order }: { order: OrderDetail }) => {
   const payment = order.payment;
 
+  //console.log(order);
   return (
     <div className="p-4 sm:p-6 space-y-6 border-b">
       <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-start sm:justify-between">

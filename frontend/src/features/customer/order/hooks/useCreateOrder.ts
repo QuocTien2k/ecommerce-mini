@@ -23,7 +23,7 @@ export const useCreateOrder = () => {
       //   queryKey: CUSTOMER_CART_QUERY_KEY.all,
       // });
       await queryClient.refetchQueries({
-        queryKey: [CUSTOMER_CART_QUERY_KEY],
+        queryKey: CUSTOMER_CART_QUERY_KEY.all,
         type: "active",
       });
 

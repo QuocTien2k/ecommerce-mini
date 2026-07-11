@@ -1,5 +1,6 @@
 export const PAYMENT_LABEL: Record<string, string> = {
   VNPAY: "VNPay",
+  MOMO: "MOMO",
   COD: "Thanh toán khi nhận hàng",
 };
 
