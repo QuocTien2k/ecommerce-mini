@@ -2,7 +2,7 @@ import type { VoucherType } from "@features/admin/vouchers/types/admin-voucher.t
 import type {
   PaymentMethod,
   PaymentStatus,
-} from "@features/customer/order/types/payment.type";
+} from "@features/customer/payment/types/payment.type";
 import type { OrderStatus } from "@shared/types/order-status.type";
 
 export interface GetOrdersQuery {

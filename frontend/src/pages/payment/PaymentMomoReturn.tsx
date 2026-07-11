@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePaymentStatus } from "@features/customer/payment/hooks/usePaymentStatus";
-import { PAYMENT_STATUSES } from "@features/customer/order/types/payment.type";
+import { PAYMENT_STATUSES } from "@features/customer/payment/types/payment.type";
 import { useMomoReturn } from "@features/customer/payment/hooks/useMomoReturn";
 import { useQueryClient } from "@tanstack/react-query";
 import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";

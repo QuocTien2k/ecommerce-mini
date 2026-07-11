@@ -1,4 +1,7 @@
-import { PAYMENT_METHODS, type PaymentMethod } from "../types/payment.type";
+import {
+  PAYMENT_METHODS,
+  type PaymentMethod,
+} from "../../payment/types/payment.type";
 
 interface Props {
   value: PaymentMethod;

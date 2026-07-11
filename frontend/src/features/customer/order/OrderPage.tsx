@@ -16,6 +16,7 @@ import { clearSelectedVoucher } from "./store/order.slice";
 import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
+import { useCreateCodPayment } from "../payment/hooks/useCreateCod";
 
 const OrderPage = () => {
   //Cart
@@ -46,6 +47,7 @@ const OrderPage = () => {
   }, [user, form]);
 
   const createOrderMutation = useCreateOrder();
+  const createCodPayment = useCreateCodPayment();
   const createVnpayPayment = useCreateVnpayPayment();
   const createMomoPayment = useCreateMomoPayment();
   const navigate = useNavigate();
@@ -79,11 +81,23 @@ const OrderPage = () => {
       case "MOMO":
         createMomoPayment.mutate(order.id);
         return;
+
+      case "COD":
+        createCodPayment.mutate(order.id, {
+          onSuccess: (paymentRes) => {
+            if (!paymentRes.status) return;
+
+            sonnerToast.success("Đặt hàng thành công");
+
+            navigate(`/order/${order.id}`);
+          },
+        });
+        return;
+
+      default:
+        sonnerToast.success("Tạo đơn hàng thành công");
+        navigate(`/order/${order.id}`);
     }
-
-    sonnerToast.success(res.message ?? "Tạo đơn hàng thành công");
-
-    navigate(`/order/${order.id}`);
   });
 
   if (!isAuthenticated) {

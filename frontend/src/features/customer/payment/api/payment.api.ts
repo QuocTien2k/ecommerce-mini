@@ -1,14 +1,21 @@
-import type { VnpayReturnResponse } from "@features/customer/order/types/payment.type";
+import type {
+  CodPaymentResponse,
+  MomoPaymentResponse,
+  VnpayPaymentResponse,
+  VnpayReturnResponse,
+} from "@features/customer/payment/types/payment.type";
 import { api } from "@shared/api/axios";
 import type { ApiResult } from "@shared/types/api-result";
-import type { CreatePaymentResponse } from "../types/create-payment.type";
 
 export const customerPaymentApi = {
-  createVnpay: (orderId: string): ApiResult<CreatePaymentResponse> =>
+  createVnpay: (orderId: string): ApiResult<VnpayPaymentResponse> =>
     api.post("/payment/vnpay", { orderId }),
 
-  createMomo: (orderId: string): ApiResult<CreatePaymentResponse> =>
+  createMomo: (orderId: string): ApiResult<MomoPaymentResponse> =>
     api.post(`/payment/momo/${orderId}`),
+
+  createCod: (orderId: string): ApiResult<CodPaymentResponse> =>
+    api.post(`/payment/cod/${orderId}`),
 
   getStatus: (
     orderId: string,

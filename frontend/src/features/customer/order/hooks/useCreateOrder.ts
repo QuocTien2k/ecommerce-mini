@@ -4,6 +4,7 @@ import { customerOrderApi } from "../api/customerOrder.api";
 import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
 import { CUSTOMER_ORDER_QUERY_KEY } from "../constant/order";
 
+/*
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
 
@@ -36,6 +37,24 @@ export const useCreateOrder = () => {
       //   "Log 2: ",
       //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
       // );
+    },
+  });
+};
+
+*/
+
+export const useCreateOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateOrderRequest) =>
+      customerOrderApi.createOrder(payload),
+
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: CUSTOMER_CART_QUERY_KEY.all,
+        type: "active",
+      });
     },
   });
 };

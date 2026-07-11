@@ -3,7 +3,7 @@ import {
   PAYMENT_METHODS,
   type OrderPaymentResponse,
   type PaymentMethod,
-} from "./payment.type";
+} from "../../payment/types/payment.type";
 import { mapCartItemsToOrderItems } from "../mapper/buildOrderItem";
 import type { OrderDetail } from "@shared/types/order.type";
 

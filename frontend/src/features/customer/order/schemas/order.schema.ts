@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { PaymentMethod } from "../types/payment.type";
+import type { PaymentMethod } from "../../payment/types/payment.type";
 
 export const orderFormSchema = z.object({
   receiverPhone: z.string().trim().min(10, "Số điện thoại không hợp lệ"),

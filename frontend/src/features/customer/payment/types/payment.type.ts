@@ -23,16 +23,6 @@ export interface CodPaymentResponse {
   status: PaymentStatus;
 }
 
-export interface VnpayPaymentInitResponse {
-  paymentUrl: string;
-}
-
-export interface VnpayReturnResponse {
-  success: boolean;
-  message: string;
-  orderId?: string;
-}
-
 export interface VnpayPaymentResponse {
   method: "VNPAY";
   paymentId: string;
@@ -43,6 +33,12 @@ export interface MomoPaymentResponse {
   method: "MOMO";
   paymentId: string;
   paymentUrl: string;
+}
+
+export interface VnpayReturnResponse {
+  success: boolean;
+  message: string;
+  orderId?: string;
 }
 
 export type OrderPaymentResponse =
