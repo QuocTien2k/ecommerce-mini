@@ -50,7 +50,6 @@ export class OrderController {
 
     return {
       order: OrderMapper.toDetail(result.order),
-      payment: result.payment,
     };
   }
 

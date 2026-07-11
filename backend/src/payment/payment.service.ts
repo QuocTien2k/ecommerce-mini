@@ -18,7 +18,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { VNPay, ProductCode, VnpLocale, dateFormat } from 'vnpay';
 import { HttpService } from '@nestjs/axios';
 import * as crypto from 'crypto';
-import { MomoIpnDto } from './types/momo.type';
+import { MomoCallbackDto, MomoReturnDto } from './types/momo.type';
 
 @Injectable()
 export class PaymentService {
@@ -773,7 +773,8 @@ export class PaymentService {
     };
   }
 
-  private verifyMomoSignature(payload: MomoIpnDto): boolean {
+  /* Momo return */
+  private verifyMomoSignature(payload: MomoCallbackDto): boolean {
     const momo = this.momoConfig;
 
     const rawSignature =
@@ -801,7 +802,7 @@ export class PaymentService {
 
   private validateMomoIpn(
     payment: Payment,
-    payload: MomoIpnDto,
+    payload: MomoCallbackDto,
   ): { resultCode: number; message: string } | null {
     const momo = this.momoConfig;
 
@@ -861,7 +862,8 @@ export class PaymentService {
     });
   }
 
-  async handleMomoIpn(payload: MomoIpnDto) {
+  async handleMomoIpn(payload: MomoCallbackDto) {
+    //console.log('MoMo IPN', payload);
     if (!this.verifyMomoSignature(payload)) {
       return {
         resultCode: 97,
@@ -907,5 +909,9 @@ export class PaymentService {
       resultCode: 0,
       message: 'success',
     };
+  }
+
+  async handleMomoReturn(payload: MomoReturnDto) {
+    return this.handleMomoIpn(payload);
   }
 }

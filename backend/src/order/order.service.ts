@@ -373,13 +373,6 @@ export class OrderService {
       this.processOrderTransaction(tx, userId, dto, receiver),
     );
 
-    const payment = await this.handlePayment(
-      userId,
-      order.id,
-      dto.paymentMethod,
-      ipAddr,
-    );
-
     const orderWithPayment = await this.prisma.order.findUnique({
       where: { id: order.id },
       include: {
@@ -394,7 +387,6 @@ export class OrderService {
 
     return {
       order: orderWithPayment,
-      payment,
     };
   }
 
