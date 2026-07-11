@@ -135,11 +135,7 @@ export class PaymentService {
           throw new BadRequestException('Đơn hàng đã được thanh toán');
         }
 
-        if (existing.status === PaymentStatus.PENDING) {
-          return existing;
-        }
-
-        // FAILED / CANCELLED → recreate
+        // FAILED / CANCELLED / PENDING → recreate
         await tx.payment.delete({
           where: { id: existing.id },
         });
@@ -847,6 +843,9 @@ export class PaymentService {
             status: OrderStatus.CONFIRMED,
           },
         });
+
+        // Clear cart
+        await this.clearUserCart(tx, payment.userId);
       });
 
       return;

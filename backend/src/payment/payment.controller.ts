@@ -54,6 +54,16 @@ export class PaymentController {
     return this.paymentService.createMomoPayment(userId, orderId);
   }
 
+  @Post('cod/:orderId')
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.USER)
+  async createCodPayment(
+    @CurrentUser('sub') userId: string,
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+  ) {
+    return this.paymentService.createCodPayment(userId, orderId);
+  }
+
   @Post('momo/ipn')
   async handleMomoIpn(@Body() body: MomoIpnDto) {
     return this.paymentService.handleMomoIpn(body);
