@@ -23,13 +23,15 @@ import ProductPage from "@/domains/product/ProductPage";
 import ProductDetail from "@/domains/product/ProductDetail";
 import { CartPage } from "@features/customer/cart/CartPage";
 import OrderPage from "@features/customer/order/OrderPage";
-import { PaymentReturn } from "@pages/payment/PaymentReturn";
+
 import MyOrders from "@features/customer/order/MyOrders";
 import AdminOrderPage from "@features/admin/orders/AdminOrderPage";
 import OrderDetail from "@features/customer/order/OrderDetail";
 import DashboardPage from "@features/admin/dashboard/DashboardPage";
 import AdminSettingPage from "@features/admin/setting/AdminSettingPage";
 import MyWishlist from "@features/customer/wishlist/MyWishlist";
+import { PaymentVnPayReturn } from "@pages/payment/PaymentVnapyReturn";
+import { PaymentMomoReturn } from "@pages/payment/PaymentMomoReturn";
 
 const AppRoutes = () => {
   return (
@@ -58,7 +60,8 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<ProductPage />} />
         <Route path="/products/:slug" element={<ProductDetail />} />
-        <Route path="/payment/return" element={<PaymentReturn />} />
+        <Route path="/payment/return" element={<PaymentVnPayReturn />} />
+        <Route path="/payment/momo/return" element={<PaymentMomoReturn />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allowedRoles={[Role.USER]} />}>

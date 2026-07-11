@@ -1,6 +1,7 @@
 export const PAYMENT_METHODS = {
   COD: "COD",
   VNPAY: "VNPAY",
+  MOMO: "MOMO",
 } as const;
 
 export type PaymentMethod =
@@ -38,4 +39,13 @@ export interface VnpayPaymentResponse {
   paymentUrl: string;
 }
 
-export type OrderPaymentResponse = CodPaymentResponse | VnpayPaymentResponse;
+export interface MomoPaymentResponse {
+  method: "MOMO";
+  paymentId: string;
+  paymentUrl: string;
+}
+
+export type OrderPaymentResponse =
+  | CodPaymentResponse
+  | VnpayPaymentResponse
+  | MomoPaymentResponse;

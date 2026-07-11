@@ -12,10 +12,10 @@ export const useCreateOrder = () => {
       customerOrderApi.createOrder(payload),
 
     onSuccess: async (response) => {
-      console.log(
-        "Log 1: ",
-        queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
-      );
+      // console.log(
+      //   "Log 1: ",
+      //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
+      // );
 
       const { order } = response.data;
 
@@ -32,10 +32,10 @@ export const useCreateOrder = () => {
         order,
       );
 
-      console.log(
-        "Log 2: ",
-        queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
-      );
+      // console.log(
+      //   "Log 2: ",
+      //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
+      // );
     },
   });
 };

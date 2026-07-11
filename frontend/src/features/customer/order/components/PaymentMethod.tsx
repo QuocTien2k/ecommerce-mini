@@ -16,6 +16,11 @@ const paymentOptions = [
     label: "VNPay",
     description: "Thanh toán qua cổng VNPay",
   },
+  {
+    value: PAYMENT_METHODS.MOMO,
+    label: "MoMo",
+    description: "Thanh toán qua ví điện tử MoMo",
+  },
 ] as const;
 
 export const PaymentMethodSelector = ({ value, onChange }: Props) => {

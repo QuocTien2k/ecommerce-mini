@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { clearSelectedVoucher } from "./store/order.slice";
 import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 import { sonnerToast } from "@lib/sonner-toast";
+import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
 
 const OrderPage = () => {
   //Cart
@@ -46,6 +47,7 @@ const OrderPage = () => {
 
   const createOrderMutation = useCreateOrder();
   const createVnpayPayment = useCreateVnpayPayment();
+  const createMomoPayment = useCreateMomoPayment();
   const navigate = useNavigate();
 
   const handleCreateOrder = form.handleSubmit(async (values) => {
@@ -69,9 +71,14 @@ const OrderPage = () => {
 
     const order = res.data.order;
 
-    if (values.paymentMethod === "VNPAY") {
-      createVnpayPayment.mutate(order.id);
-      return;
+    switch (values.paymentMethod) {
+      case "VNPAY":
+        createVnpayPayment.mutate(order.id);
+        return;
+
+      case "MOMO":
+        createMomoPayment.mutate(order.id);
+        return;
     }
 
     sonnerToast.success(res.message ?? "Tạo đơn hàng thành công");

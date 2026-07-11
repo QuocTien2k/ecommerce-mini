@@ -2,7 +2,7 @@ import { useVnpayReturn } from "@features/customer/payment/hooks/useVnpayReturn"
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export const PaymentReturn = () => {
+export const PaymentVnPayReturn = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
