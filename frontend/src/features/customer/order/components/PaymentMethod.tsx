@@ -3,10 +3,14 @@ import {
   PAYMENT_METHODS,
   type PaymentMethod,
 } from "../../payment/types/payment.type";
+import { FieldError } from "@components/ui/field-error";
 
 interface Props {
   value: PaymentMethod;
   onChange: (value: PaymentMethod) => void;
+  error?: {
+    message?: string;
+  } | null;
 }
 
 const paymentOptions = [
@@ -42,7 +46,7 @@ const paymentOptions = [
   },
 ] as const;
 
-export const PaymentMethodSelector = ({ value, onChange }: Props) => {
+export const PaymentMethodSelector = ({ value, onChange, error }: Props) => {
   return (
     <div className="space-y-3">
       <h2 className="text-sm font-medium">Phương thức thanh toán</h2>
@@ -78,6 +82,7 @@ export const PaymentMethodSelector = ({ value, onChange }: Props) => {
           </label>
         ))}
       </div>
+      <FieldError error={error} />
     </div>
   );
 };

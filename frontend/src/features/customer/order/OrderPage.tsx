@@ -18,6 +18,7 @@ import { sonnerToast } from "@lib/sonner-toast";
 import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
 import { useCreateCodPayment } from "../payment/hooks/useCreateCod";
 import { getErrorMessage } from "@lib/error";
+import { Controller } from "react-hook-form";
 
 const OrderPage = () => {
   //Cart
@@ -44,6 +45,8 @@ const OrderPage = () => {
     form.reset({
       receiverPhone: user?.phone ?? "",
       receiverAddress: user?.address ?? "",
+      paymentMethod: "COD",
+      note: "",
     });
   }, [user, form]);
 
@@ -159,9 +162,16 @@ const OrderPage = () => {
                 onSubmit={handleCreateOrder}
               />
 
-              <PaymentMethodSelector
-                value={form.watch("paymentMethod")}
-                onChange={(value) => form.setValue("paymentMethod", value)}
+              <Controller
+                control={form.control}
+                name="paymentMethod"
+                render={({ field, fieldState }) => (
+                  <PaymentMethodSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={fieldState.error}
+                  />
+                )}
               />
             </div>
           </div>
