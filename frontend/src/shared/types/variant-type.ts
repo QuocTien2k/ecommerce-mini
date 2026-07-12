@@ -23,6 +23,7 @@ export const ATTRIBUTE_LABELS: Record<string, string> = {
   storage: "Dung lượng",
   cpu: "CPU",
   ram: "RAM",
+  ssd: "SSD",
   gpu: "GPU",
   switch: "Switch",
 };
