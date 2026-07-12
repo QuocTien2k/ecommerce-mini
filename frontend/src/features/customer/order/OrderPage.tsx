@@ -56,6 +56,12 @@ const OrderPage = () => {
   const createMomoPayment = useCreateMomoPayment();
   const navigate = useNavigate();
 
+  const isSubmitting =
+    createOrderMutation.isPending ||
+    createCodPayment.isPending ||
+    createVnpayPayment.isPending ||
+    createMomoPayment.isPending;
+
   const handleCreateOrder = form.handleSubmit(async (values) => {
     if (!cart || cart.items.length === 0) return;
 
@@ -139,7 +145,11 @@ const OrderPage = () => {
   }
 
   return (
-    <QueryStateWrapper isLoading={isLoading}>
+    <QueryStateWrapper
+      isLoading={isLoading || isSubmitting}
+      fullscreen={isSubmitting}
+      loadingText="Đang chuyển đến cổng thanh toán..."
+    >
       <div className="container py-6 space-y-6">
         <h1 className="text-xl font-semibold">Đặt hàng</h1>
 
