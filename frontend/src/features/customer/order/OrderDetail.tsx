@@ -8,7 +8,7 @@ import OrderTimeline from "./components/detail/OrderTimeline";
 import OrderPricing from "./components/detail/OrderPricing";
 import OrderNotFound from "@components/order/OrderNotFound";
 import { useEffect } from "react";
-import { CUSTOMER_ORDER_QUERY_KEY } from "./constant/order";
+import { CUSTOMER_ORDER_QUERY_KEY } from "./components/constant/order";
 import { getOrderStatusLabel } from "@shared/types/order-status.utils";
 import type { OrderDetail as OrderDetailData } from "@shared/types/order.type";
 import { connectSocket, getSocket } from "@lib/socket";

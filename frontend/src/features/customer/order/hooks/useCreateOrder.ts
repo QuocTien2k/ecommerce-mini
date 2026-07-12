@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateOrderRequest } from "../types/customerOrder.type";
 import { customerOrderApi } from "../api/customerOrder.api";
 import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
-import { CUSTOMER_ORDER_QUERY_KEY } from "../constant/order";
+import { CUSTOMER_ORDER_QUERY_KEY } from "../components/constant/order";
 
 /*
 export const useCreateOrder = () => {

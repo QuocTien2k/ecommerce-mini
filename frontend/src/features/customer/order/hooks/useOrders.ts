@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CUSTOMER_ORDER_QUERY_KEY } from "../constant/order";
+import { CUSTOMER_ORDER_QUERY_KEY } from "../components/constant/order";
 import { customerOrderApi } from "../api/customerOrder.api";
 import type { GetOrdersQuery } from "@shared/types/order.type";
 
