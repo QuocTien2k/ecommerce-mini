@@ -31,6 +31,21 @@ export class VoucherService {
     private categoryService: CategoryService,
   ) {}
 
+  private getAvailableVoucherWhere(now: Date): Prisma.VoucherWhereInput {
+    return {
+      isDeleted: false,
+      isActive: true,
+      AND: [
+        {
+          OR: [{ startAt: null }, { startAt: { lte: now } }],
+        },
+        {
+          OR: [{ endAt: null }, { endAt: { gte: now } }],
+        },
+      ],
+    };
+  }
+
   /* Case create */
   private validate(dto: CreateVoucherDto) {
     // type vs value
@@ -285,18 +300,7 @@ export class VoucherService {
     const where: Prisma.UserVoucherWhereInput = {
       userId,
 
-      voucher: {
-        isDeleted: false,
-        isActive: true,
-        AND: [
-          {
-            OR: [{ startAt: null }, { startAt: { lte: now } }],
-          },
-          {
-            OR: [{ endAt: null }, { endAt: { gte: now } }],
-          },
-        ],
-      },
+      voucher: this.getAvailableVoucherWhere(now),
 
       // còn lượt dùng
       OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
@@ -588,14 +592,7 @@ export class VoucherService {
 
     /* GLOBAL vouchers (không cần UserVoucher) */
     const globalVouchers = await this.prisma.voucher.findMany({
-      where: {
-        isDeleted: false,
-        isActive: true,
-        AND: [
-          { OR: [{ startAt: null }, { startAt: { lte: now } }] },
-          { OR: [{ endAt: null }, { endAt: { gte: now } }] },
-        ],
-      },
+      where: this.getAvailableVoucherWhere(now),
       include: {
         products: { select: { id: true } },
         categories: { select: { id: true } },
@@ -610,10 +607,7 @@ export class VoucherService {
       where: {
         userId,
         OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
-        voucher: {
-          isDeleted: false,
-          isActive: true,
-        },
+        voucher: this.getAvailableVoucherWhere(now),
       },
       include: {
         voucher: {
