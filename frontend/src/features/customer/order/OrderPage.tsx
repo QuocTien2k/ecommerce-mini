@@ -17,6 +17,7 @@ import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
 import { useCreateCodPayment } from "../payment/hooks/useCreateCod";
+import { getErrorMessage } from "@lib/error";
 
 const OrderPage = () => {
   //Cart
@@ -55,48 +56,58 @@ const OrderPage = () => {
   const handleCreateOrder = form.handleSubmit(async (values) => {
     if (!cart || cart.items.length === 0) return;
 
-    const res = await createOrderMutation.mutateAsync({
-      receiverName: user?.fullname ?? "",
-      receiverPhone: values.receiverPhone,
-      receiverAddress: values.receiverAddress,
-      paymentMethod: values.paymentMethod,
-      note: values.note,
-      voucherCode: selectedVoucher?.code ?? null,
-      items: cart.items.map((item) => ({
-        productId: item.productId,
-        variantId: item.variantId,
-        quantity: item.quantity,
-      })),
-    });
+    sonnerToast.dismiss("checkout-error");
 
-    dispatch(clearSelectedVoucher());
+    try {
+      const res = await createOrderMutation.mutateAsync({
+        receiverName: user?.fullname ?? "",
+        receiverPhone: values.receiverPhone,
+        receiverAddress: values.receiverAddress,
+        paymentMethod: values.paymentMethod,
+        note: values.note,
+        voucherCode: selectedVoucher?.code ?? null,
+        items: cart.items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })),
+      });
 
-    const order = res.data.order;
+      dispatch(clearSelectedVoucher());
 
-    switch (values.paymentMethod) {
-      case "VNPAY":
-        createVnpayPayment.mutate(order.id);
-        return;
+      const order = res.data.order;
 
-      case "MOMO":
-        createMomoPayment.mutate(order.id);
-        return;
+      switch (values.paymentMethod) {
+        case "VNPAY":
+          createVnpayPayment.mutate(order.id);
+          return;
 
-      case "COD":
-        createCodPayment.mutate(order.id, {
-          onSuccess: (paymentRes) => {
-            if (!paymentRes.status) return;
+        case "MOMO":
+          createMomoPayment.mutate(order.id);
+          return;
 
-            sonnerToast.success("Đặt hàng thành công");
+        case "COD":
+          createCodPayment.mutate(order.id, {
+            onSuccess: (paymentRes) => {
+              if (!paymentRes.status) return;
 
-            navigate(`/order/${order.id}`);
-          },
-        });
-        return;
+              sonnerToast.success("Đặt hàng thành công");
 
-      default:
-        sonnerToast.success("Tạo đơn hàng thành công");
-        navigate(`/order/${order.id}`);
+              navigate(`/order/${order.id}`);
+            },
+          });
+          return;
+
+        default:
+          sonnerToast.success(res.message || "Tạo đơn hàng thành công");
+          navigate(`/order/${order.id}`);
+      }
+    } catch (error) {
+      console.error("Create order error:", error);
+
+      sonnerToast.error(getErrorMessage(error, "Đặt hàng thất bại"), {
+        id: "checkout-error",
+      });
     }
   });
 

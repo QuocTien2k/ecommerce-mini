@@ -5,6 +5,7 @@ import { PAYMENT_STATUSES } from "@features/customer/payment/types/payment.type"
 import { useMomoReturn } from "@features/customer/payment/hooks/useMomoReturn";
 import { useQueryClient } from "@tanstack/react-query";
 import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
+import Loading from "@components/ui/loading";
 
 export const PaymentMomoReturn = () => {
   const queryClient = useQueryClient();
@@ -53,8 +54,8 @@ export const PaymentMomoReturn = () => {
   }, [mutate, searchParams]);
 
   if (isLoading) {
-    return <div>Đang xác nhận thanh toán...</div>;
+    return <Loading text="Đang xác nhận thanh toán..." />;
   }
 
-  return <div>Đang xử lý kết quả thanh toán...</div>;
+  return <Loading text="Đang xử lý kết quả thanh toán..." />;
 };

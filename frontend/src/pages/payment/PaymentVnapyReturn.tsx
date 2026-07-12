@@ -1,3 +1,4 @@
+import Loading from "@components/ui/loading";
 import { CUSTOMER_CART_QUERY_KEY } from "@features/customer/cart/constants/custom-cart.constant";
 import { useVnpayReturn } from "@features/customer/payment/hooks/useVnpayReturn";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ export const PaymentVnPayReturn = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useVnpayReturn();
+  const { mutate } = useVnpayReturn();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -36,9 +37,5 @@ export const PaymentVnPayReturn = () => {
     });
   }, [location.search, mutate, navigate]);
 
-  if (isPending) {
-    return <div>Verifying payment...</div>;
-  }
-
-  return null;
+  return <Loading text="Đang xác nhận thanh toán..." />;
 };
