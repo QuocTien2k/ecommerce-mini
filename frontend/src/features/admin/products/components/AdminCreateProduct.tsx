@@ -10,22 +10,16 @@ import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
 import { Controller, useWatch } from "react-hook-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import type { CreateProductFormOutput } from "../schemas/product.schema";
 import { useAdminCreateProductForm } from "../forms/use-admin-create-product-form";
 import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
-import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { Editor } from "@components/editor/Editor";
 import { useEffect, useState } from "react";
+import { ProductCategoryCombobox } from "./combobox/ProductCategoryCombobox";
+import { ProductBrandCombobox } from "./combobox/ProductBrandCombobox";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -223,31 +217,15 @@ export const CreateProductForm = ({
             <div className="space-y-2">
               <Label>Danh mục</Label>
 
-              <Select
+              <ProductCategoryCombobox
+                categories={selectableCategories}
                 value={form.watch("categoryId")}
-                onValueChange={(value) =>
+                onChange={(value) =>
                   form.setValue("categoryId", value, {
                     shouldValidate: true,
                   })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn danh mục" />
-                </SelectTrigger>
-
-                <SelectContent
-                  className="max-h-72 p-2 text-black/50"
-                  position="popper"
-                >
-                  {selectableCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {"—".repeat(category.level - 1)}
-                      {getCategoryDisplayName(category.name)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
+              />
               {form.formState.errors.categoryId && (
                 <p className="text-sm text-red-500">
                   {form.formState.errors.categoryId.message}
@@ -259,41 +237,16 @@ export const CreateProductForm = ({
             <div className="space-y-2">
               <Label>Thương hiệu</Label>
 
-              <Select
+              <ProductBrandCombobox
+                brands={brands}
+                loading={brandsQuery.isLoading}
                 value={form.watch("brandId")}
-                onValueChange={(value) =>
+                onChange={(value) =>
                   form.setValue("brandId", value, {
                     shouldValidate: true,
                   })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn thương hiệu" />
-                </SelectTrigger>
-
-                <SelectContent
-                  className="max-h-72 p-2 text-black/70"
-                  position="popper"
-                >
-                  {brandsQuery.isLoading && (
-                    <div className="px-2 py-3 text-sm text-muted-foreground">
-                      Đang tải thương hiệu...
-                    </div>
-                  )}
-
-                  {!brandsQuery.isLoading && brands.length === 0 && (
-                    <div className="px-2 py-3 text-sm text-muted-foreground">
-                      Không có thương hiệu
-                    </div>
-                  )}
-
-                  {brands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
 
               {form.formState.errors.brandId && (
                 <p className="text-sm text-red-500">
