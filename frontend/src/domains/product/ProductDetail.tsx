@@ -141,38 +141,40 @@ const ProductDetail = () => {
         <SectionTitle title="Chi tiết sản phẩm" description="" />
       </div>
       <div className="container mx-auto py-6">
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Left Side - Image*/}
-          <div className="overflow-hidden rounded-lg border bg-white">
-            <div className="h-125 w-full">
-              <img
-                src={selectedImage ?? product.thumbnail ?? FALLBACK_IMAGE}
-                alt={product.name}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  e.currentTarget.src = FALLBACK_IMAGE;
-                }}
-              />
-            </div>
+        <div className="grid items-start gap-8 md:grid-cols-2">
+          <div className="sticky top-6">
+            {/* Left Side - Image*/}
+            <div className="overflow-hidden rounded-lg border bg-white">
+              <div className="h-125 w-full">
+                <img
+                  src={selectedImage ?? product.thumbnail ?? FALLBACK_IMAGE}
+                  alt={product.name}
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = FALLBACK_IMAGE;
+                  }}
+                />
+              </div>
 
-            <div className="mt-4 flex gap-4 p-2">
-              {allImages.map((image) => (
-                <button
-                  key={image}
-                  onClick={() => setSelectedImage(image)}
-                  className={`overflow-hidden rounded border cursor-pointer ${
-                    selectedImage === image
-                      ? "border-primary"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <img
-                    src={image}
-                    alt={product.name}
-                    className="h-20 w-20 object-cover"
-                  />
-                </button>
-              ))}
+              <div className="mt-4 flex gap-4 p-2">
+                {allImages.map((image) => (
+                  <button
+                    key={image}
+                    onClick={() => setSelectedImage(image)}
+                    className={`overflow-hidden rounded border cursor-pointer ${
+                      selectedImage === image
+                        ? "border-primary"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={product.name}
+                      className="h-20 w-20 object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
