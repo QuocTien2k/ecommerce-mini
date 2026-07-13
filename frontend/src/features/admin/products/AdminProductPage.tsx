@@ -92,7 +92,7 @@ const AdminProductPage = () => {
     }
   };
 
-  console.log("Data trả về: ", products);
+  //console.log("Data trả về: ", products);
 
   return (
     <QueryStateWrapper isLoading={isLoading} isFetching={isFetching}>
@@ -186,7 +186,7 @@ const AdminProductPage = () => {
 
                         <Badge
                           variant="secondary"
-                          className="w-fit font-mono text-[11px] tracking-wide"
+                          className="w-fit max-w-60 truncate font-mono text-[11px] tracking-wide"
                         >
                           /{product.slug}
                         </Badge>
