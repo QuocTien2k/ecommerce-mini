@@ -3,6 +3,7 @@
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -22,6 +23,28 @@ export default function AppPagination({
 }: AppPaginationProps) {
   // Không render nếu chỉ có 1 page
   //   if (totalPages <= 1) return null;
+
+  const getPages = (): Array<number | "..."> => {
+    if (totalPages <= 6) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    if (page <= 3) {
+      return [1, 2, 3, 4, "...", totalPages];
+    }
+
+    if (page >= totalPages - 2) {
+      return [
+        1,
+        "...",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    }
+    return [1, "...", page - 1, page, page + 1, "...", totalPages];
+  };
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -50,20 +73,26 @@ export default function AppPagination({
               />
             </PaginationItem>
 
-            {Array.from({ length: totalPages }, (_, index) => {
-              const pageNumber = index + 1;
+            {getPages().map((item, index) => {
+              if (item === "...") {
+                return (
+                  <PaginationItem key={`ellipsis-${index}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              }
 
               return (
-                <PaginationItem key={pageNumber}>
+                <PaginationItem key={item}>
                   <PaginationLink
                     href="#"
-                    isActive={page === pageNumber}
+                    isActive={page === item}
                     onClick={(e) => {
                       e.preventDefault();
-                      onPageChange(pageNumber);
+                      onPageChange(item);
                     }}
                   >
-                    {pageNumber}
+                    {item}
                   </PaginationLink>
                 </PaginationItem>
               );
