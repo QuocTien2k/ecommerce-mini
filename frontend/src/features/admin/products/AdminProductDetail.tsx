@@ -240,7 +240,9 @@ const AdminProductDetail = () => {
                                     {ATTRIBUTE_LABELS[key] ?? key}:
                                   </span>
 
-                                  <span className="font-semibold">{value}</span>
+                                  <span className="font-semibold">
+                                    {value || "-"}
+                                  </span>
                                 </p>
                               </div>
                             ),

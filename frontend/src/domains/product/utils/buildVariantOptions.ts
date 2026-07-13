@@ -16,6 +16,11 @@ export const buildVariantOptions = (
     colorSet.add(variant.color);
 
     Object.entries(variant.attributes).forEach(([key, value]) => {
+      const normalizedValue = value?.toString().trim();
+      if (!normalizedValue) {
+        return;
+      }
+
       if (!attributeMap.has(key)) {
         attributeMap.set(key, new Set());
       }
