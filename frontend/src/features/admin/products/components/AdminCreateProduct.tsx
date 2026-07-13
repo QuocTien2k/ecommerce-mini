@@ -20,6 +20,7 @@ import { Editor } from "@components/editor/Editor";
 import { useEffect, useState } from "react";
 import { ProductCategoryCombobox } from "./combobox/ProductCategoryCombobox";
 import { ProductBrandCombobox } from "./combobox/ProductBrandCombobox";
+import { FieldError } from "@components/ui/field-error";
 
 type CreateProductFormProps = {
   open: boolean;
@@ -150,11 +151,7 @@ export const CreateProductForm = ({
                 {...form.register("name")}
               />
 
-              {form.formState.errors.name && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.name.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.name} />
 
               {productName && (
                 <p className="text-[14px] text-blue-500">
@@ -189,11 +186,7 @@ export const CreateProductForm = ({
                 {...form.register("thumbnail")}
               />
 
-              {form.formState.errors.thumbnail && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.thumbnail.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.thumbnail} />
 
               {thumbnailPreview?.startsWith("http") && !thumbnailError && (
                 <div className="w-fit rounded-lg border bg-muted/20 p-2">
@@ -226,11 +219,7 @@ export const CreateProductForm = ({
                   })
                 }
               />
-              {form.formState.errors.categoryId && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.categoryId.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.categoryId} />
             </div>
 
             {/* brand */}
@@ -248,11 +237,7 @@ export const CreateProductForm = ({
                 }
               />
 
-              {form.formState.errors.brandId && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.brandId.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.brandId} />
             </div>
 
             {/* price */}
@@ -273,11 +258,7 @@ export const CreateProductForm = ({
                 })}
               />
 
-              {form.formState.errors.price && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.price.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.price} />
             </div>
 
             {/* discount */}
@@ -293,11 +274,7 @@ export const CreateProductForm = ({
                 })}
               />
 
-              {form.formState.errors.discountPct && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.discountPct.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.discountPct} />
             </div>
           </div>
 

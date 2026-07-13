@@ -4,6 +4,7 @@ import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import type { OrderFormSchema } from "../schemas/order.schema";
 import { Textarea } from "@components/ui/textarea";
+import { FieldError } from "@components/ui/field-error";
 
 interface OrderCustomerInfoProps {
   user: AdminUser | null;
@@ -31,11 +32,7 @@ const OrderCustomerInfo = ({ user, form }: OrderCustomerInfoProps) => {
           {...form.register("receiverPhone")}
         />
 
-        {form.formState.errors.receiverPhone && (
-          <p className="text-sm text-red-500">
-            {form.formState.errors.receiverPhone.message}
-          </p>
-        )}
+        <FieldError error={form.formState.errors.receiverPhone} />
       </div>
 
       {/* Address */}
@@ -47,11 +44,7 @@ const OrderCustomerInfo = ({ user, form }: OrderCustomerInfoProps) => {
           {...form.register("receiverAddress")}
         />
 
-        {form.formState.errors.receiverAddress && (
-          <p className="text-sm text-red-500">
-            {form.formState.errors.receiverAddress.message}
-          </p>
-        )}
+        <FieldError error={form.formState.errors.receiverAddress} />
       </div>
 
       {/* Note */}
@@ -69,12 +62,6 @@ const OrderCustomerInfo = ({ user, form }: OrderCustomerInfoProps) => {
           <span>Tối đa 300 ký tự</span>
           <span>{form.watch("note")?.length ?? 0}/300</span>
         </div>
-
-        {form.formState.errors.note && (
-          <p className="text-sm text-red-500">
-            {form.formState.errors.note.message}
-          </p>
-        )}
       </div>
     </div>
   );

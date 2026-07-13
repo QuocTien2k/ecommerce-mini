@@ -26,6 +26,7 @@ import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQu
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { Editor } from "@components/editor/Editor";
+import { FieldError } from "@components/ui/field-error";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -208,11 +209,7 @@ const AdminUpdateProduct = ({
                 {...form.register("name")}
               />
 
-              {form.formState.errors.name && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.name.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.name} />
 
               {productName && (
                 <p className="text-[14px] text-blue-500">
@@ -233,11 +230,7 @@ const AdminUpdateProduct = ({
                 )}
               />
 
-              {form.formState.errors.description && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.description.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.description} />
             </div>
 
             {/* thumbnail */}
@@ -249,11 +242,7 @@ const AdminUpdateProduct = ({
                 {...form.register("thumbnail")}
               />
 
-              {form.formState.errors.thumbnail && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.thumbnail.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.thumbnail} />
 
               {thumbnailPreview?.startsWith("http") && (
                 <div className="relative w-fit rounded-lg border bg-muted/20 p-2">
@@ -366,11 +355,7 @@ const AdminUpdateProduct = ({
                       </SelectContent>
                     </Select>
 
-                    {form.formState.errors.brandId && (
-                      <p className="text-sm text-red-500">
-                        {form.formState.errors.brandId.message}
-                      </p>
-                    )}
+                    <FieldError error={form.formState.errors.brandId} />
                   </div>
                 );
               }}
@@ -387,11 +372,7 @@ const AdminUpdateProduct = ({
                 {...form.register("price")}
               />
 
-              {form.formState.errors.price && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.price.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.price} />
             </div>
 
             {/* discount */}
@@ -417,11 +398,7 @@ const AdminUpdateProduct = ({
                 }}
               />
 
-              {form.formState.errors.discountPct && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.discountPct.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.discountPct} />
             </div>
           </div>
 

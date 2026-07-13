@@ -27,6 +27,7 @@ import {
 import { useWatch } from "react-hook-form";
 import { useAdminCategoryDetailQuery } from "../hooks/useAdminCategoryDetail";
 import { getCategoryContextLabel } from "@/utils/category/get-category-context";
+import { FieldError } from "@components/ui/field-error";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -242,11 +243,7 @@ export const UpdateCategoryForm = ({
               {...form.register("name")}
             />
 
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.name} />
           </div>
 
           {/* DESCRIPTION */}
@@ -258,11 +255,7 @@ export const UpdateCategoryForm = ({
               {...form.register("description")}
             />
 
-            {form.formState.errors.description && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.description.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.description} />
           </div>
 
           {/* PARENT */}
@@ -344,11 +337,7 @@ export const UpdateCategoryForm = ({
               </p>
             )}
 
-            {form.formState.errors.variantType && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.variantType.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.variantType} />
           </div>
 
           {/* IMAGE */}
@@ -405,11 +394,7 @@ export const UpdateCategoryForm = ({
               </div>
             </div>
 
-            {form.formState.errors.file && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.file.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.file} />
           </div>
 
           {/* ACTIVE */}

@@ -12,6 +12,7 @@ import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
+import { FieldError } from "@components/ui/field-error";
 
 type CreateBrandFormProps = {
   open: boolean;
@@ -103,11 +104,7 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
               {...form.register("name")}
             />
 
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.name} />
 
             {brandName && (
               <p className="text-[14px] text-blue-500 text-shadow-blue-800">
@@ -125,11 +122,7 @@ const AminCreateBrand = ({ open, onClose }: CreateBrandFormProps) => {
               {...form.register("thumbnail")}
             />
 
-            {form.formState.errors.thumbnail && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.thumbnail.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.thumbnail} />
 
             {thumbnailPreview?.startsWith("http") && !thumbnailError && (
               <div className="w-fit rounded-lg border bg-muted/20 p-2">

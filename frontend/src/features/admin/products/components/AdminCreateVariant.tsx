@@ -12,6 +12,7 @@ import { Input } from "@components/ui/input";
 import { AsyncButton } from "@components/common/async-button";
 import type { VariantType } from "@features/admin/categories/types/admin-category.type";
 import { VariantFieldRenderer } from "./vairant-render/Variant-Field-Render";
+import { FieldError } from "@components/ui/field-error";
 
 type CreateVariantFormProp = {
   open: boolean;
@@ -183,11 +184,7 @@ const AdminCreateVariant = ({
                 {...form.register("color")}
               />
 
-              {form.formState.errors.color && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.color.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.color} />
             </div>
 
             <VariantFieldRenderer variantType={variantType} form={form} />
@@ -205,11 +202,7 @@ const AdminCreateVariant = ({
                 })}
               />
 
-              {form.formState.errors.stock && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.stock.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.stock} />
             </div>
           </div>
 
@@ -318,11 +311,7 @@ const AdminCreateVariant = ({
                 </div>
               </div>
 
-              {form.formState.errors.files && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.files.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.files} />
             </div>
           )}
 
@@ -368,17 +357,7 @@ const AdminCreateVariant = ({
                 </div>
               )}
 
-              {form.formState.errors.imageUrls && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.imageUrls.message}
-                </p>
-              )}
-
-              {form.formState.errors.files && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.files.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.imageUrls} />
             </div>
           )}
 

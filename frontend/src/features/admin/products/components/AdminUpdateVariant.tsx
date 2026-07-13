@@ -13,6 +13,7 @@ import { AsyncButton } from "@components/common/async-button";
 import type { VariantType } from "@features/admin/categories/types/admin-category.type";
 import { VariantFieldRenderer } from "./vairant-render/Variant-Field-Render";
 import { VariantUpdateImageManager } from "./VariantUpdateIamge";
+import { FieldError } from "@components/ui/field-error";
 
 type AdminUpdateVariantProps = {
   open: boolean;
@@ -130,11 +131,7 @@ const AdminUpdateVariant = ({
             <div className="space-y-2">
               <Label>Màu sắc</Label>
               <Input {...form.register("color")} />
-              {form.formState.errors.color && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.color.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.color} />
             </div>
 
             <VariantFieldRenderer variantType={variantType} form={form} />
@@ -145,11 +142,7 @@ const AdminUpdateVariant = ({
                 type="number"
                 {...form.register("stock", { valueAsNumber: true })}
               />
-              {form.formState.errors.stock && (
-                <p className="text-sm text-red-500">
-                  {form.formState.errors.stock.message}
-                </p>
-              )}
+              <FieldError error={form.formState.errors.stock} />
             </div>
           </div>
 

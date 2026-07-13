@@ -12,6 +12,7 @@ import { Input } from "@components/ui/input";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import { useWatch } from "react-hook-form";
+import { FieldError } from "@components/ui/field-error";
 
 type UpdateBrandFormProps = {
   open: boolean;
@@ -122,11 +123,7 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
               {...form.register("name")}
             />
 
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.name} />
           </div>
 
           {/* thumbnail */}
@@ -138,11 +135,7 @@ const AdminUpdateBrand = ({ open, onClose, brand }: UpdateBrandFormProps) => {
               {...form.register("thumbnail")}
             />
 
-            {form.formState.errors.thumbnail && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.thumbnail.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.thumbnail} />
 
             {thumbnailPreview?.startsWith("http") && (
               <div className="relative w-fit rounded-lg border bg-muted/20 p-2">

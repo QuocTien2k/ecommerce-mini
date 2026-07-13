@@ -22,6 +22,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { toSlug } from "@/utils/toSlug";
 import { VARIANT_TYPES, type VariantType } from "../types/admin-category.type";
 import { variantTypeOptions } from "@shared/types/variant-type";
+import { FieldError } from "@components/ui/field-error";
 
 type CreateCategoryFormProps = {
   open: boolean;
@@ -174,12 +175,7 @@ export const CreateCategoryForm = ({
               {...form.register("name")}
             />
 
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
-
+            <FieldError error={form.formState.errors.name} />
             {categoryName && (
               <p className="text-[14px] text-blue-500 text-shadow-blue-800">
                 Slug preview: {toSlug(categoryName)}
@@ -196,11 +192,7 @@ export const CreateCategoryForm = ({
               {...form.register("description")}
             />
 
-            {form.formState.errors.description && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.description.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.description} />
           </div>
 
           {/* {Chọn danh mục cha} */}
@@ -269,11 +261,7 @@ export const CreateCategoryForm = ({
               </div>
             )}
 
-            {form.formState.errors.variantType && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.variantType.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.variantType} />
           </div>
 
           {/* {Ảnh danh mục} */}
@@ -336,11 +324,7 @@ export const CreateCategoryForm = ({
               </div>
             </div>
 
-            {form.formState.errors.file && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors.file.message}
-              </p>
-            )}
+            <FieldError error={form.formState.errors.file} />
           </div>
 
           {/* {Hoạt động} */}
