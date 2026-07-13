@@ -12,21 +12,15 @@ import { Trash2, Undo2, X } from "lucide-react";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { toSlug } from "@/utils/toSlug";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 import { Checkbox } from "@components/ui/checkbox";
 import { AsyncButton } from "@components/common/async-button";
 import { Controller, useWatch } from "react-hook-form";
 import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQuery";
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
-import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { Editor } from "@components/editor/Editor";
 import { FieldError } from "@components/ui/field-error";
+import { ProductCategoryCombobox } from "./combobox/ProductCategoryCombobox";
+import { ProductBrandCombobox } from "./combobox/ProductBrandCombobox";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -283,83 +277,40 @@ const AdminUpdateProduct = ({
             </div>
 
             {/* category */}
-            <Controller
-              control={form.control}
-              name="categoryId"
-              render={({ field }) => {
-                // console.log("field:", typeof field.value, field.value);
+            <div className="space-y-2">
+              <Label>Danh mục</Label>
 
-                // console.log(
-                //   "category:",
-                //   typeof categories[0]?.id,
-                //   categories[0]?.id,
-                // );
+              <ProductCategoryCombobox
+                categories={selectableCategories}
+                value={form.watch("categoryId")}
+                onChange={(value) =>
+                  form.setValue("categoryId", value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+              />
 
-                return (
-                  <div className="space-y-2">
-                    <Label>Danh mục</Label>
-
-                    <Select
-                      key={field.value}
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue>
-                          {categories.find((c) => c.id === field.value)?.name ||
-                            "Chọn danh mục"}
-                        </SelectValue>
-                      </SelectTrigger>
-
-                      <SelectContent position="popper">
-                        {selectableCategories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {"—".repeat(category.level - 1)}
-                            {getCategoryDisplayName(category.name)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                );
-              }}
-            />
+              <FieldError error={form.formState.errors.categoryId} />
+            </div>
 
             {/* brand */}
-            <Controller
-              control={form.control}
-              name="brandId"
-              render={({ field }) => {
-                return (
-                  <div className="space-y-2">
-                    <Label>Thương hiệu</Label>
+            <div className="space-y-2">
+              <Label>Thương hiệu</Label>
 
-                    <Select
-                      key={field.value}
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue>
-                          {brands.find((b) => b.id === field.value)?.name ||
-                            "Chọn thương hiệu"}
-                        </SelectValue>
-                      </SelectTrigger>
+              <ProductBrandCombobox
+                brands={brands}
+                value={form.watch("brandId")}
+                onChange={(value) =>
+                  form.setValue("brandId", value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+              />
 
-                      <SelectContent position="popper">
-                        {brands.map((brand) => (
-                          <SelectItem key={brand.id} value={String(brand.id)}>
-                            {brand.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <FieldError error={form.formState.errors.brandId} />
-                  </div>
-                );
-              }}
-            />
+              <FieldError error={form.formState.errors.brandId} />
+            </div>
 
             {/* price */}
             <div className="space-y-2">
