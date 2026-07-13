@@ -27,15 +27,19 @@ import type { FlatCategoryItem } from "@features/admin/categories/types/admin-ca
 type Props = {
   categories: FlatCategoryItem[];
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string | undefined) => void;
   placeholder?: string;
+  allowNone?: boolean;
+  noneLabel?: string;
 };
 
-export const ProductCategoryCombobox = ({
+export const CategoryCombobox = ({
   categories,
   value,
   onChange,
   placeholder = "Chọn danh mục",
+  allowNone = false,
+  noneLabel = "Không có danh mục cha",
 }: Props) => {
   const [open, setOpen] = useState(false);
 
@@ -51,7 +55,9 @@ export const ProductCategoryCombobox = ({
         >
           {selectedCategory
             ? getCategoryDisplayName(selectedCategory.name)
-            : placeholder}
+            : allowNone && !value
+              ? noneLabel
+              : placeholder}
 
           <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50 shrink-0" />
         </Button>
@@ -65,6 +71,25 @@ export const ProductCategoryCombobox = ({
             <CommandEmpty>Không tìm thấy danh mục.</CommandEmpty>
 
             <CommandGroup>
+              {allowNone && (
+                <CommandItem
+                  value={noneLabel}
+                  onSelect={() => {
+                    onChange(undefined);
+                    setOpen(false);
+                  }}
+                >
+                  {noneLabel}
+
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      !value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </CommandItem>
+              )}
+
               {categories.map((category) => (
                 <CommandItem
                   key={category.id}

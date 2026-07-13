@@ -23,6 +23,7 @@ import { toSlug } from "@/utils/toSlug";
 import { VARIANT_TYPES, type VariantType } from "../types/admin-category.type";
 import { variantTypeOptions } from "@shared/types/variant-type";
 import { FieldError } from "@components/ui/field-error";
+import { CategoryCombobox } from "./CategoryCombobox";
 
 type CreateCategoryFormProps = {
   open: boolean;
@@ -74,10 +75,9 @@ export const CreateCategoryForm = ({
   const createCategoryMutation = useCreateCategoryMutation();
 
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+  const flatCategories = flatCategoriesQuery.data?.data ?? [];
 
-  const selectedParent = flatCategoriesQuery.data?.data.find(
-    (item) => item.id === parentId,
-  );
+  const selectedParent = flatCategories.find((item) => item.id === parentId);
 
   useEffect(() => {
     if (selectedParent) {
@@ -199,34 +199,16 @@ export const CreateCategoryForm = ({
           <div className="space-y-2">
             <Label>Danh mục cha</Label>
 
-            <Select
-              value={form.watch("parentId") ?? "none"}
-              onValueChange={(value) =>
-                form.setValue(
-                  "parentId",
-                  value === "none" ? undefined : value,
-                  {
-                    shouldValidate: true,
-                  },
-                )
+            <CategoryCombobox
+              categories={flatCategories}
+              value={form.watch("parentId")}
+              allowNone
+              onChange={(value) =>
+                form.setValue("parentId", value, {
+                  shouldValidate: true,
+                })
               }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục cha" />
-              </SelectTrigger>
-
-              <SelectContent
-                className="max-h-72 p-2 text-black/50"
-                position="popper"
-              >
-                <SelectItem value="none">Không có danh mục cha</SelectItem>
-                {flatCategoriesQuery.data?.data?.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {`${"".repeat(category.level - 1)}${category.name}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </div>
 
           {/* {Loại variant} */}

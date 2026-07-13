@@ -19,8 +19,8 @@ import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQu
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { Editor } from "@components/editor/Editor";
 import { FieldError } from "@components/ui/field-error";
-import { ProductCategoryCombobox } from "./combobox/ProductCategoryCombobox";
 import { ProductBrandCombobox } from "./combobox/ProductBrandCombobox";
+import { CategoryCombobox } from "@features/admin/categories/components/CategoryCombobox";
 
 type AdminUpdateProductProps = {
   open: boolean;
@@ -280,7 +280,7 @@ const AdminUpdateProduct = ({
             <div className="space-y-2">
               <Label>Danh mục</Label>
 
-              <ProductCategoryCombobox
+              <CategoryCombobox
                 categories={selectableCategories}
                 value={form.watch("categoryId")}
                 onChange={(value) =>

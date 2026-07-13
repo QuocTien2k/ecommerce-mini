@@ -28,6 +28,7 @@ import { useWatch } from "react-hook-form";
 import { useAdminCategoryDetailQuery } from "../hooks/useAdminCategoryDetail";
 import { getCategoryContextLabel } from "@/utils/category/get-category-context";
 import { FieldError } from "@components/ui/field-error";
+import { CategoryCombobox } from "./CategoryCombobox";
 
 type UpdateCategoryFormProps = {
   open: boolean;
@@ -52,6 +53,7 @@ export const UpdateCategoryForm = ({
 
   const updateMutation = useUpdateCategoryMutation();
   const flatCategoriesQuery = useAdminFlatCategoriesQuery();
+  const flatCategories = flatCategoriesQuery.data?.data ?? [];
   const categoryDetailQuery = useAdminCategoryDetailQuery(
     open ? categoryId : undefined,
   );
@@ -80,9 +82,7 @@ export const UpdateCategoryForm = ({
     name: "variantType",
   });
 
-  const selectedParent = flatCategoriesQuery.data?.data.find(
-    (item) => item.id === parentId,
-  );
+  const selectedParent = flatCategories.find((item) => item.id === parentId);
 
   const isVariantLocked = detail ? !detail.canChangeVariantType : false;
   const isReady =
@@ -262,34 +262,21 @@ export const UpdateCategoryForm = ({
           <div className="space-y-2">
             <Label>Danh mục cha</Label>
 
-            <Select
-              value={parentId || "none"}
-              onValueChange={(value) => {
-                const nextParentId = value === "none" ? undefined : value;
+            <CategoryCombobox
+              categories={flatCategories}
+              value={parentId}
+              allowNone
+              noneLabel="Không có danh mục cha"
+              onChange={(value) => {
+                const nextParentId = value || undefined;
 
                 form.setValue("parentId", nextParentId);
 
-                if (value === "none") {
+                if (!value) {
                   form.setValue("variantType", VARIANT_TYPES.NONE);
                 }
               }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục cha" />
-              </SelectTrigger>
-
-              <SelectContent
-                className="max-h-72 p-2 text-black/50"
-                position="popper"
-              >
-                <SelectItem value="none">Không có danh mục cha</SelectItem>
-                {flatCategoriesQuery.data?.data?.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {`${"".repeat(category.level - 1)}${category.name}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </div>
 
           {/* {Loại variant} */}
