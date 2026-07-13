@@ -10,7 +10,7 @@ import { useCallback } from "react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { AsyncButton } from "@components/common/async-button";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 
 type AssignVoucherFormProps = {
   voucherId: string;

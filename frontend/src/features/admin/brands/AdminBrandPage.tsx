@@ -18,7 +18,7 @@ import AminCreateBrand from "./components/AminCreateBrand";
 import AdminUpdateBrand from "./components/AdminUpdateBrand";
 import { useAdminBrandAction } from "./hooks/useAdminStatusMutation";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { FALLBACK_IMAGE } from "@shared/constants/image";
 
 type PendingAction = "update" | "softDelete" | "restore" | null;

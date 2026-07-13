@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { sonnerToast } from "@/lib/sonner-toast";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useToggleWishlist } from "../hooks/useCustomerWishlist";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { AsyncButton } from "@components/common/async-button";
 
 type Props = {

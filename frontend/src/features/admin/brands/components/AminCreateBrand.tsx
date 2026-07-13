@@ -2,7 +2,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useCreateBrandForm } from "../forms/use-create-brand-form";
 import { useAdminCreateBrand } from "../hooks/useAdminCreateBrand";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { Label } from "@components/ui/label";

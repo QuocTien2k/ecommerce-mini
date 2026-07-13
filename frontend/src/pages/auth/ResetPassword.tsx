@@ -3,7 +3,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import type { ResetPasswordDto } from "@features/auth/types";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

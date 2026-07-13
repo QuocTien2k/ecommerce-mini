@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@components/ui/select";
 
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import { X } from "lucide-react";
 import { AdminProductSelector } from "./AdminProductSelector";

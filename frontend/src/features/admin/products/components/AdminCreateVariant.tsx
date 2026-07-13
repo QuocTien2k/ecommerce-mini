@@ -6,7 +6,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useAdminCreateVariant } from "../hooks/useAdminCreateProduct";
 import type { CreateProductVariantFormOutput } from "../schemas/product-variant.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Label } from "@components/ui/label";
 import { Input } from "@components/ui/input";
 import { AsyncButton } from "@components/common/async-button";

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { useUpsertRating } from "./hooks/useUpsertRating";
 import { useGetMyRating } from "./hooks/useGetMyRating";
 import { useDeleteRating } from "./hooks/useDeleteRating";

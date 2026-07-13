@@ -2,7 +2,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/useAdminCategoryFlatQuery";
 import { useAdminCreateProduct } from "../hooks/useAdminCreateProduct";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { Label } from "@components/ui/label";

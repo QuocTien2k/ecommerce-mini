@@ -25,7 +25,7 @@ import { useAdminSoftDeleteVoucher } from "./hooks/useAdminSofteDeleteVoucher";
 import { ConfirmModal } from "@components/common/confirm";
 import { useAdminVoucherFilter } from "./hooks/useAdminVoucherFilter";
 import { AssignVoucherDialog } from "./components/assign-voucher/AssignVoucherDialog";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 
 type PendingAction = "update" | "delete" | null;
 

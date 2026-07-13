@@ -9,7 +9,21 @@ export const getErrorMessage = (
   fallback = "Có lỗi xảy ra",
 ): string => {
   if (isApiError(error)) {
-    return error.response?.data?.message ?? fallback;
+    const status = error.response?.status;
+
+    switch (status) {
+      case 401:
+        return "Vui lòng đăng nhập để sử dụng tính năng này.";
+
+      case 403:
+        return "Bạn không có quyền thực hiện thao tác này.";
+
+      case 404:
+        return error.response?.data?.message ?? "Không tìm thấy dữ liệu.";
+
+      default:
+        return error.response?.data?.message ?? fallback;
+    }
   }
 
   return fallback;

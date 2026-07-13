@@ -4,7 +4,7 @@ import type { AdminVariantResponse } from "../types/admin-variant.type";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import type { UpdateProductVariantFormOutput } from "../schemas/product-variant.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { Label } from "@components/ui/label";

@@ -9,7 +9,7 @@ import { Title } from "@components/ui/title-module";
 import CopyableText from "@components/common/copyable-text";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { cn } from "@lib/utils";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import AppPagination from "@components/common/pagination";

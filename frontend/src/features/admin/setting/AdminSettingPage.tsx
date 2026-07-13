@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useGetSetting } from "@/domains/setting/hooks/useSetting";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import AdminSettingCard from "./components/AdminSettingCard";
-import { isNotFoundError } from "@lib/error";
+import { isNotFoundError } from "@lib/error-message";
 import AdminSettingDialog from "./components/AdminSettingDialog";
 
 const AdminSettingPage = () => {

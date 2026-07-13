@@ -6,7 +6,7 @@ import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/us
 import { useEffect, useState } from "react";
 import type { UpdateProductFormOutput } from "../schemas/product.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { Trash2, Undo2, X } from "lucide-react";
 import { Label } from "@components/ui/label";

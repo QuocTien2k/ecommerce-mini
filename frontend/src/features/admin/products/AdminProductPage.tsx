@@ -23,7 +23,7 @@ import AdminUpdateProduct from "./components/AdminUpdateProduct";
 import type { AdminBrandItem } from "@features/admin/brands/types/admin-brand.type";
 import { useAdminBrandQuery } from "@features/admin/brands/hooks/useAdminBrandQuery";
 import { useAdminStatusMutation } from "./hooks/useAdminStatusMutation";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { getCategoryDisplayName } from "@/utils/category/category-display-name";
 import { FALLBACK_IMAGE } from "@shared/constants/image";
 

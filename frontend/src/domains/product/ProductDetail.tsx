@@ -20,7 +20,7 @@ import { ShoppingCart } from "lucide-react";
 import { useAddToCart } from "@features/customer/cart/hooks/useAddToCart";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { toast } from "sonner";
 import { useAppSelector } from "@app/hooks";
 import ProductRating from "@features/customer/rating/ProductRating";

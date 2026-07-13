@@ -5,7 +5,7 @@ import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
 import type { SignupFormValues } from "@features/auth/signup/signup.schema";
 import { useSignupForm } from "@features/auth/signup/useSignupForm";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Controller } from "react-hook-form";

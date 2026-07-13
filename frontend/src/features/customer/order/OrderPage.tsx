@@ -17,7 +17,7 @@ import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
 import { useCreateCodPayment } from "../payment/hooks/useCreateCod";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Controller } from "react-hook-form";
 
 const OrderPage = () => {

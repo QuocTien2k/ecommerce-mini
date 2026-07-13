@@ -3,7 +3,7 @@ import { useChangePasswordMutation } from "../hooks/useChangePassword";
 import { useChangePasswordForm } from "../form/use-change-password";
 import type { ChangePasswordSchema } from "../schema/account.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { AsyncButton } from "@components/common/async-button";

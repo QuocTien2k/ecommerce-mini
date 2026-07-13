@@ -14,7 +14,7 @@ import {
   type AdminVoucher,
   type UpdateVoucherPayload,
 } from "@features/admin/vouchers/types/admin-voucher.type";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import { cn } from "@lib/utils";
 import { format } from "date-fns";

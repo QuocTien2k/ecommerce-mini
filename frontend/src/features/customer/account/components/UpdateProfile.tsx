@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 import { buildAddress, parseAddress } from "@/utils/address.mapper";
 import type { UpdateProfileSchema } from "../schema/account.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { X } from "lucide-react";
 import { AsyncButton } from "@components/common/async-button";

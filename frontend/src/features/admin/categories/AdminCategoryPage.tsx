@@ -21,7 +21,7 @@ import {
   useSoftDeleteCategoryMutation,
 } from "./hooks/useCategoryStatusMutation";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { CreateCategoryForm } from "./components/AdminCreateCategory";
 import { format } from "date-fns";

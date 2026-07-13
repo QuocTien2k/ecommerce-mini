@@ -3,7 +3,7 @@ import { useUpdateBrandForm } from "../forms/use-update-brand-form";
 import type { AdminBrandItem } from "../types/admin-brand.type";
 import { useAdminUpdateBrand } from "../hooks/useAdminUpdateBrand";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { useEffect, useState } from "react";
 import { Button } from "@components/ui/button";
 import { Trash2, Undo2, X } from "lucide-react";

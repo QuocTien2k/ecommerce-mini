@@ -2,7 +2,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { AsyncButton } from "@components/common/async-button";
 import { Input } from "@components/ui/input";
 import { authApi } from "@features/auth/auth.api";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";

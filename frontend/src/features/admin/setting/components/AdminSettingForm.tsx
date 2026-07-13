@@ -5,7 +5,7 @@ import { useAdminCreateSetting } from "../hooks/useCreateSetting";
 import { useEffect, useRef, useState } from "react";
 import type { CreateSettingFormOutput } from "../schemas/setting.schema";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { Button } from "@components/ui/button";
 import { AsyncButton } from "@components/common/async-button";
 import { FieldError } from "@components/ui/field-error";

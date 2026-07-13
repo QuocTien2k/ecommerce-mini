@@ -17,7 +17,7 @@ import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { formatCurrency } from "@lib/format-currency";
 import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
-import { getErrorMessage } from "@lib/error";
+import { getErrorMessage } from "@lib/error-message";
 import { AsyncButton } from "@components/common/async-button";
 
 interface AdminOrderUpdateProps {
