@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVoucherDto } from './dtos/create-voucher.dto';
-import { Prisma, Voucher, VoucherScope, VoucherType } from '@prisma/client';
+import {
+  Prisma,
+  UserVoucher,
+  Voucher,
+  VoucherScope,
+  VoucherType,
+} from '@prisma/client';
 import { AssignVoucherDto } from './dtos/assign-voucher.dto';
 import {
   buildPaginatedResponse,
@@ -44,6 +50,50 @@ export class VoucherService {
         },
       ],
     };
+  }
+
+  private validateVoucherState(
+    voucher: Voucher & {
+      userVouchers: UserVoucher[];
+    },
+  ) {
+    const now = new Date();
+
+    if (voucher.isDeleted || !voucher.isActive) {
+      throw new BadRequestException('Voucher không hợp lệ');
+    }
+
+    if (voucher.startAt && voucher.startAt > now) {
+      throw new BadRequestException('Voucher chưa bắt đầu');
+    }
+
+    if (voucher.endAt && voucher.endAt < now) {
+      throw new BadRequestException('Voucher đã hết hạn');
+    }
+
+    if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+      throw new BadRequestException('Voucher đã hết lượt sử dụng');
+    }
+
+    const userVoucher = voucher.userVouchers[0];
+
+    if (voucher.scope === VoucherScope.ORDER) {
+      if (!userVoucher) {
+        throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
+      }
+
+      const remaining =
+        userVoucher.remainingUsage ??
+        (userVoucher.usagePerUser != null
+          ? userVoucher.usagePerUser - userVoucher.usedCount
+          : null);
+
+      if (remaining != null && remaining <= 0) {
+        throw new BadRequestException('Bạn đã dùng hết voucher này');
+      }
+    }
+
+    return userVoucher ?? null;
   }
 
   /* Case create */
@@ -594,8 +644,21 @@ export class VoucherService {
     const globalVouchers = await this.prisma.voucher.findMany({
       where: this.getAvailableVoucherWhere(now),
       include: {
-        products: { select: { id: true } },
-        categories: { select: { id: true } },
+        products: {
+          select: {
+            id: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+          },
+        },
+        userVouchers: {
+          where: {
+            userId,
+          },
+        },
       },
     });
 
@@ -612,8 +675,21 @@ export class VoucherService {
       include: {
         voucher: {
           include: {
-            products: { select: { id: true } },
-            categories: { select: { id: true } },
+            products: {
+              select: {
+                id: true,
+              },
+            },
+            categories: {
+              select: {
+                id: true,
+              },
+            },
+            userVouchers: {
+              where: {
+                userId,
+              },
+            },
           },
         },
       },
@@ -666,6 +742,8 @@ export class VoucherService {
 
     for (const { voucher } of vouchers) {
       try {
+        this.validateVoucherState(voucher);
+
         const result = await this.previewVoucher(voucher, subtotal);
 
         availableVouchers.push({
@@ -715,44 +793,16 @@ export class VoucherService {
       throw new BadRequestException('Voucher không tồn tại');
     }
 
-    if (!voucher || voucher.isDeleted || !voucher.isActive) {
-      throw new BadRequestException('Voucher không hợp lệ');
-    }
-
-    const now = new Date();
-
-    if (voucher.startAt && voucher.startAt > now) {
-      throw new BadRequestException('Voucher chưa bắt đầu');
-    }
-
-    if (voucher.endAt && voucher.endAt < now) {
-      throw new BadRequestException('Voucher đã hết hạn');
-    }
-
-    if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
-      throw new BadRequestException('Voucher đã hết lượt sử dụng');
-    }
-
-    const userVoucher = voucher.userVouchers[0];
-
-    if (voucher.scope === VoucherScope.ORDER) {
-      if (!userVoucher) {
-        throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
-      }
-    }
+    const userVoucher = this.validateVoucherState(voucher);
 
     let remaining: number | null = null;
 
-    if (voucher.scope === VoucherScope.ORDER) {
+    if (userVoucher) {
       remaining =
         userVoucher.remainingUsage ??
         (userVoucher.usagePerUser != null
           ? userVoucher.usagePerUser - userVoucher.usedCount
           : null);
-
-      if (remaining != null && remaining <= 0) {
-        throw new BadRequestException('Bạn đã dùng hết voucher này');
-      }
     }
 
     const productIds = items.map((i) => i.productId);
