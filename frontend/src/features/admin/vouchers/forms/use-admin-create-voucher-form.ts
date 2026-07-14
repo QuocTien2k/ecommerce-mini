@@ -1,6 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { VOUCHER_SCOPES, VOUCHER_TYPES } from "../types/admin-voucher.type";
+import {
+  VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
+  VOUCHER_TYPES,
+} from "../types/admin-voucher.type";
 import {
   createVoucherSchema,
   type CreateVoucherFormOutput,
@@ -25,6 +29,7 @@ export const useAdminCreateVoucherForm = () => {
       usageLimit: 1,
 
       scope: VOUCHER_SCOPES.ORDER,
+      target: VOUCHER_TARGETS.GLOBAL,
 
       isActive: true,
 

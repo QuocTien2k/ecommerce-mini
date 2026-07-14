@@ -3,7 +3,12 @@ import { Button } from "@components/ui/button";
 
 import { X } from "lucide-react";
 import { useAdminVoucherDetailQuery } from "../hooks/useAdminVoucherQuery";
-import { VOUCHER_SCOPES, VOUCHER_TYPES } from "../types/admin-voucher.type";
+import {
+  VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
+  VOUCHER_TYPES,
+} from "../types/admin-voucher.type";
+import { formatCurrency } from "@lib/format-currency";
 
 type AdminVoucherDetailModalProps = {
   open: boolean;
@@ -93,10 +98,11 @@ export default function AdminVoucherDetailModal({
                   <p className="font-bold text-2xl mt-1 text-primary">
                     {voucher.type === VOUCHER_TYPES.PERCENT
                       ? `${voucher.value}%`
-                      : `${Number(voucher.value).toLocaleString("vi-VN")}đ`}
+                      : formatCurrency(voucher.value)}
                   </p>
                 </div>
 
+                {/* SCOPE */}
                 <div>
                   <p className="text-xs text-muted-foreground">Phạm vi</p>
                   <p className="font-semibold mt-1 capitalize">
@@ -113,7 +119,7 @@ export default function AdminVoucherDetailModal({
                   <p className="text-xs text-muted-foreground">Giảm tối đa</p>
                   <p className="font-semibold mt-1">
                     {voucher.maxDiscount
-                      ? `${Number(voucher.maxDiscount).toLocaleString("vi-VN")}đ`
+                      ? formatCurrency(voucher.maxDiscount)
                       : "--"}
                   </p>
                 </div>
@@ -123,7 +129,7 @@ export default function AdminVoucherDetailModal({
                   <p className="text-xs text-muted-foreground">Đơn tối thiểu</p>
                   <p className="font-semibold mt-1">
                     {voucher.minOrderValue
-                      ? `${Number(voucher.minOrderValue).toLocaleString("vi-VN")}đ`
+                      ? formatCurrency(voucher.minOrderValue)
                       : "--"}
                   </p>
                 </div>
@@ -196,6 +202,23 @@ export default function AdminVoucherDetailModal({
                   </div>
                 </div>
               )}
+
+              {/* Target */}
+              <div>
+                <p className="text-xs text-muted-foreground">Đối tượng</p>
+
+                <div className="mt-1">
+                  {voucher.target === VOUCHER_TARGETS.GLOBAL ? (
+                    <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                      Công khai
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-700">
+                      Cá nhân
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

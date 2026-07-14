@@ -10,9 +10,11 @@ import {
 import {
   VOUCHER_SCOPES,
   VOUCHER_STATUSES,
+  VOUCHER_TARGETS,
   VOUCHER_TYPES,
   type VoucherScope,
   type VoucherStatus,
+  type VoucherTarget,
   type VoucherType,
 } from "@features/admin/vouchers/types/admin-voucher.type";
 
@@ -23,6 +25,8 @@ type Props = {
     type: "" | VoucherType;
 
     scope: "" | VoucherScope;
+
+    target: "" | VoucherTarget;
 
     status: "" | VoucherStatus;
 
@@ -35,6 +39,8 @@ type Props = {
     setType: (value: "" | VoucherType) => void;
 
     setScope: (value: "" | VoucherScope) => void;
+
+    setTarget: (value: "" | VoucherTarget) => void;
 
     setStatus: (value: "" | VoucherStatus) => void;
 
@@ -102,6 +108,28 @@ const AdminVoucherFilter = ({ filters, actions, onReset }: Props) => {
             <SelectItem value={VOUCHER_SCOPES.CATEGORY}>
               Theo danh mục
             </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Target */}
+      <div className="w-52">
+        <Select
+          value={filters.target || "ALL"}
+          onValueChange={(value) =>
+            actions.setTarget(value === "ALL" ? "" : (value as VoucherTarget))
+          }
+        >
+          <SelectTrigger className="w-full cursor-pointer">
+            <SelectValue placeholder="Tất cả đối tượng" />
+          </SelectTrigger>
+
+          <SelectContent position="popper">
+            <SelectItem value="ALL">Tất cả đối tượng</SelectItem>
+
+            <SelectItem value={VOUCHER_TARGETS.GLOBAL}>Công khai</SelectItem>
+
+            <SelectItem value={VOUCHER_TARGETS.PERSONAL}>Cá nhân</SelectItem>
           </SelectContent>
         </Select>
       </div>

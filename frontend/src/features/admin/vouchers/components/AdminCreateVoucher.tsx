@@ -24,9 +24,11 @@ import { useAdminFlatCategoriesQuery } from "@features/admin/categories/hooks/us
 import type { CreateVoucherFormOutput } from "../schema/admin-voucher";
 import {
   VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
   VOUCHER_TYPES,
   type CreateVoucherPayload,
   type VoucherScope,
+  type VoucherTarget,
   type VoucherType,
 } from "../types/admin-voucher.type";
 
@@ -78,6 +80,7 @@ export const AdminCreateVoucher = ({
           usageLimit: values.usageLimit,
 
           scope: values.scope,
+          target: values.target,
 
           isActive: values.isActive,
 
@@ -352,6 +355,38 @@ export const AdminCreateVoucher = ({
                 <FieldError error={form.formState.errors.categoryIds} />
               </div>
             )}
+
+            {/* Target  */}
+            <div className="space-y-2">
+              <Label>Đối tượng áp dụng</Label>
+
+              <Select
+                value={form.watch("target")}
+                onValueChange={(value) =>
+                  form.setValue("target", value as VoucherTarget)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn đối tượng" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value={VOUCHER_TARGETS.GLOBAL}>
+                    Công khai
+                  </SelectItem>
+
+                  <SelectItem value={VOUCHER_TARGETS.PERSONAL}>
+                    Cá nhân
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-xs text-muted-foreground">
+                {form.watch("target") === VOUCHER_TARGETS.GLOBAL
+                  ? "Mọi người dùng đều có thể sử dụng voucher này."
+                  : "Voucher chỉ sử dụng được sau khi được gán cho người dùng."}
+              </span>
+              <FieldError error={form.formState.errors.target} />
+            </div>
           </div>
 
           {/* Time start */}

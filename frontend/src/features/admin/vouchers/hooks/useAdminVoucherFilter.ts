@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-
 import { useDebounce } from "@/hooks/useDebounce";
 import type {
   GetAdminVouchersQuery,
   VoucherScope,
   VoucherStatus,
+  VoucherTarget,
   VoucherType,
-} from "../../types/admin-voucher.type";
+} from "../types/admin-voucher.type";
 
 export const useAdminVoucherFilter = () => {
   const [page, setPage] = useState(1);
@@ -19,6 +19,8 @@ export const useAdminVoucherFilter = () => {
   /* "": no filter */
   const [scope, setScope] = useState<"" | VoucherScope>("");
 
+  const [target, setTarget] = useState<"" | VoucherTarget>("");
+
   /* "": no filter */
   const [status, setStatus] = useState<"" | VoucherStatus>("");
 
@@ -29,7 +31,7 @@ export const useAdminVoucherFilter = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, type, scope, status, isActive]);
+  }, [debouncedSearch, type, scope, target, status, isActive]);
 
   const queryParams = useMemo<GetAdminVouchersQuery>(() => {
     const params: GetAdminVouchersQuery = {
@@ -52,6 +54,11 @@ export const useAdminVoucherFilter = () => {
       params.scope = scope;
     }
 
+    // target
+    if (target) {
+      params.target = target;
+    }
+
     // status
     if (status) {
       params.status = status;
@@ -63,7 +70,7 @@ export const useAdminVoucherFilter = () => {
     }
 
     return params;
-  }, [page, debouncedSearch, type, scope, status, isActive]);
+  }, [page, debouncedSearch, type, scope, target, status, isActive]);
 
   const resetFilters = () => {
     setPage(1);
@@ -74,6 +81,8 @@ export const useAdminVoucherFilter = () => {
 
     setScope("");
 
+    setTarget("");
+
     setStatus("");
 
     setIsActive("");
@@ -83,6 +92,7 @@ export const useAdminVoucherFilter = () => {
     search,
     type,
     scope,
+    target,
     status,
     isActive,
   };
@@ -91,6 +101,7 @@ export const useAdminVoucherFilter = () => {
     setSearch,
     setType,
     setScope,
+    setTarget,
     setStatus,
     setIsActive,
   };

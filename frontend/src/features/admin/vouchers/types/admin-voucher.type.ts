@@ -22,6 +22,14 @@ export const VOUCHER_STATUSES = {
 export type VoucherStatus =
   (typeof VOUCHER_STATUSES)[keyof typeof VOUCHER_STATUSES];
 
+export const VOUCHER_TARGETS = {
+  GLOBAL: "GLOBAL",
+  PERSONAL: "PERSONAL",
+} as const;
+
+export type VoucherTarget =
+  (typeof VOUCHER_TARGETS)[keyof typeof VOUCHER_TARGETS];
+
 export interface AdminVoucher {
   id: string;
 
@@ -39,6 +47,7 @@ export interface AdminVoucher {
   usedCount: number;
 
   scope: VoucherScope;
+  target: VoucherTarget;
 
   isActive: boolean;
   isDeleted: boolean;
@@ -76,6 +85,8 @@ export interface GetAdminVouchersQuery {
 
   scope?: VoucherScope;
 
+  target?: VoucherTarget;
+
   status?: VoucherStatus;
 
   isActive?: boolean;
@@ -96,6 +107,7 @@ export interface CreateVoucherPayload {
   usageLimit: number;
 
   scope: VoucherScope;
+  target: VoucherTarget;
 
   isActive: boolean;
 

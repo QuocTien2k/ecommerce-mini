@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { VOUCHER_SCOPES, VOUCHER_TYPES } from "../types/admin-voucher.type";
+import {
+  VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
+  VOUCHER_TYPES,
+} from "../types/admin-voucher.type";
 
 const optionalPositiveNumber = (
   invalidMessage: string,
@@ -57,6 +61,8 @@ export const createVoucherSchema = z
       VOUCHER_SCOPES.PRODUCT,
       VOUCHER_SCOPES.CATEGORY,
     ]),
+
+    target: z.enum([VOUCHER_TARGETS.GLOBAL, VOUCHER_TARGETS.PERSONAL]),
 
     isActive: z.boolean().default(true),
 
