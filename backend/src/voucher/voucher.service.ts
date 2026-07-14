@@ -52,11 +52,7 @@ export class VoucherService {
     };
   }
 
-  private validateVoucherState(
-    voucher: Voucher & {
-      userVouchers: UserVoucher[];
-    },
-  ) {
+  private validateVoucherState(voucher: Voucher) {
     const now = new Date();
 
     if (voucher.isDeleted || !voucher.isActive) {
@@ -74,26 +70,24 @@ export class VoucherService {
     if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
       throw new BadRequestException('Voucher đã hết lượt sử dụng');
     }
+  }
 
-    const userVoucher = voucher.userVouchers[0];
-
-    if (voucher.scope === VoucherScope.ORDER) {
-      if (!userVoucher) {
-        throw new BadRequestException('Bạn không có quyền sử dụng voucher này');
-      }
-
-      const remaining =
-        userVoucher.remainingUsage ??
-        (userVoucher.usagePerUser != null
-          ? userVoucher.usagePerUser - userVoucher.usedCount
-          : null);
-
-      if (remaining != null && remaining <= 0) {
-        throw new BadRequestException('Bạn đã dùng hết voucher này');
-      }
+  private validateUserVoucher(userVoucher: UserVoucher | null): number | null {
+    if (!userVoucher) {
+      return null;
     }
 
-    return userVoucher ?? null;
+    const remaining =
+      userVoucher.remainingUsage ??
+      (userVoucher.usagePerUser != null
+        ? userVoucher.usagePerUser - userVoucher.usedCount
+        : null);
+
+    if (remaining != null && remaining <= 0) {
+      throw new BadRequestException('Bạn đã dùng hết voucher này');
+    }
+
+    return remaining;
   }
 
   /* Case create */
@@ -737,15 +731,24 @@ export class VoucherService {
     subtotal: number,
   ): Promise<AvailableVoucherDto[]> {
     const vouchers = await this.resolveUserVouchers(userId);
-
+    console.log(
+      vouchers.map(({ voucher }) => ({
+        code: voucher.code,
+        scope: voucher.scope,
+        userVouchers: voucher.userVouchers.length,
+      })),
+    );
     const availableVouchers: AvailableVoucherDto[] = [];
 
     for (const { voucher } of vouchers) {
       try {
         this.validateVoucherState(voucher);
 
-        const result = await this.previewVoucher(voucher, subtotal);
+        const remaining = this.validateUserVoucher(
+          voucher.userVouchers[0] ?? null,
+        );
 
+        const result = await this.previewVoucher(voucher, subtotal);
         availableVouchers.push({
           id: voucher.id,
           code: voucher.code,
@@ -761,12 +764,19 @@ export class VoucherService {
           appliedSubtotal: result.appliedSubtotal,
           discount: result.discount,
           finalTotal: result.finalTotal,
-          remainingUsage: result.remainingUsage ?? null,
+          remainingUsage: remaining,
         });
-      } catch {
-        continue;
+      } catch (e) {
+        console.log(voucher.code, e);
       }
     }
+
+    console.log(
+      availableVouchers.map((v) => ({
+        code: v.code,
+        remainingUsage: v.remainingUsage,
+      })),
+    );
 
     return availableVouchers;
   }
@@ -793,17 +803,10 @@ export class VoucherService {
       throw new BadRequestException('Voucher không tồn tại');
     }
 
-    const userVoucher = this.validateVoucherState(voucher);
+    this.validateVoucherState(voucher);
 
-    let remaining: number | null = null;
-
-    if (userVoucher) {
-      remaining =
-        userVoucher.remainingUsage ??
-        (userVoucher.usagePerUser != null
-          ? userVoucher.usagePerUser - userVoucher.usedCount
-          : null);
-    }
+    const userVoucher = voucher.userVouchers[0] ?? null;
+    const remaining = this.validateUserVoucher(userVoucher);
 
     const productIds = items.map((i) => i.productId);
 

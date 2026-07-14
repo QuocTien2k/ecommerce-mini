@@ -13,6 +13,7 @@ model Voucher {
   usedCount    Int      @default(0)
 
   scope VoucherScope @default(ORDER)
+  target VoucherTarget @default(GLOBAL)
 
   isActive     Boolean  @default(true)
   isDeleted    Boolean @default(false)

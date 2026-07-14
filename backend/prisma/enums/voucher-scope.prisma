@@ -3,3 +3,8 @@ enum VoucherScope {
   PRODUCT
   CATEGORY
 }
+
+enum VoucherTarget {
+  GLOBAL      // Ai cũng dùng được, không cần assign
+  PERSONAL    // Phải assign qua UserVoucher
+}

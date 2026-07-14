@@ -54,6 +54,11 @@ enum VoucherScope {
   PRODUCT
   CATEGORY
 }
+
+enum VoucherTarget {
+  GLOBAL      // Ai cũng dùng được, không cần assign
+  PERSONAL    // Phải assign qua UserVoucher
+}
 enum VoucherType {
   PERCENT   // giảm theo %
   FIXED     // giảm số tiền cố định
@@ -465,6 +470,7 @@ model Voucher {
   usedCount    Int      @default(0)
 
   scope VoucherScope @default(ORDER)
+  target VoucherTarget @default(GLOBAL)
 
   isActive     Boolean  @default(true)
   isDeleted    Boolean @default(false)
