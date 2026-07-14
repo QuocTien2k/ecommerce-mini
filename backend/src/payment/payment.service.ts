@@ -109,7 +109,11 @@ export class PaymentService {
   async createCodPayment(
     userId: string,
     orderId: string,
-  ): Promise<{ paymentId: string }> {
+  ): Promise<{
+    method: PaymentMethod;
+    paymentId: string;
+    status: PaymentStatus;
+  }> {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
@@ -160,7 +164,9 @@ export class PaymentService {
     });
 
     return {
+      method: payment.method,
       paymentId: payment.id,
+      status: payment.status,
     };
   }
 
@@ -187,7 +193,11 @@ export class PaymentService {
     userId: string,
     orderId: string,
     ipAddr: string,
-  ): Promise<{ paymentUrl: string; paymentId: string }> {
+  ): Promise<{
+    method: 'VNPAY';
+    paymentUrl: string;
+    paymentId: string;
+  }> {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
@@ -196,11 +206,11 @@ export class PaymentService {
     });
 
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new NotFoundException('Không tìm thấy đơn hàng');
     }
 
     if (order.status !== OrderStatus.PENDING) {
-      throw new BadRequestException('Order is not valid for payment');
+      throw new BadRequestException('Đơn hàng không hợp lệ để thanh toán');
     }
 
     const now = new Date();
@@ -240,6 +250,7 @@ export class PaymentService {
     // console.log('FINAL PAYMENT URL:', paymentUrl);
 
     return {
+      method: 'VNPAY',
       paymentUrl,
       paymentId: payment.id,
     };
@@ -571,58 +582,6 @@ export class PaymentService {
     };
   }
 
-  private async createOrReuseMomoPayment(
-    tx: Prisma.TransactionClient,
-    order: Order,
-    userId: string,
-    now: Date,
-    expireDate: Date,
-  ): Promise<Payment> {
-    const existing = await tx.payment.findUnique({
-      where: {
-        orderId: order.id,
-      },
-    });
-
-    if (existing) {
-      if (existing.status === PaymentStatus.SUCCESS) {
-        throw new BadRequestException('Order already paid');
-      }
-
-      if (existing.status === PaymentStatus.PENDING) {
-        if (!existing.expiredAt || existing.expiredAt > now) {
-          return existing;
-        }
-
-        await tx.payment.delete({
-          where: {
-            id: existing.id,
-          },
-        });
-      } else {
-        await tx.payment.delete({
-          where: {
-            id: existing.id,
-          },
-        });
-      }
-    }
-
-    const transactionRef = `${order.id}-${Date.now()}`;
-
-    return tx.payment.create({
-      data: {
-        orderId: order.id,
-        userId,
-        method: PaymentMethod.MOMO,
-        status: PaymentStatus.PENDING,
-        amount: order.totalPrice,
-        transactionRef,
-        expiredAt: expireDate,
-      },
-    });
-  }
-
   private generateMomoCreateSignature(params: {
     amount: string;
     requestId: string;
@@ -692,7 +651,7 @@ export class PaymentService {
   async createMomoPayment(
     userId: string,
     orderId: string,
-  ): Promise<{ paymentUrl: string; paymentId: string }> {
+  ): Promise<{ method: 'MOMO'; paymentUrl: string; paymentId: string }> {
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
@@ -705,7 +664,7 @@ export class PaymentService {
     }
 
     if (order.status !== OrderStatus.PENDING) {
-      throw new BadRequestException('Order is not valid for payment');
+      throw new BadRequestException('Đơn hàng không hợp lệ để thanh toán');
     }
 
     const now = new Date();
@@ -764,6 +723,7 @@ export class PaymentService {
     }
 
     return {
+      method: 'MOMO',
       paymentUrl: data.payUrl,
       paymentId: payment.id,
     };
