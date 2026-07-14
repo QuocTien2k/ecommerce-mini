@@ -25,15 +25,16 @@ import { toast } from "sonner";
 import { useAppSelector } from "@app/hooks";
 import ProductRating from "@features/customer/rating/ProductRating";
 import { WishlistButton } from "@features/customer/wishlist/components/WishlistButton";
+import { ProductRelated } from "./components/ProductRelated";
 
 const ProductDetail = () => {
   //check auth
   const user = useAppSelector((state) => state.user.user);
   const isAuthenticated = Boolean(user?.id);
 
-  const { slug } = useParams<{ slug: string }>();
+  const { slug = "" } = useParams<{ slug: string }>();
 
-  const { data: product, isLoading } = usePublicProductDetail(slug ?? "");
+  const { data: product, isLoading } = usePublicProductDetail(slug);
   const { loading, run } = useScopedLoading();
 
   const addToCartMutation = useAddToCart();
@@ -343,6 +344,11 @@ ${
             <TiptapContent content={product.description} />
           </div>
         </div>
+
+        <Separator className="my-8" />
+
+        {/* Related Products */}
+        <ProductRelated slug={slug} />
       </div>
     </QueryStateWrapper>
   );

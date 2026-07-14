@@ -1,6 +1,7 @@
 import { api } from "@shared/api/axios";
 import type { ApiResult } from "@shared/types/api-result";
 import type {
+  ProductCardItem,
   PublicHomeProductsResponse,
   PublicProductDetailResponse,
   PublicProductListQueryParams,
@@ -16,4 +17,7 @@ export const publicProductApi = {
 
   getDetail: (slug: string): ApiResult<PublicProductDetailResponse> =>
     api.get(`/product/${slug}`),
+
+  getRelated: (slug: string): ApiResult<ProductCardItem[]> =>
+    api.get(`/product/${slug}/related`),
 };

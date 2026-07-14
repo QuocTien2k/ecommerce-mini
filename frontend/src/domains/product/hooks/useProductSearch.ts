@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { publicProductApi } from "../api/publicProduct.api";
-
-export const PRODUCT_SEARCH_PREVIEW_QUERY_KEY = "product-search-preview";
+import { PUBLIC_PRODUCT_QUERY_KEY } from "../constants/product.constant";
 
 export const useProductSearchPreviewQuery = (
   keyword: string,
@@ -9,7 +8,7 @@ export const useProductSearchPreviewQuery = (
 ) => {
   //console.log("Preview Query:", keyword);
   return useQuery({
-    queryKey: [PRODUCT_SEARCH_PREVIEW_QUERY_KEY, keyword],
+    queryKey: PUBLIC_PRODUCT_QUERY_KEY.searchPreview(keyword),
 
     queryFn: async () =>
       publicProductApi.getList({

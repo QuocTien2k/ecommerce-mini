@@ -1,10 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { GetWishlistQuery } from "../types/customerWishlist.type";
 import { customerWishlistApi } from "../api/customerWishlist.api";
-import {
-  PUBLIC_HOME_PRODUCTS_QUERY_KEY,
-  PUBLIC_PRODUCTS_QUERY_KEY,
-} from "@/domains/product/hooks/usePublicProduct";
+import { PUBLIC_PRODUCT_QUERY_KEY } from "@/domains/product/constants/product.constant";
 
 export const CUSTOMER_WISHLIST_QUERY_KEY = "customer-wishlist";
 
@@ -33,15 +30,15 @@ export const useToggleWishlist = () => {
       });
 
       queryClient.invalidateQueries({
-        queryKey: [PUBLIC_HOME_PRODUCTS_QUERY_KEY],
+        queryKey: [...PUBLIC_PRODUCT_QUERY_KEY.all, "list"],
       });
 
       queryClient.invalidateQueries({
-        queryKey: [PUBLIC_PRODUCTS_QUERY_KEY],
+        queryKey: [...PUBLIC_PRODUCT_QUERY_KEY.all, "detail"],
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["public-product-detail"],
+        queryKey: [...PUBLIC_PRODUCT_QUERY_KEY.all, "related"],
       });
     },
   });
