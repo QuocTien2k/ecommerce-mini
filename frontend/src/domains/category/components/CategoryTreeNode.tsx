@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PublicCategoryTreeItem } from "../types/public-category.type";
 
@@ -17,7 +17,9 @@ export const CategoryTreeNode = ({
   setExpandedIds,
   onSelectCategory,
 }: CategoryTreeNodeProps) => {
-  const isSelected = selectedPath.some((item) => item.id === category.id);
+  const activeCategory = selectedPath[selectedPath.length - 1];
+
+  const isActive = activeCategory?.id === category.id;
 
   const hasChildren = category.children.length > 0;
 
@@ -61,12 +63,16 @@ export const CategoryTreeNode = ({
           type="button"
           onClick={() => onSelectCategory(category)}
           className={cn(
-            "cursor-pointer flex-1 rounded-md px-2 py-2 text-left text-sm transition-colors",
+            "cursor-pointer flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm transition-colors",
             "hover:text-primary",
-            isSelected && "font-semibold text-primary",
+            isActive && "font-semibold text-primary",
           )}
         >
-          {category.name}
+          <span>{category.name}</span>
+
+          {isActive && (
+            <Sparkles className="h-4 w-4 shrink-0 text-primary drop-shadow-sm" />
+          )}
         </button>
       </div>
 
