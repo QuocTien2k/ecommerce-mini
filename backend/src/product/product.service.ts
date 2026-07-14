@@ -290,6 +290,34 @@ export class ProductService {
     };
   }
 
+  //helper build card select
+  private buildProductCardSelect(userId?: string) {
+    return {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      thumbnail: true,
+
+      price: true,
+      discountPrice: true,
+      discountPct: true,
+
+      ratingAvg: true,
+      ratingCount: true,
+
+      isActive: true,
+
+      categoryId: true,
+      brandId: true,
+
+      createdAt: true,
+      updatedAt: true,
+
+      ...this.buildWishlistSelect(userId),
+    } satisfies Prisma.ProductSelect;
+  }
+
   //lists product for user
   async findAllProducts(query: GetProductsQueryDto, userId?: string) {
     // pagination (default limit = 10)
@@ -350,30 +378,7 @@ export class ProductService {
         orderBy: query.priceSort
           ? { price: query.priceSort }
           : { createdAt: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          thumbnail: true,
-
-          price: true,
-          discountPrice: true,
-          discountPct: true,
-
-          ratingAvg: true,
-          ratingCount: true,
-
-          isActive: true,
-
-          categoryId: true,
-          brandId: true,
-
-          createdAt: true,
-          updatedAt: true,
-
-          ...this.buildWishlistSelect(userId),
-        },
+        select: this.buildProductCardSelect(userId),
       }),
 
       this.prisma.product.count({
@@ -461,6 +466,95 @@ export class ProductService {
 
       variants: mappedVariants,
     };
+  }
+
+  //related products
+  async findRelatedProducts(slug: string, userId?: string) {
+    const currentProduct = await this.prisma.product.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        categoryId: true,
+        brandId: true,
+        isActive: true,
+        deletedAt: true,
+      },
+    });
+
+    if (
+      !currentProduct ||
+      !currentProduct.isActive ||
+      currentProduct.deletedAt
+    ) {
+      throw new NotFoundException('Sản phẩm không tìm thấy');
+    }
+
+    const relatedProducts = await this.prisma.product.findMany({
+      where: {
+        isActive: true,
+        deletedAt: null,
+        categoryId: currentProduct.categoryId,
+        id: {
+          not: currentProduct.id,
+        },
+      },
+      take: 8,
+      orderBy: [
+        {
+          ratingAvg: 'desc',
+        },
+        {
+          ratingCount: 'desc',
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
+      select: this.buildProductCardSelect(userId),
+    });
+
+    let products = relatedProducts;
+
+    if (products.length < 8) {
+      const excludeIds = [
+        currentProduct.id,
+        ...products.map((item) => item.id),
+      ];
+
+      const brandProducts = await this.prisma.product.findMany({
+        where: {
+          isActive: true,
+          deletedAt: null,
+          brandId: currentProduct.brandId,
+          id: {
+            notIn: excludeIds,
+          },
+        },
+        take: 8 - products.length,
+        orderBy: [
+          {
+            ratingAvg: 'desc',
+          },
+          {
+            ratingCount: 'desc',
+          },
+          {
+            createdAt: 'desc',
+          },
+        ],
+        select: this.buildProductCardSelect(userId),
+      });
+
+      products = [...products, ...brandProducts];
+    }
+
+    return products.map((item) => {
+      const { wishlist = [], ...product } = item as typeof item & {
+        wishlist?: { productId: string }[];
+      };
+
+      return this.formatProduct(product, wishlist.length > 0);
+    });
   }
 
   // latest products for home page

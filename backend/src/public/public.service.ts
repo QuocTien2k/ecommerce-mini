@@ -27,24 +27,19 @@ export class PublicService {
 
   /* Case product */
   async getHomeData(userId?: string) {
-    const products = await this.productService.getHomeProducts(userId);
-
-    return products;
+    return this.productService.getHomeProducts(userId);
   }
 
   async getProducts(query: GetProductsQueryDto, userId?: string) {
-    const products = await this.productService.findAllProducts(query, userId);
-
-    return products;
+    return this.productService.findAllProducts(query, userId);
   }
 
   async getProductDetail(slug: string, userId?: string) {
-    const product_detail = await this.productService.findProductDetail(
-      slug,
-      userId,
-    );
+    return this.productService.findProductDetail(slug, userId);
+  }
 
-    return product_detail;
+  async getRelatedProducts(slug: string, userId?: string) {
+    return this.productService.findRelatedProducts(slug, userId);
   }
 
   /* Case setting */

@@ -43,6 +43,15 @@ export class PublicController {
     return this.publicService.getProductDetail(slug, userId);
   }
 
+  @Get('product/:slug/related')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getRelatedProducts(
+    @CurrentUser('sub') userId: string | undefined,
+    @Param('slug') slug: string,
+  ) {
+    return this.publicService.getRelatedProducts(slug, userId);
+  }
+
   @Get('setting')
   async getSetting() {
     return this.publicService.getSetting();
