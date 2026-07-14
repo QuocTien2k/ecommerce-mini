@@ -1,4 +1,4 @@
-import { VoucherScope, VoucherType } from '@prisma/client';
+import { VoucherScope, VoucherTarget, VoucherType } from '@prisma/client';
 import { IsUUID } from 'class-validator';
 
 export class GetVoucherDetailAdminDto {
@@ -16,6 +16,7 @@ export class VoucherDetailAdminResponseDto {
   usageLimit?: number | null;
   usedCount: number;
   scope: VoucherScope;
+  target: VoucherTarget;
   isActive: boolean;
   startAt: Date | null;
   endAt: Date | null;

@@ -8,7 +8,7 @@ import {
   Max,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { VoucherType, VoucherScope } from '@prisma/client';
+import { VoucherType, VoucherScope, VoucherTarget } from '@prisma/client';
 import { VoucherStatus } from '@voucher/enum/voucher-status.enum';
 
 export class GetVouchersAdminDto {
@@ -36,6 +36,10 @@ export class GetVouchersAdminDto {
   @IsOptional()
   @IsEnum(VoucherScope)
   scope?: VoucherScope;
+
+  @IsOptional()
+  @IsEnum(VoucherTarget)
+  target?: VoucherTarget;
 
   @IsOptional()
   @IsEnum(VoucherStatus)

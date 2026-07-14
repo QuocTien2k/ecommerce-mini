@@ -9,7 +9,7 @@ import {
   IsArray,
   ValidateIf,
 } from 'class-validator';
-import { VoucherType, VoucherScope } from '@prisma/client';
+import { VoucherType, VoucherScope, VoucherTarget } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 
 export class CreateVoucherDto {
@@ -46,6 +46,10 @@ export class CreateVoucherDto {
   @IsOptional()
   @IsEnum(VoucherScope)
   scope?: VoucherScope;
+
+  @IsOptional()
+  @IsEnum(VoucherTarget)
+  target?: VoucherTarget;
 
   @IsOptional()
   @IsBoolean()

@@ -10,6 +10,7 @@ import {
   UserVoucher,
   Voucher,
   VoucherScope,
+  VoucherTarget,
   VoucherType,
 } from '@prisma/client';
 import { AssignVoucherDto } from './dtos/assign-voucher.dto';
@@ -162,6 +163,7 @@ export class VoucherService {
       minOrderValue: dto.minOrderValue,
       usageLimit: dto.usageLimit,
       scope: dto.scope,
+      target: dto.target,
       isActive: dto.isActive ?? true,
       startAt: new Date(dto.startAt),
       endAt: new Date(dto.endAt),
@@ -211,6 +213,12 @@ export class VoucherService {
 
       if (!voucher) {
         throw new NotFoundException('Voucher không tồn tại');
+      }
+
+      if (voucher.target === VoucherTarget.GLOBAL) {
+        throw new BadRequestException(
+          'Voucher GLOBAL không thể cấp phát cho người dùng',
+        );
       }
 
       if (!voucher.isActive) {
@@ -341,36 +349,56 @@ export class VoucherService {
     const { page, limit, skip } = getPagination(query);
     const now = new Date();
 
-    const where: Prisma.UserVoucherWhereInput = {
-      userId,
+    const voucherWhere = this.getAvailableVoucherWhere(now);
 
-      voucher: this.getAvailableVoucherWhere(now),
+    const [globalVouchers, personalVouchers] = await Promise.all([
+      this.prisma.voucher.findMany({
+        where: {
+          ...voucherWhere,
+          target: VoucherTarget.GLOBAL,
+        },
+      }),
 
-      // còn lượt dùng
-      OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
-    };
-
-    const [data, total] = await Promise.all([
       this.prisma.userVoucher.findMany({
-        where,
+        where: {
+          userId,
+
+          voucher: {
+            ...voucherWhere,
+            target: VoucherTarget.PERSONAL,
+          },
+
+          OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
+        },
+
         include: {
           voucher: true,
         },
-        orderBy: {
-          assignedAt: 'desc',
-        },
-        skip,
-        take: limit,
       }),
-
-      this.prisma.userVoucher.count({ where }),
     ]);
+
+    // Chuẩn hóa GLOBAL thành cùng shape với UserVoucher
+    const globalItems = globalVouchers.map((voucher) => ({
+      id: `global-${voucher.id}`,
+      userId,
+      voucherId: voucher.id,
+      remainingUsage: null,
+      assignedAt: voucher.createdAt,
+      voucher,
+    }));
+
+    const items = [...globalItems, ...personalVouchers].sort(
+      (a, b) => b.assignedAt.getTime() - a.assignedAt.getTime(),
+    );
+
+    const total = items.length;
+    const data = items.slice(skip, skip + limit);
 
     return buildPaginatedResponse(data, total, page, limit);
   }
 
   private buildAdminWhere(dto: GetVouchersAdminDto): Prisma.VoucherWhereInput {
-    const { search, type, scope, isActive, status } = dto;
+    const { search, type, scope, target, isActive, status } = dto;
     const now = new Date();
 
     let statusCondition: Prisma.VoucherWhereInput = {};
@@ -411,7 +439,7 @@ export class VoucherService {
 
       ...(type && { type }),
       ...(scope && { scope }),
-
+      ...(target && { target }),
       ...(isActive !== undefined && { isActive }),
 
       ...statusCondition,
@@ -494,6 +522,7 @@ export class VoucherService {
       usageLimit: voucher.usageLimit ?? 0,
       usedCount: voucher.usedCount,
       scope: voucher.scope,
+      target: voucher.target,
       isActive: voucher.isActive,
       startAt: voucher.startAt,
       endAt: voucher.endAt,
@@ -605,15 +634,17 @@ export class VoucherService {
     }
 
     // đã assign → không cho xoá
-    const assigned = await this.prisma.userVoucher.findFirst({
-      where: { voucherId },
-      select: { id: true },
-    });
+    if (voucher.target === VoucherTarget.PERSONAL) {
+      const assigned = await this.prisma.userVoucher.findFirst({
+        where: { voucherId },
+        select: { id: true },
+      });
 
-    if (assigned) {
-      throw new BadRequestException(
-        'Không thể xoá voucher vì đã được cấp cho người dùng',
-      );
+      if (assigned) {
+        throw new BadRequestException(
+          'Không thể xoá voucher vì đã được cấp cho người dùng',
+        );
+      }
     }
 
     // đã bị xoá trước đó
@@ -636,7 +667,10 @@ export class VoucherService {
 
     /* GLOBAL vouchers (không cần UserVoucher) */
     const globalVouchers = await this.prisma.voucher.findMany({
-      where: this.getAvailableVoucherWhere(now),
+      where: {
+        ...this.getAvailableVoucherWhere(now),
+        target: VoucherTarget.GLOBAL,
+      },
       include: {
         products: {
           select: {
@@ -664,7 +698,10 @@ export class VoucherService {
       where: {
         userId,
         OR: [{ remainingUsage: null }, { remainingUsage: { gt: 0 } }],
-        voucher: this.getAvailableVoucherWhere(now),
+        voucher: {
+          ...this.getAvailableVoucherWhere(now),
+          target: VoucherTarget.PERSONAL,
+        },
       },
       include: {
         voucher: {
@@ -744,9 +781,11 @@ export class VoucherService {
       try {
         this.validateVoucherState(voucher);
 
-        const remaining = this.validateUserVoucher(
-          voucher.userVouchers[0] ?? null,
-        );
+        let remaining: number | null = null;
+
+        if (voucher.target === VoucherTarget.PERSONAL) {
+          remaining = this.validateUserVoucher(voucher.userVouchers[0] ?? null);
+        }
 
         const result = await this.previewVoucher(voucher, subtotal);
         availableVouchers.push({
@@ -805,8 +844,18 @@ export class VoucherService {
 
     this.validateVoucherState(voucher);
 
-    const userVoucher = voucher.userVouchers[0] ?? null;
-    const remaining = this.validateUserVoucher(userVoucher);
+    let userVoucher: UserVoucher | null = null;
+    let remaining: number | null = null;
+
+    if (voucher.target === VoucherTarget.PERSONAL) {
+      userVoucher = voucher.userVouchers[0] ?? null;
+
+      if (!userVoucher) {
+        throw new BadRequestException('Bạn chưa được cấp voucher này');
+      }
+
+      remaining = this.validateUserVoucher(userVoucher);
+    }
 
     const productIds = items.map((i) => i.productId);
 
