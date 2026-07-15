@@ -185,7 +185,6 @@ export class VoucherService {
   }
 
   async createVoucher(dto: CreateVoucherDto) {
-    console.log('CREATE DTO:', dto);
     this.validate(dto);
 
     try {
@@ -690,9 +689,6 @@ export class VoucherService {
       },
     });
 
-    // console.log('=== GLOBAL VOUCHERS ===');
-    // console.log(globalVouchers.map((v) => v.code));
-
     /* ASSIGNED vouchers (UserVoucher) */
     const assignedUserVouchers = await this.prisma.userVoucher.findMany({
       where: {
@@ -725,9 +721,6 @@ export class VoucherService {
         },
       },
     });
-
-    // console.log('=== ASSIGNED VOUCHERS ===');
-    // console.log(assignedUserVouchers.map((v) => v.voucher.code));
 
     /* Normalize về cùng format */
     const merged = [
@@ -831,7 +824,7 @@ export class VoucherService {
           remainingUsage: remaining,
         });
       } catch (e) {
-        console.log(voucher.code, e);
+        continue;
       }
     }
 
