@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAdminVouchersQuery } from "./hooks/useAdminVoucherQuery";
 import {
   VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
   VOUCHER_TYPES,
   type AdminVoucher,
 } from "./types/admin-voucher.type";
@@ -298,17 +299,21 @@ const AdminVoucherPage = () => {
                           Cập nhật
                         </AsyncButton>
 
-                        <AsyncButton
-                          size="sm"
-                          variant="outline"
-                          disabled={loading || isFetching || voucher.isDeleted}
-                          onClick={() => {
-                            setSelectedVoucher(voucher);
-                            setOpenAssign(true);
-                          }}
-                        >
-                          Gửi
-                        </AsyncButton>
+                        {voucher.target === VOUCHER_TARGETS.PERSONAL && (
+                          <AsyncButton
+                            size="sm"
+                            variant="outline"
+                            disabled={
+                              loading || isFetching || voucher.isDeleted
+                            }
+                            onClick={() => {
+                              setSelectedVoucher(voucher);
+                              setOpenAssign(true);
+                            }}
+                          >
+                            Gửi
+                          </AsyncButton>
+                        )}
 
                         <AsyncButton
                           size="icon"

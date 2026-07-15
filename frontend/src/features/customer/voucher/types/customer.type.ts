@@ -1,5 +1,6 @@
 import type {
   VoucherScope,
+  VoucherTarget,
   VoucherType,
 } from "@features/admin/vouchers/types/admin-voucher.type";
 
@@ -17,6 +18,7 @@ export interface CustomerVoucher {
   usageLimit: number | null;
 
   scope: VoucherScope;
+  target: VoucherTarget;
 
   startAt: string | null;
   endAt: string | null;

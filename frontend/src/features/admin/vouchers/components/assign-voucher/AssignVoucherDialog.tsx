@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import { AssignVoucherForm } from "./AssignVoucherForm";
 import { useAdminAssignVoucherForm } from "../../forms/use-admin-assign-voucher";
-import type { AdminVoucher } from "../../types/admin-voucher.type";
+import {
+  VOUCHER_TARGETS,
+  type AdminVoucher,
+} from "../../types/admin-voucher.type";
 
 type AssignVoucherDialogProps = {
   open: boolean;
@@ -35,6 +38,8 @@ export const AssignVoucherDialog = ({
 
   if (!voucher) return null;
 
+  const isGlobal = voucher.target === VOUCHER_TARGETS.GLOBAL;
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -42,19 +47,23 @@ export const AssignVoucherDialog = ({
           <DialogTitle>Gửi voucher "{voucher.code}"</DialogTitle>
 
           <DialogDescription>
-            Chọn người dùng nhận voucher này.
+            {isGlobal
+              ? "Voucher GLOBAL được áp dụng cho tất cả người dùng, không thể cấp phát thủ công."
+              : "Chọn người dùng nhận voucher này."}
           </DialogDescription>
         </DialogHeader>
 
-        <FormProvider {...form}>
-          <AssignVoucherForm
-            voucherId={voucher.id}
-            onSuccess={() => {
-              form.reset();
-              onOpenChange(false);
-            }}
-          />
-        </FormProvider>
+        {!isGlobal && (
+          <FormProvider {...form}>
+            <AssignVoucherForm
+              voucherId={voucher.id}
+              onSuccess={() => {
+                form.reset();
+                onOpenChange(false);
+              }}
+            />
+          </FormProvider>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -2,6 +2,7 @@ import { CalendarDays, RotateCcw, TicketPercent } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate } from "@/lib/format-date";
 import type { UserVoucher } from "../types/customer.type";
+import { formatCurrency } from "@lib/format-currency";
 
 type VoucherCardProps = {
   voucher: UserVoucher;
@@ -11,7 +12,7 @@ const VoucherCard = ({ voucher }: VoucherCardProps) => {
   const discountText =
     voucher.voucher.type === "PERCENT"
       ? `-${voucher.voucher.value}%`
-      : `-${Number(voucher.voucher.value).toLocaleString("vi-VN")}đ`;
+      : `-${formatCurrency(voucher.voucher.value)}`;
 
   return (
     <Card className="border-l-primary transition-all hover:shadow-md border-l-4">
