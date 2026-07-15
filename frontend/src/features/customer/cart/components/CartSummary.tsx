@@ -16,7 +16,7 @@ import { getVoucherLabel } from "../lib/voucher-label";
 interface Props {
   totalQuantity: number;
   totalPrice: number;
-  availableVouchers?: AvailableVoucher[];
+  availableVouchers: AvailableVoucher[];
 }
 
 export const CartSummary = ({
@@ -31,7 +31,7 @@ export const CartSummary = ({
   );
 
   const selectedVoucher =
-    availableVouchers?.find((v) => v.id === selectedVoucherId) ?? null;
+    availableVouchers.find((v) => v.id === selectedVoucherId) ?? null;
 
   const discount = selectedVoucher?.discount ?? 0;
   const finalTotal = selectedVoucher?.finalTotal ?? totalPrice;
@@ -65,7 +65,7 @@ export const CartSummary = ({
           </div>
         </div>
 
-        {availableVouchers && availableVouchers.length > 0 && (
+        {availableVouchers.length > 0 && (
           <div className="border-t pt-3 space-y-2">
             <span className="text-sm font-medium">Voucher khả dụng</span>
 

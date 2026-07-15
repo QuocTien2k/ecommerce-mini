@@ -3,15 +3,12 @@ import { useGetCart } from "./hooks/useGetCart";
 import { EmptyState } from "@components/cart/EmptyState";
 import { CartSummary } from "./components/CartSummary";
 import { CartItemCard } from "./components/CartItemCard";
-import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 
 export const CartPage = () => {
   const { data: cartResponse } = useGetCart();
-  //const { data: voucherResponse } = useGetAvailableVouchers();
 
   const cart = cartResponse?.data;
-  const { data: voucherResponse } = useGetAvailableVouchers(cart?.totalPrice);
-  const availableVouchers = voucherResponse?.data;
+  const availableVouchers = cart?.availableVouchers ?? [];
 
   if (!cart || cart.items.length === 0) {
     return (

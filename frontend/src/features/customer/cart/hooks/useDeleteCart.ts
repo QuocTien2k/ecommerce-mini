@@ -9,8 +9,8 @@ export const useDeleteCartItem = () => {
     mutationFn: (cartItemId: string) =>
       customerCartApi.deleteCartItem(cartItemId),
 
-    onSuccess: (response) => {
-      queryClient.setQueryData(CUSTOMER_CART_QUERY_KEY.all, response);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_CART_QUERY_KEY.all });
     },
   });
 };

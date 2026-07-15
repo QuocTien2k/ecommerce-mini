@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-
 import { customerCartApi } from "../api/customerCart.api";
 import { CUSTOMER_CART_QUERY_KEY } from "../constants/custom-cart.constant";
 

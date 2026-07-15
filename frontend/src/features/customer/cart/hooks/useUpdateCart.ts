@@ -17,8 +17,8 @@ export const useUpdateCartItem = () => {
         quantity,
       }),
 
-    onSuccess: (response) => {
-      queryClient.setQueryData(CUSTOMER_CART_QUERY_KEY.all, response);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_CART_QUERY_KEY.all });
     },
   });
 };

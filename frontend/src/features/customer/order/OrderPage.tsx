@@ -13,7 +13,6 @@ import { PaymentMethodSelector } from "./components/PaymentMethod";
 import { useCreateVnpayPayment } from "../payment/hooks/useCreateVnpay";
 import { useNavigate } from "react-router-dom";
 import { clearSelectedVoucher } from "./store/order.slice";
-import { useGetAvailableVouchers } from "../voucher/hooks/useAvailabelVoucher";
 import { sonnerToast } from "@lib/sonner-toast";
 import { useCreateMomoPayment } from "../payment/hooks/useCreateMomo";
 import { useCreateCodPayment } from "../payment/hooks/useCreateCod";
@@ -35,11 +34,10 @@ const OrderPage = () => {
   const selectedVoucherId = useAppSelector(
     (state) => state.order.selectedVoucherId,
   );
-  const { data: voucherResponse } = useGetAvailableVouchers(cart?.totalPrice);
-  const availableVouchers = voucherResponse?.data;
+  const availableVouchers = cart?.availableVouchers ?? [];
 
   const selectedVoucher =
-    availableVouchers?.find((v) => v.id === selectedVoucherId) ?? null;
+    availableVouchers.find((v) => v.id === selectedVoucherId) ?? null;
 
   useEffect(() => {
     form.reset({

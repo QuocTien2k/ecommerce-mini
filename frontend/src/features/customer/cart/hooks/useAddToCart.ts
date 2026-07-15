@@ -10,13 +10,13 @@ export const useAddToCart = () => {
     mutationFn: (payload: AddToCartPayload) =>
       customerCartApi.addToCart(payload),
 
-    onSuccess: (response) => {
+    onSuccess: () => {
       // console.log(
       //   "Before:",
       //   queryClient.getQueryData([CUSTOMER_CART_QUERY_KEY]),
       // );
 
-      queryClient.setQueryData(CUSTOMER_CART_QUERY_KEY.all, response);
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_CART_QUERY_KEY.all });
 
       // console.log(
       //   "After:",
