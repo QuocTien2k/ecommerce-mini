@@ -550,25 +550,35 @@ export class VoucherService {
 
     if (dto.startAt && dto.endAt) {
       if (new Date(dto.startAt) > new Date(dto.endAt)) {
-        throw new BadRequestException('startAt phải trước endAt');
+        throw new BadRequestException(
+          'Thời gian bắt đầu phải trước thời gian kết thúc',
+        );
       }
     }
 
-    if (dto.startAt && new Date(dto.startAt) < now) {
-      throw new BadRequestException('startAt không được ở quá khứ');
+    // Chỉ kiểm tra khi thực sự thay đổi thời gian bắt đầu
+    if (dto.startAt) {
+      const newStartAt = new Date(dto.startAt);
+
+      const isChanged =
+        !current.startAt || newStartAt.getTime() !== current.startAt.getTime();
+
+      if (isChanged && newStartAt < now) {
+        throw new BadRequestException(
+          'Không thể cập nhật thời gian bắt đầu về quá khứ',
+        );
+      }
     }
 
     if (dto.endAt && new Date(dto.endAt) < now) {
-      throw new BadRequestException('endAt không hợp lệ');
+      throw new BadRequestException('Thời gian kết thúc không hợp lệ');
     }
 
-    // usageLimit: không cho giảm dưới usedCount
-    if (dto.usageLimit != null) {
-      if (dto.usageLimit < current.usedCount) {
-        throw new BadRequestException(
-          'usageLimit không được nhỏ hơn usedCount',
-        );
-      }
+    // Không cho giảm giới hạn sử dụng xuống dưới số lượt đã dùng
+    if (dto.usageLimit != null && dto.usageLimit < current.usedCount) {
+      throw new BadRequestException(
+        'Giới hạn sử dụng không được nhỏ hơn số lượt đã sử dụng',
+      );
     }
   }
 
