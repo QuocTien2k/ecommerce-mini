@@ -44,7 +44,7 @@ export const usePublicProductFilter = () => {
 
   const goToPage = (p: number) => {
     updateParams({ trang: p });
-    scrollToTop();
+    //scrollToTop();
   };
 
   /**
@@ -58,7 +58,7 @@ export const usePublicProductFilter = () => {
     debounceRef.current = setTimeout(() => {
       updateParams({
         search: value.trim(),
-        page: 1,
+        trang: 1,
       });
     }, 500);
   };
@@ -66,28 +66,28 @@ export const usePublicProductFilter = () => {
   const setCategoryId = (v: string) => {
     updateParams({
       categoryId: v,
-      page: 1,
+      trang: 1,
     });
   };
 
   const setBrandId = (v: string) => {
     updateParams({
       brandId: v,
-      page: 1,
+      trang: 1,
     });
   };
 
   const setPriceSort = (v: "asc" | "desc" | "") => {
     updateParams({
       priceSort: v,
-      page: 1,
+      trang: 1,
     });
   };
 
   const setMinRating = (v?: number) => {
     updateParams({
       minRating: v ?? null,
-      page: 1,
+      trang: 1,
     });
   };
 
