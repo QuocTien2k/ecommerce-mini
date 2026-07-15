@@ -76,17 +76,29 @@ export const AdminUpdateVoucher = ({
       sonnerToast.dismiss("voucher-update-error");
 
       try {
-        const payload: UpdateVoucherPayload = {
-          isActive: values.isActive,
+        const { dirtyFields } = form.formState;
 
-          usageLimit: values.usageLimit,
+        const payload: UpdateVoucherPayload = {};
 
-          minOrderValue: values.minOrderValue,
+        if (dirtyFields.isActive) {
+          payload.isActive = values.isActive;
+        }
 
-          startAt: values.startAt || undefined,
+        if (dirtyFields.usageLimit) {
+          payload.usageLimit = values.usageLimit;
+        }
 
-          endAt: values.endAt || undefined,
-        };
+        if (dirtyFields.minOrderValue) {
+          payload.minOrderValue = values.minOrderValue;
+        }
+
+        if (dirtyFields.startAt) {
+          payload.startAt = values.startAt || undefined;
+        }
+
+        if (dirtyFields.endAt) {
+          payload.endAt = values.endAt || undefined;
+        }
 
         const result = await run(() =>
           updateVoucherMutation.mutateAsync({
