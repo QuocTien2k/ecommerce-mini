@@ -1,4 +1,4 @@
-import { VoucherScope, VoucherType } from '@prisma/client';
+import { VoucherScope, VoucherTarget, VoucherType } from '@prisma/client';
 
 export class AvailableVoucherDto {
   id: string;
@@ -14,6 +14,8 @@ export class AvailableVoucherDto {
   minOrderValue: number | null;
 
   scope: VoucherScope;
+
+  target: VoucherTarget;
 
   endAt: Date | null;
 

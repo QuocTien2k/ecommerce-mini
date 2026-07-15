@@ -798,6 +798,7 @@ export class VoucherService {
             ? Number(voucher.minOrderValue)
             : null,
           scope: voucher.scope,
+          target: voucher.target,
           endAt: voucher.endAt,
           subtotal: result.subtotal,
           appliedSubtotal: result.appliedSubtotal,
