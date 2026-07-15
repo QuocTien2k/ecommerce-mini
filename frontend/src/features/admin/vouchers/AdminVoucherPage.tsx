@@ -1,11 +1,5 @@
 import { useState } from "react";
 import { useAdminVouchersQuery } from "./hooks/useAdminVoucherQuery";
-import {
-  VOUCHER_SCOPES,
-  VOUCHER_TARGETS,
-  VOUCHER_TYPES,
-  type AdminVoucher,
-} from "./types/admin-voucher.type";
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Title } from "@components/ui/title-module";
 import { Button } from "@components/ui/button";
@@ -27,6 +21,12 @@ import { ConfirmModal } from "@components/common/confirm";
 import { useAdminVoucherFilter } from "./hooks/useAdminVoucherFilter";
 import { AssignVoucherDialog } from "./components/assign-voucher/AssignVoucherDialog";
 import { getErrorMessage } from "@lib/error-message";
+import type { AdminVoucher } from "./types/admin-voucher.type";
+import {
+  VOUCHER_SCOPES,
+  VOUCHER_TARGETS,
+  VOUCHER_TYPES,
+} from "@shared/types/voucher";
 
 type PendingAction = "update" | "delete" | null;
 

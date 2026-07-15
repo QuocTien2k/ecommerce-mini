@@ -16,7 +16,7 @@ import {
   type VoucherStatus,
   type VoucherTarget,
   type VoucherType,
-} from "@features/admin/vouchers/types/admin-voucher.type";
+} from "@shared/types/voucher";
 
 type Props = {
   filters: {

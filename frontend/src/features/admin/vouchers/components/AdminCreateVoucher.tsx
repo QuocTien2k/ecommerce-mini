@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-
 import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
 import { X } from "lucide-react";
@@ -26,11 +25,11 @@ import {
   VOUCHER_SCOPES,
   VOUCHER_TARGETS,
   VOUCHER_TYPES,
-  type CreateVoucherPayload,
   type VoucherScope,
   type VoucherTarget,
   type VoucherType,
-} from "../types/admin-voucher.type";
+} from "@shared/types/voucher";
+import type { CreateVoucherPayload } from "../types/admin-voucher.type";
 
 type CreateVoucherFormProps = {
   open: boolean;

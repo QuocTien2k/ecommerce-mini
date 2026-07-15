@@ -8,11 +8,9 @@ import { Label } from "@components/ui/label";
 import { useAdminUpdateVoucherForm } from "@features/admin/vouchers/forms/use-admin-update-voucher-form";
 
 import type { UpdateVoucherFormOutput } from "@features/admin/vouchers/schema/admin-voucher";
-import {
-  VOUCHER_SCOPES,
-  VOUCHER_TYPES,
-  type AdminVoucher,
-  type UpdateVoucherPayload,
+import type {
+  AdminVoucher,
+  UpdateVoucherPayload,
 } from "@features/admin/vouchers/types/admin-voucher.type";
 import { getErrorMessage } from "@lib/error-message";
 import { sonnerToast } from "@lib/sonner-toast";
@@ -21,6 +19,7 @@ import { format } from "date-fns";
 import { CircleCheckBig, CircleX, X } from "lucide-react";
 import { useEffect } from "react";
 import { useAdminUpdateVoucher } from "../hooks/useAdminUpdateVoucher";
+import { VOUCHER_SCOPES, VOUCHER_TYPES } from "@shared/types/voucher";
 
 type UpdateVoucherFormProps = {
   open: boolean;

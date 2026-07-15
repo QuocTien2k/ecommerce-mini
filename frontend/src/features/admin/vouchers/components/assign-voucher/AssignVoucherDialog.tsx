@@ -8,10 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { AssignVoucherForm } from "./AssignVoucherForm";
 import { useAdminAssignVoucherForm } from "../../forms/use-admin-assign-voucher";
-import {
-  VOUCHER_TARGETS,
-  type AdminVoucher,
-} from "../../types/admin-voucher.type";
+import type { AdminVoucher } from "../../types/admin-voucher.type";
+import { VOUCHER_TARGETS } from "@shared/types/voucher";
 
 type AssignVoucherDialogProps = {
   open: boolean;

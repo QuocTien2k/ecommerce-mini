@@ -2,7 +2,7 @@ import type {
   VoucherScope,
   VoucherTarget,
   VoucherType,
-} from "@features/admin/vouchers/types/admin-voucher.type";
+} from "@shared/types/voucher";
 
 export interface CustomerVoucher {
   id: string;
@@ -48,6 +48,7 @@ export interface AvailableVoucher {
 
   type: VoucherType;
   scope: VoucherScope;
+  target: VoucherTarget;
 
   value: number;
   maxDiscount: number | null;

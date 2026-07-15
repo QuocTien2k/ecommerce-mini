@@ -1,14 +1,14 @@
 import { QueryStateWrapper } from "@components/query/QueryStateWrapper";
 import { Button } from "@components/ui/button";
-
 import { X } from "lucide-react";
 import { useAdminVoucherDetailQuery } from "../hooks/useAdminVoucherQuery";
+
+import { formatCurrency } from "@lib/format-currency";
 import {
   VOUCHER_SCOPES,
   VOUCHER_TARGETS,
   VOUCHER_TYPES,
-} from "../types/admin-voucher.type";
-import { formatCurrency } from "@lib/format-currency";
+} from "@shared/types/voucher";
 
 type AdminVoucherDetailModalProps = {
   open: boolean;

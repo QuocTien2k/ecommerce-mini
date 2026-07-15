@@ -1,9 +1,9 @@
-import { z } from "zod";
 import {
   VOUCHER_SCOPES,
   VOUCHER_TARGETS,
   VOUCHER_TYPES,
-} from "../types/admin-voucher.type";
+} from "@shared/types/voucher";
+import { z } from "zod";
 
 const optionalPositiveNumber = (
   invalidMessage: string,
