@@ -747,8 +747,23 @@ export class VoucherService {
     return Array.from(unique.values());
   }
 
-  private async previewVoucher(voucher: Voucher, subtotal: number) {
-    const appliedSubtotal = subtotal;
+  private async previewVoucher(
+    voucher: Voucher & {
+      products: { id: string }[];
+      categories: { id: string }[];
+    },
+    items: {
+      productId: string;
+      quantity: number;
+      price: number;
+      categoryId: string;
+    }[],
+    subtotal: number,
+  ) {
+    const { appliedSubtotal } = await this.resolveApplicableItems(
+      voucher,
+      items,
+    );
 
     const discount = this.calculateVoucherDiscount(voucher, appliedSubtotal);
 
@@ -765,16 +780,20 @@ export class VoucherService {
 
   async getAvailableVouchers(
     userId: string,
-    subtotal: number,
+    items: {
+      productId: string;
+      quantity: number;
+      price: number;
+      categoryId: string;
+    }[],
   ): Promise<AvailableVoucherDto[]> {
     const vouchers = await this.resolveUserVouchers(userId);
-    console.log(
-      vouchers.map(({ voucher }) => ({
-        code: voucher.code,
-        scope: voucher.scope,
-        userVouchers: voucher.userVouchers.length,
-      })),
+
+    const subtotal = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
     );
+
     const availableVouchers: AvailableVoucherDto[] = [];
 
     for (const { voucher } of vouchers) {
@@ -787,7 +806,12 @@ export class VoucherService {
           remaining = this.validateUserVoucher(voucher.userVouchers[0] ?? null);
         }
 
-        const result = await this.previewVoucher(voucher, subtotal);
+        const result = await this.previewVoucher(voucher, items, subtotal);
+
+        if (result.appliedSubtotal <= 0) {
+          continue;
+        }
+
         availableVouchers.push({
           id: voucher.id,
           code: voucher.code,
@@ -811,14 +835,54 @@ export class VoucherService {
       }
     }
 
-    console.log(
-      availableVouchers.map((v) => ({
-        code: v.code,
-        remainingUsage: v.remainingUsage,
-      })),
+    return availableVouchers;
+  }
+
+  //
+  private async resolveApplicableItems(
+    voucher: Voucher & {
+      products: { id: string }[];
+      categories: { id: string }[];
+    },
+    items: {
+      productId: string;
+      quantity: number;
+      price: number;
+      categoryId: string;
+    }[],
+  ) {
+    let applicableItems = items;
+
+    if (voucher.scope === VoucherScope.PRODUCT) {
+      const allowed = new Set(voucher.products.map((p) => p.id));
+
+      applicableItems = items.filter((i) => allowed.has(i.productId));
+    }
+
+    if (voucher.scope === VoucherScope.CATEGORY) {
+      const allowed = new Set(voucher.categories.map((c) => c.id));
+
+      const enrichedWithAncestors = await Promise.all(
+        items.map(async (i) => ({
+          ...i,
+          ancestorIds: await this.categoryService.getAncestorIds(i.categoryId),
+        })),
+      );
+
+      applicableItems = enrichedWithAncestors.filter((i) =>
+        i.ancestorIds.some((id) => allowed.has(id)),
+      );
+    }
+
+    const appliedSubtotal = applicableItems.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0,
     );
 
-    return availableVouchers;
+    return {
+      applicableItems,
+      appliedSubtotal,
+    };
   }
 
   /*Case apply*/
@@ -897,45 +961,9 @@ export class VoucherService {
       throw new BadRequestException('Không đạt giá trị đơn tối thiểu');
     }
 
-    let applicableItems = enrichedItems;
-
-    if (voucher.scope === VoucherScope.PRODUCT) {
-      const allowed = new Set(voucher.products.map((p) => p.id));
-      applicableItems = enrichedItems.filter((i) => allowed.has(i.productId));
-    }
-
-    if (voucher.scope === VoucherScope.CATEGORY) {
-      const allowed = new Set(voucher.categories.map((c) => c.id));
-
-      const enrichedWithAncestors = await Promise.all(
-        enrichedItems.map(async (i) => {
-          const ancestorIds = await this.categoryService.getAncestorIds(
-            i.categoryId,
-          );
-          // console.log('=== VOUCHER CATEGORY ===');
-          // console.log(voucher.categories.map((c) => c.id));
-
-          // console.log('=== PRODUCT ROOT CHAIN ===');
-          // console.log({
-          //   productId: i.productId,
-          //   ancestorIds,
-          // });
-
-          return {
-            ...i,
-            ancestorIds,
-          };
-        }),
-      );
-
-      applicableItems = enrichedWithAncestors.filter((i) =>
-        i.ancestorIds.some((id) => allowed.has(id)),
-      );
-    }
-
-    const appliedSubtotal = applicableItems.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0,
+    const { appliedSubtotal } = await this.resolveApplicableItems(
+      voucher,
+      enrichedItems,
     );
 
     if (appliedSubtotal <= 0) {

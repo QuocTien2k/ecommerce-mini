@@ -9,18 +9,27 @@ import { AddToCartDto } from './dtos/add-to-cart.dto';
 import { buildCartResponse } from './mappers/cart.mapper';
 import { UpdateCartItemDto } from './dtos/update-cart.dto';
 import { Prisma } from '@prisma/client';
+import { VoucherService } from '@voucher/voucher.service';
 
 @Injectable()
 export class CartItemsService {
   constructor(
     private prisma: PrismaService,
     private cartPricingService: CartPricingService,
+    private readonly voucherService: VoucherService,
   ) {}
 
   async getMyCart(userId: string) {
     const items = await this.prisma.cartItem.findMany({
       where: { userId },
-      include: { variant: true },
+      include: {
+        variant: true,
+        product: {
+          select: {
+            categoryId: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -32,7 +41,7 @@ export class CartItemsService {
     const { itemTotals, totalPrice, totalQuantity } =
       this.cartPricingService.calculateCart(pricingInput);
 
-    return buildCartResponse(
+    const cart = buildCartResponse(
       items.map((i) => ({
         ...i,
         productImage: i.productImage ?? undefined,
@@ -41,6 +50,23 @@ export class CartItemsService {
       totalQuantity,
       totalPrice,
     );
+
+    const voucherItems = items.map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      price: Number(item.price),
+      categoryId: item.product.categoryId,
+    }));
+
+    const availableVouchers = await this.voucherService.getAvailableVouchers(
+      userId,
+      voucherItems,
+    );
+
+    return {
+      ...cart,
+      availableVouchers,
+    };
   }
 
   async addToCart(userId: string, dto: AddToCartDto) {
