@@ -56,8 +56,9 @@ const OrderPage = () => {
   const createMomoPayment = useCreateMomoPayment();
   const navigate = useNavigate();
 
-  const isSubmitting =
-    createOrderMutation.isPending ||
+  const isCreatingOrder = createOrderMutation.isPending;
+
+  const isRedirectingPayment =
     createCodPayment.isPending ||
     createVnpayPayment.isPending ||
     createMomoPayment.isPending;
@@ -65,7 +66,7 @@ const OrderPage = () => {
   const handleCreateOrder = form.handleSubmit(async (values) => {
     if (!cart || cart.items.length === 0) return;
 
-    sonnerToast.dismiss("checkout-error");
+    //sonnerToast.dismiss("checkout-error");
 
     try {
       const res = await createOrderMutation.mutateAsync({
@@ -114,9 +115,10 @@ const OrderPage = () => {
     } catch (error) {
       console.error("Create order error:", error);
 
-      sonnerToast.error(getErrorMessage(error, "Đặt hàng thất bại"), {
-        id: "checkout-error",
-      });
+      // sonnerToast.error(getErrorMessage(error, "Đặt hàng thất bại"), {
+      //   id: "checkout-error",
+      // });
+      sonnerToast.error(getErrorMessage(error, "Đặt hàng thất bại"));
     }
   });
 
@@ -146,8 +148,8 @@ const OrderPage = () => {
 
   return (
     <QueryStateWrapper
-      isLoading={isLoading || isSubmitting}
-      fullscreen={isSubmitting}
+      isLoading={isLoading || isRedirectingPayment}
+      fullscreen={isRedirectingPayment}
       loadingText="Đang chuyển đến cổng thanh toán..."
     >
       <div className="container py-6 space-y-6">
@@ -168,7 +170,7 @@ const OrderPage = () => {
                 totalPrice={cart.totalPrice}
                 totalQuantity={cart.totalQuantity}
                 selectedVoucher={selectedVoucher}
-                isSubmitting={createOrderMutation.isPending}
+                isSubmitting={isCreatingOrder || isRedirectingPayment}
                 onSubmit={handleCreateOrder}
               />
 
