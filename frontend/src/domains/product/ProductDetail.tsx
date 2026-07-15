@@ -106,7 +106,9 @@ const ProductDetail = () => {
     );
   }
 
-  const isOutOfStock = (selectedVariant?.stock ?? 0) <= 0;
+  const isVariantUnavailable = !selectedVariant;
+
+  const isOutOfStock = selectedVariant?.stock === 0;
 
   const handleAddToCart = async () => {
     if (!selectedVariant || loading) return;
@@ -131,9 +133,29 @@ const ProductDetail = () => {
     }
   };
 
+  const handleSelectColor = (color: string) => {
+    if (!product) return;
+
+    setSelectedColor(color);
+
+    const firstVariant = product.variants.find(
+      (variant) => variant.color === color,
+    );
+
+    if (firstVariant) {
+      setSelectedAttributes(firstVariant.attributes);
+    }
+  };
+
   //console.log("Product: ", product.variants);
 
   const hasDiscount = product.discountPrice != null;
+
+  // console.log({
+  //   selectedColor,
+  //   selectedAttributes,
+  //   selectedVariant,
+  // });
 
   return (
     <QueryStateWrapper isLoading={isLoading}>
@@ -258,7 +280,7 @@ ${
                 {options.colors.map((color) => (
                   <button
                     key={color}
-                    onClick={() => setSelectedColor(color)}
+                    onClick={() => handleSelectColor(color)}
                     className={`rounded-md border px-4 py-2 text-sm transition-colors cursor-pointer duration-200
     ${selectedColor === color ? "border-black bg-black text-white" : "border-transparent text-gray-700 hover:bg-gray-100"}`}
                   >
@@ -321,15 +343,25 @@ ${
 
             {/* Actions */}
             <div className="pt-2">
+              {isVariantUnavailable && (
+                <p className="mt-2 text-sm text-destructive">
+                  Phiên bản bạn chọn hiện không có.
+                </p>
+              )}
+
+              {!isVariantUnavailable && isOutOfStock && (
+                <p className="mt-2 text-sm text-destructive">Đã hết hàng.</p>
+              )}
+
               <AsyncButton
-                size={"lg"}
+                size="lg"
                 loading={loading}
-                disabled={loading || isOutOfStock}
+                disabled={loading || isOutOfStock || isVariantUnavailable}
                 onClick={handleAddToCart}
                 className="h-12 px-6 text-lg font-semibold inline-flex items-center gap-2"
               >
                 <ShoppingCart className="size-5" />
-                {isOutOfStock ? "Hết hàng" : "Thêm vào giỏ hàng"}
+                Thêm vào giỏ hàng
               </AsyncButton>
             </div>
           </div>
