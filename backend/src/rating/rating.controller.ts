@@ -9,7 +9,6 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -23,8 +22,8 @@ export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
 
   @Get(':productId/me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard)
   async getMyRating(
     @CurrentUser('sub') userId: string,
     @Param('productId', new ParseUUIDPipe()) productId: string,
@@ -33,8 +32,8 @@ export class RatingController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Đánh giá sản phẩm thành công!')
   async upsertRating(
     @CurrentUser('sub') userId: string,
@@ -44,8 +43,8 @@ export class RatingController {
   }
 
   @Delete(':productId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.USER)
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Xóa đánh giá thành công!')
   async delete(
     @CurrentUser('sub') userId: string,
