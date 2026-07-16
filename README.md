@@ -1,98 +1,216 @@
+# Mini E-Commerce
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://capsule-render.vercel.app/api?type=waving&height=220&text=Mini%20E-Commerce&fontSize=45&fontAlignY=40&color=0:0ea5e9,100:2563eb&fontColor=ffffff"/>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=react,nestjs,ts,vite,postgres,prisma,redux,tailwind,nodejs"/>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![NestJS](https://img.shields.io/badge/NestJS-11-E0234E)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)
 
-## Project setup
+</p>
 
-```bash
-$ npm install
+## 📖 Overview
+
+Mini E-Commerce is a full-stack web application that simulates a modern online shopping platform. The project is built with a separated Frontend and Backend architecture, focusing on scalability, maintainability, and clean code organization.
+
+## ✨ Features
+
+### Customer
+
+- Authentication (JWT + Refresh Token)
+- Browse products, categories and brands
+- Product search & filtering
+- Shopping cart
+- Wishlist
+- Voucher collection & redemption
+- Product ratings
+- Order management
+- COD, VNPay and MoMo payment
+- Profile management
+- Real-time notifications
+
+### Administrator
+
+- Dashboard & analytics
+- Product management
+- Category management
+- Brand management
+- Voucher management
+- User management
+- Order management
+- Website settings
+
+## 🛠 Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Redux Toolkit
+- TanStack Query
+- React Hook Form
+- Zod
+- Tailwind CSS
+- shadcn/ui
+- Socket.IO Client
+
+### Backend
+
+- NestJS
+- PostgreSQL
+- Prisma ORM
+- Passport JWT
+- Socket.IO
+- Nodemailer
+
+## 🏗 Backend Structure
+
+```text
+backend
+├── prisma
+├── src
+│   ├── common
+│   ├── config
+│   ├── modules
+│   │   ├── auth
+│   │   ├── brand
+│   │   ├── cart-items
+│   │   ├── category
+│   │   ├── dashboard
+│   │   ├── notification
+│   │   ├── order
+│   │   ├── payment
+│   │   ├── product
+│   │   ├── product-variant
+│   │   ├── public
+│   │   ├── rating
+│   │   ├── setting
+│   │   ├── user
+│   │   ├── voucher
+│   │   └── wishlist
+│   ├── app.module.ts
+│   └── main.ts
+└── package.json
 ```
 
-## Compile and run the project
+## 🏗 Frontend Structure
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```text
+frontend
+├── src
+│   ├── app
+│   ├── components
+│   ├── domains
+│   ├── features
+│   │   ├── admin
+│   │   ├── auth
+│   │   ├── customer
+│   │   └── notification
+│   ├── hooks
+│   ├── layouts
+│   ├── lib
+│   ├── pages
+│   ├── providers
+│   ├── routes
+│   ├── services
+│   ├── shared
+│   ├── types
+│   └── utils
+└── package.json
 ```
 
-## Run tests
+## ⚙ Backend Modules
+
+| Module          | Responsibilities                                    |
+| --------------- | --------------------------------------------------- |
+| Auth            | Authentication, JWT, Refresh Token, Forgot Password |
+| Product         | Product CRUD & Product Details                      |
+| Product Variant | Variant Management                                  |
+| Category        | Category Management                                 |
+| Brand           | Brand Management                                    |
+| Cart            | Shopping Cart                                       |
+| Wishlist        | Wishlist                                            |
+| Voucher         | Voucher Management                                  |
+| Order           | Order Lifecycle                                     |
+| Payment         | COD, VNPay, MoMo                                    |
+| Dashboard       | Revenue & Analytics                                 |
+| Notification    | Real-time Notifications                             |
+| Rating          | Product Reviews                                     |
+| User            | Profile & User Management                           |
+| Setting         | Website Settings                                    |
+| Public          | Public APIs                                         |
+
+## 💳 Payment
+
+- Cash on Delivery (COD)
+- VNPay
+- MoMo
+
+Payment flow includes payment creation, signature verification, IPN handling, return URL processing and payment status synchronization.
+
+## 🔔 Real-time Notification
+
+Socket.IO is used to deliver real-time notifications for order status updates and user events.
+
+## 🚀 Getting Started
+
+### Backend
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run start:dev
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Frontend
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
+npm run dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🔑 Environment Variables
 
-## Resources
+Backend
 
-Check out a few resources that may come in handy when working with NestJS:
+```env
+DATABASE_URL=
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+MAIL_HOST=
+MAIL_PORT=
+VNPAY_TMN_CODE=
+MOMO_PARTNER_CODE=
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Frontend
 
-## Support
+```env
+VITE_API_URL=
+VITE_SOCKET_URL=
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📌 Future Improvements
 
-## Stay in touch
+- Docker
+- Redis Cache
+- CI/CD
+- Unit Testing
+- Integration Testing
+- Elasticsearch
+- Multi-language Support
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 👨‍💻 Author
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Developed as a portfolio project for learning modern full-stack web development with React and NestJS.
