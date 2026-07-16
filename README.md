@@ -73,7 +73,37 @@ Mini E-Commerce is a full-stack web application that simulates a modern online s
 - Socket.IO
 - Nodemailer
 
-## 🏗 Backend Structure
+## 🏛 Project Architecture
+
+```text
+                        +----------------------+
+                        |      Web Client      |
+                        |    React + Vite      |
+                        +----------+-----------+
+                                   |
+                     REST API / WebSocket
+                                   |
+                    +--------------v--------------+
+                    |       NestJS Backend        |
+                    | Authentication • Business   |
+                    | Payment • Notification      |
+                    +--------------+--------------+
+                                   |
+                    +--------------v--------------+
+                    | PostgreSQL + Prisma ORM     |
+                    +-----------------------------+
+
+                 External Integrations
+        ┌──────────────┬──────────────┬──────────────┐
+        │    VNPay     │     MoMo     │  Nodemailer  │
+        └──────────────┴──────────────┴──────────────┘
+```
+
+The application follows a separated frontend-backend architecture. The React client communicates with the NestJS backend through REST APIs and WebSocket connections. Business logic is handled by the backend, while Prisma ORM manages data persistence in PostgreSQL. External integrations include VNPay, MoMo, and Nodemailer for payment processing and email services.
+
+---
+
+## 📂 Backend Structure
 
 ```text
 backend
@@ -103,7 +133,9 @@ backend
 └── package.json
 ```
 
-## 🏗 Frontend Structure
+---
+
+## 📂 Frontend Structure
 
 ```text
 frontend
@@ -129,7 +161,9 @@ frontend
 └── package.json
 ```
 
-## ⚙ Backend Modules
+---
+
+## ⚙️ Backend Modules
 
 | Module          | Responsibilities                                    |
 | --------------- | --------------------------------------------------- |
@@ -150,17 +184,31 @@ frontend
 | Setting         | Website Settings                                    |
 | Public          | Public APIs                                         |
 
-## 💳 Payment
+---
 
-- Cash on Delivery (COD)
-- VNPay
-- MoMo
+## 💳 Payment Flow
 
-Payment flow includes payment creation, signature verification, IPN handling, return URL processing and payment status synchronization.
+The system supports three payment methods:
+
+- **Cash on Delivery (COD)**
+- **VNPay**
+- **MoMo**
+
+For online payments (VNPay and MoMo), the payment workflow includes:
+
+1. Create payment transaction.
+2. Redirect the customer to the payment gateway.
+3. Handle the Return URL after payment.
+4. Verify the digital signature.
+5. Process the IPN (Instant Payment Notification).
+6. Synchronize payment status.
+7. Update the corresponding order status.
+
+---
 
 ## 🔔 Real-time Notification
 
-Socket.IO is used to deliver real-time notifications for order status updates and user events.
+Socket.IO is used to deliver real-time notifications for order status updates and other user-related events.
 
 ## 🚀 Getting Started
 
