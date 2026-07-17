@@ -18,6 +18,7 @@ import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { getRefreshTokenCookieOptions } from '@common/helpers/cookie.helper';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { GoogleLoginDto } from './dtos/google-login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -40,6 +41,26 @@ export class AuthController {
     const { accessToken, refreshToken } = await this.authService.login(
       dto.email,
       dto.password,
+    );
+
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      getRefreshTokenCookieOptions(this.configService),
+    );
+
+    return {
+      accessToken,
+    };
+  }
+
+  @Post('google')
+  async googleLogin(
+    @Body() dto: GoogleLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    const { accessToken, refreshToken } = await this.authService.googleLogin(
+      dto.idToken,
     );
 
     res.cookie(

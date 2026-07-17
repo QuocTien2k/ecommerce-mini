@@ -14,15 +14,72 @@ import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ConfigService } from '@nestjs/config';
+import { OAuth2Client } from 'google-auth-library';
+import { AuthProvider, User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
+  private readonly googleClient: OAuth2Client;
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private readonly mailService: MailService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+    );
+  }
+
+  //helper token
+  private async issueTokens(user: User): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    const hashedRefreshToken = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+
+    await this.prisma.refreshToken.updateMany({
+      where: {
+        userId: user.id,
+        isRevoked: false,
+      },
+      data: {
+        isRevoked: true,
+      },
+    });
+
+    await this.prisma.refreshToken.create({
+      data: {
+        tokenHash: hashedRefreshToken,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 
   async signup(data: SignupUserDto) {
     let { email, phone, fullname, password, address } = data;
@@ -86,6 +143,12 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
+    if (!user.password) {
+      throw new UnauthorizedException(
+        'Tài khoản này được đăng ký bằng Google. Vui lòng đăng nhập bằng Google.',
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -98,50 +161,79 @@ export class AuthService {
       );
     }
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    return this.issueTokens(user);
+  }
 
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+  async googleLogin(
+    idToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken,
+      audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
     });
 
-    const refreshToken = crypto.randomBytes(64).toString('hex');
+    const payload = ticket.getPayload();
 
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    if (!payload) {
+      throw new UnauthorizedException('Google token không hợp lệ');
+    }
 
-    // SHA256 hash
-    const hashedRefreshToken = crypto
-      .createHash('sha256')
-      .update(refreshToken)
-      .digest('hex');
+    if (!payload.email) {
+      throw new UnauthorizedException('Google không trả về email');
+    }
 
-    // revoke toàn bộ token cũ của user
-    await this.prisma.refreshToken.updateMany({
+    if (!payload.email_verified) {
+      throw new UnauthorizedException('Email Google chưa được xác minh');
+    }
+
+    const email = payload.email.toLowerCase().trim();
+
+    let user = await this.prisma.user.findUnique({
       where: {
-        userId: user.id,
-        isRevoked: false,
-      },
-      data: {
-        isRevoked: true,
+        email,
       },
     });
 
-    await this.prisma.refreshToken.create({
-      data: {
-        tokenHash: hashedRefreshToken,
-        userId: user.id,
-        expiresAt,
-      },
-    });
+    // Chưa có tài khoản -> tạo mới
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          fullname: payload.name ?? email,
+          avatar: payload.picture,
+          provider: AuthProvider.GOOGLE,
+          googleId: payload.sub,
+        },
+      });
+    } else {
+      // Đã có tài khoản LOCAL nhưng chưa liên kết Google
+      if (!user.googleId) {
+        user = await this.prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            googleId: payload.sub,
+            avatar: user.avatar ?? payload.picture,
+          },
+        });
+      }
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+      // Đã liên kết Google nhưng không đúng tài khoản Google
+      if (user.googleId !== payload.sub) {
+        throw new UnauthorizedException(
+          'Google account không khớp với tài khoản đã liên kết.',
+        );
+      }
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException(
+        'Tài khoản đã bị khóa. Vui lòng liên hệ hỗ trợ qua email.',
+      );
+    }
+
+    return this.issueTokens(user);
   }
 
   async refresh(refreshToken: string) {

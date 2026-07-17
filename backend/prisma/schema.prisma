@@ -8,6 +8,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
 enum VariantType {
   NONE          //thiết bị gia dụng
 
@@ -426,9 +430,12 @@ model UserVoucher {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  provider AuthProvider @default(LOCAL)
+
+  googleId String? @unique
   phone     String?  @unique
   fullname  String
-  password  String
+  password  String?
   avatar    String?
   avatarPublicId String?
   address   String?
@@ -452,6 +459,7 @@ model User {
 
   @@index([role, isActive])
   @@index([createdAt])
+  @@index([provider])
 
   @@map("users")
 }

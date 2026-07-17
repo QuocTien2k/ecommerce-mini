@@ -99,6 +99,12 @@ export class UserService {
       throw new NotFoundException('Người dùng không tồn tại!');
     }
 
+    if (!user.password) {
+      throw new BadRequestException(
+        'Tài khoản này đăng nhập bằng Google và chưa thiết lập mật khẩu.',
+      );
+    }
+
     //Check old password
     const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
     if (!isMatch) {
