@@ -13,6 +13,7 @@ import { AsyncButton } from "@components/common/async-button";
 import { useFlashMessage } from "@/hooks/flash-message";
 import { userApi } from "@features/admin/user/api/user.api";
 import { setUser } from "@features/admin/user/store/user.slice";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -30,42 +31,60 @@ const Login = () => {
   const showPasswordError =
     errors.password && (dirtyFields.password || isSubmitted);
 
+  const loginSuccess = async (accessToken: string) => {
+    dispatch(setCredentials({ accessToken, role: null }));
+
+    const profile = await userApi.getMe();
+
+    dispatch(setUser(profile.data));
+    dispatch(
+      setCredentials({
+        accessToken,
+        role: profile.data.role,
+      }),
+    );
+
+    localStorage.setItem("hasAuthHint", "true");
+
+    navigate(profile.data.role === Role.ADMIN ? "/admin" : "/");
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     //toast
     sonnerToast.dismiss("login-error");
     try {
-      const user = await run(
+      await run(
         async () => {
           const res = await authApi.login(data.email, data.password);
-          //console.log("Res: ", res.data.accessToken);
-          const accessToken = res.data.accessToken;
-
-          dispatch(setCredentials({ accessToken, role: null }));
-
-          const profile = await userApi.getMe();
-          //console.log("profile: ", profile.data.role);
-
-          dispatch(setUser(profile.data));
-          dispatch(
-            setCredentials({
-              accessToken,
-              role: profile.data.role,
-            }),
-          );
-
-          localStorage.setItem("hasAuthHint", "true");
-
-          return profile;
+          await loginSuccess(res.data.accessToken);
         },
         { minDuration: 600 },
       );
-
-      navigate(user.data.role === Role.ADMIN ? "/admin" : "/");
     } catch (error) {
-      console.log("Login error:", error);
       sonnerToast.error(getErrorMessage(error, "Đăng nhập thất bại"), {
         id: "login-error",
       });
+    }
+  };
+
+  const handleGoogleLogin = async (idToken: string) => {
+    sonnerToast.dismiss("login-error");
+
+    try {
+      await run(
+        async () => {
+          const res = await authApi.googleLogin(idToken);
+          await loginSuccess(res.data.accessToken);
+        },
+        { minDuration: 600 },
+      );
+    } catch (error) {
+      sonnerToast.error(
+        getErrorMessage(error, "Đăng nhập bằng Google thất bại"),
+        {
+          id: "login-error",
+        },
+      );
     }
   };
 
@@ -106,15 +125,48 @@ const Login = () => {
           </p>
         </div>
 
-        <div className="flex justify-center">
-          <AsyncButton
-            loading={loading}
-            type="submit"
-            className="px-6 py-5"
-            loadingText="Đang đăng nhập"
-          >
-            Đăng nhập
-          </AsyncButton>
+        {/*Login*/}
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <AsyncButton
+              loading={loading}
+              type="submit"
+              className="h-11 w-full"
+              loadingText="Đang đăng nhập"
+            >
+              Đăng nhập
+            </AsyncButton>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Hoặc
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              theme="outline"
+              size="large"
+              shape="pill"
+              text="continue_with"
+              width="320"
+              onSuccess={(credentialResponse) => {
+                if (!credentialResponse.credential) return;
+
+                handleGoogleLogin(credentialResponse.credential);
+              }}
+              onError={() => {
+                sonnerToast.error("Đăng nhập Google thất bại");
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex justify-between text-sm">
