@@ -7,5 +7,6 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   READY_TO_SHIP: 'Đã ra kho',
   SHIPPING: 'Đang giao',
   DELIVERED: 'Đã giao thành công',
+  DELIVERY_FAILED: 'Giao hàng thất bại',
   CANCELLED: 'Đã hủy',
 };

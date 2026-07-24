@@ -396,8 +396,9 @@ export class OrderService {
     CONFIRMED: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
     PROCESSING: [OrderStatus.READY_TO_SHIP, OrderStatus.CANCELLED],
     READY_TO_SHIP: [OrderStatus.SHIPPING],
-    SHIPPING: [OrderStatus.DELIVERED],
+    SHIPPING: [OrderStatus.DELIVERED, OrderStatus.DELIVERY_FAILED],
     DELIVERED: [],
+    DELIVERY_FAILED: [],
     CANCELLED: [],
   };
 
