@@ -19,6 +19,7 @@ import { useScopedLoading } from "@/hooks/use-scoped-loading";
 import { sonnerToast } from "@lib/sonner-toast";
 import { getErrorMessage } from "@lib/error-message";
 import { AsyncButton } from "@components/common/async-button";
+import { ORDER_STATUS_TRANSITIONS } from "../types/adimn-order.type";
 
 interface AdminOrderUpdateProps {
   open: boolean;
@@ -39,10 +40,15 @@ const AdminUpdateOrder = ({
   const updateOrder = useUpdateOrderStatus();
   const [status, setStatus] = useState<OrderStatus | "">("");
 
+  const availableStatuses = data?.status
+    ? ORDER_STATUS_TRANSITIONS[data.status]
+    : [];
+
   useEffect(() => {
-    if (data?.status) {
-      setStatus(data.status);
-    }
+    if (!data?.status) return;
+
+    const nextStatuses = ORDER_STATUS_TRANSITIONS[data.status];
+    setStatus(nextStatuses[0] ?? "");
   }, [data]);
 
   const handleUpdate = async () => {
@@ -133,21 +139,36 @@ const AdminUpdateOrder = ({
             <Select
               value={status}
               onValueChange={(value) => setStatus(value as OrderStatus)}
+              disabled={availableStatuses.length === 0}
             >
               <SelectTrigger className="mt-2 w-full">
-                <SelectValue placeholder="Chọn trạng thái" />
+                <SelectValue
+                  placeholder={
+                    availableStatuses.length === 0
+                      ? "Không thể cập nhật"
+                      : "Chọn trạng thái"
+                  }
+                />
               </SelectTrigger>
 
               <SelectContent position="popper">
-                {ORDER_STATUS_OPTIONS.filter((opt) => opt.value !== "ALL").map(
-                  (opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ),
-                )}
+                {ORDER_STATUS_OPTIONS.filter(
+                  (opt) =>
+                    opt.value !== "ALL" &&
+                    availableStatuses.includes(opt.value as OrderStatus),
+                ).map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+
+            {availableStatuses.length === 0 && (
+              <p className="mt-2 text-sm font-medium text-amber-600">
+                Đơn hàng đã ở trạng thái cuối, không thể cập nhật.
+              </p>
+            )}
           </div>
 
           {/* Action */}
@@ -159,7 +180,11 @@ const AdminUpdateOrder = ({
             <AsyncButton
               type="button"
               loading={loading}
-              disabled={loading || status === data?.status}
+              disabled={
+                loading ||
+                availableStatuses.length === 0 ||
+                status === data?.status
+              }
               onClick={handleUpdate}
             >
               Cập nhật
