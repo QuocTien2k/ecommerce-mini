@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class MomoCallbackDto {
   @IsString()
@@ -41,6 +41,11 @@ export class MomoCallbackDto {
 
   @IsString()
   signature: string;
+
+  // MoMo may introduce additional optional callback fields over time.
+  @IsOptional()
+  @IsString()
+  profileId?: string;
 }
 
 export class MomoIpnDto extends MomoCallbackDto {}
