@@ -16,7 +16,10 @@ export const ORDER_FLOW_TIMELINE: OrderStatus[] = [
 /**
  * TERMINAL STATUS: không thuộc flow chính
  */
-export const ORDER_TERMINAL_STATUS: OrderStatus[] = ["CANCELLED"];
+export const ORDER_TERMINAL_STATUS: OrderStatus[] = [
+  "DELIVERY_FAILED",
+  "CANCELLED",
+];
 
 /**
  * LABEL hiển thị (dùng cho admin + user UI)
@@ -28,6 +31,7 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   READY_TO_SHIP: "Đã xuất kho",
   SHIPPING: "Đang vận chuyển",
   DELIVERED: "Giao thành công",
+  DELIVERY_FAILED: "Giao hàng thất bại",
   CANCELLED: "Đã huỷ",
 };
 
@@ -49,6 +53,7 @@ export const ORDER_STATUS_COLORS: Partial<Record<OrderStatus, string>> = {
   READY_TO_SHIP: "bg-cyan-100 text-cyan-700",
   SHIPPING: "bg-purple-100 text-purple-700",
   DELIVERED: "bg-green-100 text-green-700",
+  DELIVERY_FAILED: "bg-red-100 text-red-700",
   CANCELLED: "bg-red-100 text-red-700",
 };
 

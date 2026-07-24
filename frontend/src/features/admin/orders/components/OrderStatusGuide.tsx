@@ -93,6 +93,10 @@ export default function OrderStatusGuideModal({
                   Khi đơn hàng đã giao thành công hoặc đã hủy thì không thể cập
                   nhật sang trạng thái khác.
                 </li>
+                <li>
+                  Nếu khách hàng không nhận hàng hoặc đơn vị vận chuyển không
+                  giao thành công, hãy cập nhật trạng thái "Giao hàng thất bại".
+                </li>
               </ul>
             </div>
           </div>

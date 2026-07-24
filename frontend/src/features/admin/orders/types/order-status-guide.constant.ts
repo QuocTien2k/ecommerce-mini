@@ -20,10 +20,14 @@ export const ORDER_STATUS_GUIDE: OrderStatusGuideItem[] = [
   },
   {
     currentStatus: ORDER_STATUSES.SHIPPING,
-    nextStatuses: [ORDER_STATUSES.DELIVERED],
+    nextStatuses: [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.DELIVERY_FAILED],
   },
   {
     currentStatus: ORDER_STATUSES.DELIVERED,
+    nextStatuses: [],
+  },
+  {
+    currentStatus: ORDER_STATUSES.DELIVERY_FAILED,
     nextStatuses: [],
   },
   {
